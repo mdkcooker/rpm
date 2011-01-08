@@ -1,0 +1,25 @@
+From 4e572593b43a91c17957013aa1fa80d4b6a39c7d Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 04/35] provides obsoleted
+
+---
+ lib/depends.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/lib/depends.c b/lib/depends.c
+index 810e909..ad21d4f 100644
+--- a/lib/depends.c
++++ b/lib/depends.c
+@@ -343,7 +343,7 @@ addheader:
+ 	     * If no obsoletes version info is available, match all names.
+ 	     */
+ 	    if (rpmdsEVR(obsoletes) == NULL
+-	     || rpmdsAnyMatchesDep(oh, obsoletes, _rpmds_nopromote)) {
++	     || rpmdsNVRMatchesDep(oh, obsoletes, _rpmds_nopromote)) {
+ 		char * ohNEVRA = headerGetNEVRA(oh, NULL);
+ #ifdef	DYING	/* XXX see http://bugzilla.redhat.com #134497 */
+ 		if (rpmVersionCompare(h, oh))
+-- 
+1.6.1.3
+

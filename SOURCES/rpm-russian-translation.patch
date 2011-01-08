@@ -1,0 +1,25 @@
+From fb82549acdac355b95ef3895d8e0100bf15c543e Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 21/35] russian translation
+
+---
+ po/ru.po |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/po/ru.po b/po/ru.po
+index fe4c994..4770302 100644
+--- a/po/ru.po
++++ b/po/ru.po
+@@ -1477,7 +1477,7 @@ msgstr "
+ 
+ #: lib/cpio.c:229
+ msgid " failed - "
+-msgstr "не удалось - "
++msgstr " не удалось - "
+ 
+ #: lib/depends.c:203
+ #, fuzzy, c-format
+-- 
+1.6.1.3
+

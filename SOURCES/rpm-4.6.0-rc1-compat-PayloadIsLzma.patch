@@ -1,0 +1,44 @@
+From 6ba8e42403610de9f22f6ebcde7761635e0ad38e Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Thu, 12 Feb 2009 10:59:31 +0000
+Subject: [PATCH 15/35] compat PayloadIsLzma
+
+- rpm must feature PayloadIsLzma = 4.4.2-1 to be the most compatible (?!)
+  (with SuSE, and with temporary cooker packages with PayloadIsLzma <= 4.4.2.2-1)
+
+- built packages must require PayloadIsLzma <= 4.4.6-1 to be compatible with
+  mandriva 2008.0
+---
+ build/pack.c |    2 +-
+ lib/rpmds.c  |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/build/pack.c b/build/pack.c
+index 523367b..2745f34 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -385,7 +385,7 @@ rpmRC writeRPM(Header *hdrp, unsigned char ** pkgidp, const char *fileName,
+ 	    (void) rpmlibNeedsFeature(h, "PayloadIsBzip2", "3.0.5-1");
+ 	} else if (strcmp(s+1, "lzdio") == 0) {
+ 	    compr = "lzma";
+-	    (void) rpmlibNeedsFeature(h, "PayloadIsLzma", "4.4.90-1");
++	    (void) rpmlibNeedsFeature(h, "PayloadIsLzma", "4.4.6-1");
+ 	} else {
+ 	    rpmlog(RPMLOG_ERR, _("Unknown payload compression: %s\n"),
+ 		   rpmio_flags);
+diff --git a/lib/rpmds.c b/lib/rpmds.c
+index cdcf3a8..ff0c8a9 100644
+--- a/lib/rpmds.c
++++ b/lib/rpmds.c
+@@ -985,7 +985,7 @@ static const struct rpmlibProvides_s rpmlibProvides[] = {
+ 	(RPMSENSE_RPMLIB|RPMSENSE_EQUAL),
+     N_("package payload can be compressed using bzip2.") },
+ #endif
+-    { "rpmlib(PayloadIsLzma)",		"4.4.90-1",
++    { "rpmlib(PayloadIsLzma)",		"4.4.2-1",
+ 	(RPMSENSE_RPMLIB|RPMSENSE_EQUAL),
+     N_("package payload can be compressed using lzma.") },
+     { "rpmlib(PayloadFilesHavePrefix)",	"4.0-1",
+-- 
+1.6.1.3
+

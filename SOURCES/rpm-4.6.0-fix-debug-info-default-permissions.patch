@@ -1,0 +1,13 @@
+Index: rpm-4.6.0/macros.in
+===================================================================
+--- rpm-4.6.0/macros.in
++++ rpm-4.6.0/macros.in	2010-05-12 18:26:55.929790222 +0200
+@@ -183,7 +183,7 @@
+ Debug information is useful when developing applications that use this\
+ package or when debugging this package.\
+ %files debug -f debugfiles.list\
+-%defattr(-,root,root)\
++%defattr(644,root,root,755)\
+ %endif\
+ %{nil}
+ 

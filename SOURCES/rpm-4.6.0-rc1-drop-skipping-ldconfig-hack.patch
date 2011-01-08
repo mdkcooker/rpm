@@ -1,0 +1,65 @@
+From e3fc88544e38da33480a5d6b70c6becbbe0cd0ff Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 22/35] drop skipping ldconfig hack
+
+---
+ lib/psm.c |   23 -----------------------
+ 1 files changed, 0 insertions(+), 23 deletions(-)
+
+diff --git a/lib/psm.c b/lib/psm.c
+index 0d0aa7a..c7445d5 100644
+--- a/lib/psm.c
++++ b/lib/psm.c
+@@ -569,10 +569,6 @@ static rpmRC runLuaScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t argv,
+ 
+ /**
+  */
+-static int ldconfig_done = 0;
+-
+-static const char * ldconfig_path = "/sbin/ldconfig";
+-
+ static void doScriptExec(rpmts ts, ARGV_const_t argv, rpmtd prefixes,
+ 			FD_t scriptFd, FD_t out)
+ {
+@@ -714,27 +710,11 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
+ 
+     psm->sq.reaper = 1;
+ 
+-    /*
+-     * If a successor node, and ldconfig was just run, don't bother.
+-     */
+-    if (ldconfig_path && *argvp != NULL && psm->unorderedSuccessor) {
+- 	if (ldconfig_done && !strcmp(*argvp[0], ldconfig_path)) {
+-	    rpmlog(RPMLOG_DEBUG, "%s: %s skipping redundant \"%s\".\n",
+-		   psm->stepName, sname, *argvp[0]);
+-	    free(sname);
+-	    return RPMRC_OK;
+-	}
+-    }
+-
+     rpmlog(RPMLOG_DEBUG, "%s: %s %ssynchronous scriptlet start\n",
+ 	   psm->stepName, sname, (psm->unorderedSuccessor ? "a" : ""));
+ 
+     if (argvCount(*argvp) == 0) {
+ 	argvAdd(argvp, "/bin/sh");
+-	ldconfig_done = 0;
+-    } else {
+-	ldconfig_done = (ldconfig_path && !strcmp(*argvp[0], ldconfig_path)
+-		? 1 : 0);
+     }
+ 
+ 
+@@ -761,9 +741,6 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
+ 	    xx = Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
+ 	}
+ 
+-	if (ldconfig_path && strstr(script, ldconfig_path) != NULL)
+-	    ldconfig_done = 1;
+-
+ 	xx = Fwrite(script, sizeof(script[0]), strlen(script), fd);
+ 	xx = Fclose(fd);
+ 
+-- 
+1.6.1.3
+

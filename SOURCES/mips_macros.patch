@@ -1,0 +1,15 @@
+Index: rpm-4.6.0/macros.in
+===================================================================
+--- rpm-4.6.0.orig/macros.in	1970-01-01 00:00:08.000000000 +0000
++++ rpm-4.6.0/macros.in	2009-03-23 17:37:19.000000000 +0000
+@@ -1160,6 +1160,10 @@
+ # arch macro for all supported Alpha processors
+ %alpha	alpha alphaev56 alphaev6 alphaev67
+ 
++#------------------------------------------------------------------------------
++# arch macro for all supported mips 64-bit procs/socs compatibles
++%mips	mips mipsel mips64 mips64el mips32 mips32el
++
+ #------------------------------------------------------------------------
+ # Use in %install to generate locale specific file lists. For example,
+ #

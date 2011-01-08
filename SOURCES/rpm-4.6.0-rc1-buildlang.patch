@@ -1,0 +1,27 @@
+From ac6ea0fcf30c24266fdab39b57ca57e86c85f012 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 35/35] buildlang
+
+---
+ build/build.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/build/build.c b/build/build.c
+index a3454db..2bc2836 100644
+--- a/build/build.c
++++ b/build/build.c
+@@ -182,6 +182,10 @@ fprintf(stderr, "*** rootDir %s buildDir %s\n", rootDir, buildDir);
+     if (!(child = fork())) {
+ 
+ 	errno = 0;
++	setenv ("LANG", "C", 1);
++	unsetenv ("LC_ALL");
++	unsetenv ("LANGUAGE");
++	unsetenv ("LINGUAS");
+ 	(void) execvp(argv[0], (char *const *)argv);
+ 
+ 	rpmlog(RPMLOG_ERR, _("Exec of %s failed (%s): %s\n"),
+-- 
+1.6.1.3
+

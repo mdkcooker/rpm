@@ -1,0 +1,18 @@
+diff -p -up rpm-4.6.1/installplatform.3002 rpm-4.6.1/installplatform
+--- rpm-4.6.1/installplatform.3002	2009-05-18 11:26:30.000000000 +0200
++++ rpm-4.6.1/installplatform	2010-09-29 07:35:48.283829689 +0200
+@@ -122,6 +122,14 @@ for SUBST in $SUBSTS ; do
+ 	ISANAME=alpha
+ 	ISABITS=64
+ 	;;
++    mipsel)
++        ISANAME=mipsel
++	ISABITS=32
++	;;
++    mips)
++        ISANAME=mips
++	ISABITS=32
++	;;
+   esac
+ 
+   if [ -n "$MULTILIBNO" ]; then

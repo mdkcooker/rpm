@@ -1,0 +1,33 @@
+From 15609e15e64dc382b55d780973632ec53156b22e Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 10/35] check file trim double slash in buildroot
+
+---
+ scripts/check-files |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/check-files b/scripts/check-files
+index b397f1c..31e92fe 100755
+--- a/scripts/check-files
++++ b/scripts/check-files
+@@ -13,12 +13,14 @@ if [ ! -d "$RPM_BUILD_ROOT" ] ; then
+ 	exit 1
+ fi
+ 
++RPM_BUILD_ROOT=`echo $RPM_BUILD_ROOT | sed 's://*:/:g'`
+ [ "$TMPDIR" ] || TMPDIR=/tmp
+ FILES_DISK=`mktemp $TMPDIR/rpmXXXXXX`
+ FILES_RPM=`mktemp $TMPDIR/rpmXXXXXX`
+ 
+-find $RPM_BUILD_ROOT -type f -o -type l | LC_ALL=C sort > $FILES_DISK
+-LC_ALL=C sort > $FILES_RPM
++
++find $RPM_BUILD_ROOT -type f -o -type l | sed 's://*:/:g' | LC_ALL=C sort > $FILES_DISK
++sed 's://*:/:g' | LC_ALL=C sort -u > $FILES_RPM
+ 
+ diff -d "$FILES_DISK" "$FILES_RPM" | grep "^< " | cut -c3- | 
+ while read f; do
+-- 
+1.6.1.3
+

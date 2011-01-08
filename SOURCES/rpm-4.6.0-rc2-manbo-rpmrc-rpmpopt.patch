@@ -1,0 +1,77 @@
+From d3edae7c4ecd3cef3e3ef9aa9a9e2eb6bf9f9e38 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 05/35] manbo rpmrc rpmpopt
+
+---
+ Makefile.am     |    1 +
+ lib/Makefile.am |    1 +
+ lib/poptALL.c   |    1 +
+ lib/rpmrc.c     |    2 +-
+ rpmqv.c         |    1 +
+ 5 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 74f1031..2e1e419 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -36,6 +36,7 @@ AM_CPPFLAGS += @WITH_LIBELF_INCLUDE@
+ AM_CPPFLAGS += -DLOCALEDIR="\"$(localedir)\""
+ AM_CPPFLAGS += -DRPMCONFIGDIR="\"@RPMCONFIGDIR@\""
+ AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"@RPMCONFIGDIR@/rpmpopt-${VERSION}\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"@RPMCONFIGDIR@/manbo/rpmpopt\""
+ 
+ pkginclude_HEADERS =
+ nodist_pkginclude_HEADERS =
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index cb4f376..70c20e7 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -12,6 +12,7 @@ AM_CPPFLAGS += -DSYSCONFDIR="\"$(sysconfdir)\""
+ AM_CPPFLAGS += -DLOCALSTATEDIR="\"$(localstatedir)\""
+ AM_CPPFLAGS += -DRPMCONFIGDIR="\"@RPMCONFIGDIR@\""
+ AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"@RPMCONFIGDIR@/rpmpopt-${VERSION}\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"@RPMCONFIGDIR@/manbo/rpmpopt\""
+ 
+ check_PROGRAMS =
+ CLEANFILES =
+diff --git a/lib/poptALL.c b/lib/poptALL.c
+index 520a3d3..600cd88 100644
+--- a/lib/poptALL.c
++++ b/lib/poptALL.c
+@@ -342,6 +342,7 @@ rpmcliInit(int argc, char *const argv[], struct poptOption * optionsTable)
+ 
+     optCon = poptGetContext(__progname, argc, (const char **)argv, optionsTable, 0);
+     (void) poptReadConfigFile(optCon, LIBRPMALIAS_FILENAME);
++    (void) poptReadConfigFile(optCon, LIBVENDORALIAS_FILENAME);
+     (void) poptReadDefaultConfig(optCon, 1);
+     poptSetExecPath(optCon, RPMCONFIGDIR, 1);
+ 
+diff --git a/lib/rpmrc.c b/lib/rpmrc.c
+index eb430a4..bd5744b 100644
+--- a/lib/rpmrc.c
++++ b/lib/rpmrc.c
+@@ -26,7 +26,7 @@
+ 
+ static const char * const defrcfiles = 
+       RPMCONFIGDIR "/rpmrc" 
+-  ":" RPMCONFIGDIR "/" RPMCANONVENDOR "/rpmrc"
++  ":" RPMCONFIGDIR "/" "manbo" "/rpmrc"
+   ":" SYSCONFDIR "/rpmrc"
+   ":~/.rpmrc"; 
+ 
+diff --git a/rpmqv.c b/rpmqv.c
+index 3db1f9a..701cb3e 100644
+--- a/rpmqv.c
++++ b/rpmqv.c
+@@ -262,6 +262,7 @@ int main(int argc, char *argv[])
+     /* XXX popt argv definition should be fixed instead of casting... */
+     optCon = poptGetContext(poptCtx, argc, (const char **)argv, optionsTable, 0);
+     (void) poptReadConfigFile(optCon, LIBRPMALIAS_FILENAME);
++    (void) poptReadConfigFile(optCon, LIBVENDORALIAS_FILENAME);
+     (void) poptReadDefaultConfig(optCon, 1);
+     poptSetExecPath(optCon, RPMCONFIGDIR, 1);
+ 
+-- 
+1.6.1.3
+

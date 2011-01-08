@@ -1,0 +1,22 @@
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Mon, 1 Jun 2009 10:28:50 +0000 (+0300)
+Subject: Map PreReq into Requires(pre,preun) at build
+X-Git-Url: http://rpm.org/gitweb?p=rpm.git;a=commitdiff_plain;h=8a372720b962b07c2db0e80dc895d24ac0055eec
+
+Map PreReq into Requires(pre,preun) at build
+- this gives a more reasonable mapping to former behavior of PreReq
+  when cutting loops
+(cherry picked from commit 95c9e817ef6ed2cda5629f0c5edb6f7b19c209cf)
+diff -p -up rpm-4.6.0/build/parseReqs.c.orig rpm-4.6.0/build/parseReqs.c
+--- rpm-4.6.0/build/parseReqs.c.orig	2009-08-23 09:28:43.107329674 +0300
++++ rpm-4.6.0/build/parseReqs.c	2009-08-23 09:28:43.466329373 +0300
+@@ -59,7 +59,8 @@ rpmRC parseRCPOT(rpmSpec spec, Package p
+ 	h = spec->buildRestrictions;
+ 	break;
+     case RPMTAG_PREREQ:
+-	tagflags |= RPMSENSE_PREREQ;
++	/* XXX map legacy PreReq into Requires(pre,preun) */
++	tagflags |= (RPMSENSE_SCRIPT_PRE|RPMSENSE_SCRIPT_PREUN);
+ 	h = pkg->header;
+ 	break;
+     case RPMTAG_BUILDPREREQ:

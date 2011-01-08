@@ -1,0 +1,93 @@
+From 425c1581d8414773a70cfb7640076fac3af49d1e Mon Sep 17 00:00:00 2001
+From: Pascal "Pixel" Rigaux <pascal@rigaux.org>
+Date: Thu, 29 Jan 2009 11:46:56 +0100
+Subject: [PATCH 28/35] introduce %_after_setup which is called after %setup
+
+%_after_setup is called after %setup with the various tarballs applied by %setup
+(used by git-repository--after-tarball in rpm-mandriva-setup-build)
+---
+ build/parsePrep.c |   26 ++++++++++++++++++++++----
+ 1 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/build/parsePrep.c b/build/parsePrep.c
+index 1c08464..a2c47d0 100644
+--- a/build/parsePrep.c
++++ b/build/parsePrep.c
+@@ -140,7 +140,7 @@ static char *doPatch(rpmSpec spec, uint32_t c, int strip, const char *db,
+  * @param quietly	should -vv be omitted from tar?
+  * @return		expanded %setup macro (NULL on error)
+  */
+-static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
++static char *doUntar(rpmSpec spec, uint32_t c, int quietly, StringBuf after_setup_cmd)
+ {
+     char *fn;
+     char *buf = NULL;
+@@ -162,6 +162,11 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ 	return NULL;
+     }
+ 
++    if (after_setup_cmd) {
++	appendStringBuf(after_setup_cmd, " ");
++	appendStringBuf(after_setup_cmd, sp->source);
++    }
++    
+     fn = rpmGetPath("%{_sourcedir}/", sp->source, NULL);
+ 
+     /* FIX: shrug */
+@@ -276,6 +281,14 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+ 
+     before = newStringBuf();
+     after = newStringBuf();
++    StringBuf after_setup_cmd = NULL;
++    {	char *fix = rpmExpand("%{?_after_setup}", NULL);
++        if (fix && *fix) {
++	    after_setup_cmd = newStringBuf();
++	    appendStringBuf(after_setup_cmd, fix);
++	}
++	free(fix);
++    }
+ 
+     optCon = poptGetContext(NULL, argc, argv, optionsTable, 0);
+     while ((arg = poptGetNextOpt(optCon)) > 0) {
+@@ -293,7 +306,7 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+ 	    return RPMRC_FAIL;
+ 	}
+ 
+-	{   char *chptr = doUntar(spec, num, quietly);
++	{   char *chptr = doUntar(spec, num, quietly, after_setup_cmd);
+ 	    if (chptr == NULL)
+ 		return RPMRC_FAIL;
+ 
+@@ -352,7 +365,7 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+ 
+     /* do the default action */
+    if (!createDir && !skipDefaultAction) {
+-	char *chptr = doUntar(spec, 0, quietly);
++	char *chptr = doUntar(spec, 0, quietly, after_setup_cmd);
+ 	if (!chptr)
+ 	    return RPMRC_FAIL;
+ 	appendLineStringBuf(spec->prep, chptr);
+@@ -369,7 +382,7 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+     }
+ 
+     if (createDir && !skipDefaultAction) {
+-	char *chptr = doUntar(spec, 0, quietly);
++	char *chptr = doUntar(spec, 0, quietly, after_setup_cmd);
+ 	if (chptr == NULL)
+ 	    return RPMRC_FAIL;
+ 	appendLineStringBuf(spec->prep, chptr);
+@@ -386,6 +399,11 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+ 	}
+ 	free(fix);
+     }
++
++    if (after_setup_cmd) {
++	appendLineStringBuf(spec->prep, getStringBuf(after_setup_cmd));
++	after_setup_cmd = freeStringBuf(after_setup_cmd);
++    }
+ 	
+     return RPMRC_OK;
+ }
+-- 
+1.6.1.3
+

@@ -1,0 +1,91 @@
+Index: rpm-4.6.0/macros.in
+===================================================================
+--- rpm-4.6.0.orig/macros.in	2009-07-20 09:14:54.000000000 +0000
++++ rpm-4.6.0/macros.in	2009-07-20 09:14:58.000000000 +0000
+@@ -1150,7 +1150,7 @@
+ 
+ #------------------------------------------------------------------------------
+ # arch macro for all supported ARM processors
+-%arm	armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv7l
++%arm	armv3l armv4b armv4l armv4tl armv5tl armv5tel armv5tejl armv6l armv7l
+ 
+ #------------------------------------------------------------------------------
+ # arch macro for all supported Sparc processors
+Index: rpm-4.6.0/installplatform
+===================================================================
+--- rpm-4.6.0.orig/installplatform	2009-07-20 09:16:31.000000000 +0000
++++ rpm-4.6.0/installplatform	2009-07-20 09:16:44.000000000 +0000
+@@ -32,7 +32,7 @@
+ case "$arch" in
+   i[3456]86|pentium[34]|athlon|geode) SUBSTS='s_i386_i386_ s_i386_i486_ s_i386_i586_ s_i386_i686_ s_i386_pentium3_ s_i386_pentium4_ s_i386_athlon_ s_i386_geode_' ;;
+   alpha*) SUBSTS='s_alpha_alpha_ s_alpha_alphaev5_ s_alpha_alphaev56_ s_alpha_alphapca56_ s_alpha_alphaev6_ s_alpha_alphaev67_' ;;
+-  arm*) SUBSTS='s_arm_armv3l_ s_arm_armv4l_ s_arm_armv4tl_ s_arm_armv5tel_ s_arm_armv5tejl_ s_arm_armv6l_ s_arm_armv7l_' ;;
++  arm*) SUBSTS='s_arm_armv3l_ s_arm_armv4l_ s_arm_armv4tl_ s_arm_armv5tl_ s_arm_armv5tel_ s_arm_armv5tejl_ s_arm_armv6l_ s_arm_armv7l_' ;;
+   sh4*) SUBSTS='s_sh4_sh4_ s_sh4_sh4a_' ;;
+   sparc*) SUBSTS='s_sparc\(64\|64v\|v9v\|v9\)_sparc_ s_sparc64_sparcv9_;s_sparc\([^v]\|$\)_sparcv9\1_ s_sparcv9_sparc64_;s_sparc\([^6]\|$\)_sparc64\1_' ;;
+   powerpc*|ppc*) SUBSTS='s_ppc64_ppc_ s_ppc\([^6ip]\|$\)_ppc64\1_ s_ppc\([^6ip]\|$\)_ppciseries_ s_ppc\([^6ip]\|$\)_ppcpseries_ s_ppc\([^6ip]\|$\)_ppc64iseries_ s_ppc\([^6ip]\|$\)_ppc64pseries_' ;;
+Index: rpm-4.6.0/lib/rpmts.c
+===================================================================
+--- rpm-4.6.0.orig/lib/rpmts.c	2009-07-20 09:17:04.000000000 +0000
++++ rpm-4.6.0/lib/rpmts.c	2009-07-20 09:17:25.000000000 +0000
+@@ -167,7 +167,7 @@
+ 	"m68k",
+ 	"rs6000",
+ 	"ia64",
+-	"armv3l", "armv4b", "armv4l", "armv4tl", "armv5tel", "armv5tejl", "armv6l",
++	"armv3l", "armv4b", "armv4l", "armv4tl", "armv5tl", "armv5tel", "armv5tejl", "armv6l",
+ 	"s390", "i370", "s390x",
+ 	"sh", "xtensa",
+ 	"noarch",
+Index: rpm-4.6.0/rpmrc.in
+===================================================================
+--- rpm-4.6.0.orig/rpmrc.in	2009-07-20 09:18:00.000000000 +0000
++++ rpm-4.6.0/rpmrc.in	2009-07-20 09:19:47.000000000 +0000
+@@ -62,6 +62,7 @@
+ optflags: armv4b -O2 -g -march=armv4
+ optflags: armv4l -O2 -g -march=armv4
+ optflags: armv4tl -O2 -g -march=armv4t
++optflags: armv5tl -O2 -g -march=armv5t
+ optflags: armv5tel -O2 -g -march=armv5te
+ optflags: armv5tejl -O2 -g -march=armv5te
+ optflags: armv6l -O2 -g -march=armv6
+@@ -136,6 +137,7 @@
+ arch_canon:	armv3l: armv3l	12
+ arch_canon:     armv4b:	armv4b 	12
+ arch_canon:     armv4l:	armv4l 	12
++arch_canon:     armv5tl: armv5tl 	12
+ arch_canon:     armv5tel: armv5tel 	12
+ arch_canon:     armv5tejl: armv5tejl 	12
+ arch_canon:     armv6l: armv6l 	12
+@@ -244,6 +246,7 @@
+ buildarchtranslate: armv4b: armv4b
+ buildarchtranslate: armv4l: armv4l
+ buildarchtranslate: armv4tl: armv4tl
++buildarchtranslate: armv5tl: armv5tl
+ buildarchtranslate: armv5tel: armv5tel
+ buildarchtranslate: armv5tejl: armv5tejl
+ buildarchtranslate: armv6l: armv6l
+@@ -331,8 +334,9 @@
+ arch_compat: armv4b: noarch
+ arch_compat: armv7l: armv6l
+ arch_compat: armv6l: armv5tejl
+-arch_compat: armv5tejl: armv5tel
+-arch_compat: armv5tel: armv4tl
++arch_compat: armv5tejl: armv5tel armv5tl
++arch_compat: armv5tel: armv4tl armv5tl
++arch_compat: armv5tl: armv4tl
+ arch_compat: armv4tl: armv4l
+ arch_compat: armv4l: armv3l
+ arch_compat: armv3l: noarch
+@@ -435,8 +439,9 @@
+ buildarch_compat: armv4b: noarch
+ buildarch_compat: armv7l: armv6l
+ buildarch_compat: armv6l: armv5tejl
+-buildarch_compat: armv5tejl: armv5tel
+-buildarch_compat: armv5tel: armv4tl
++buildarch_compat: armv5tejl: armv5tel armv5tl
++buildarch_compat: armv5tel: armv4tl armv5tl
++buildarch_compat: armv5tl: armv4tl
+ buildarch_compat: armv4tl: armv4l
+ buildarch_compat: armv4l: armv3l
+ buildarch_compat: armv3l: noarch

@@ -1,0 +1,35 @@
+From 62db7bc77c2618798e35bf7eb57de3c5e0695f0a Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 06/35] bb shortcircuit
+
+---
+ rpmqv.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/rpmqv.c b/rpmqv.c
+index 701cb3e..4c13783 100644
+--- a/rpmqv.c
++++ b/rpmqv.c
+@@ -664,14 +664,16 @@ int main(int argc, char *argv[])
+ 	case 'b':
+ 	    ba->buildAmount |= RPMBUILD_PACKAGEBINARY;
+ 	    ba->buildAmount |= RPMBUILD_CLEAN;
++	    if (ba->shortCircuit)
++		break;
+ 	case 'i':
+ 	    ba->buildAmount |= RPMBUILD_INSTALL;
+ 	    ba->buildAmount |= RPMBUILD_CHECK;
+-	    if ((ba->buildChar == 'i') && ba->shortCircuit)
++	    if (/* (ba->buildChar == 'i') && */ ba->shortCircuit)
+ 		break;
+ 	case 'c':
+ 	    ba->buildAmount |= RPMBUILD_BUILD;
+-	    if ((ba->buildChar == 'c') && ba->shortCircuit)
++	    if (/* (ba->buildChar == 'c') && */ ba->shortCircuit)
+ 		break;
+ 	case 'p':
+ 	    ba->buildAmount |= RPMBUILD_PREP;
+-- 
+1.6.1.3
+

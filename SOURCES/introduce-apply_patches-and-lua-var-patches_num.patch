@@ -1,0 +1,80 @@
+From c23682dfa9f8752039d19ad80793ce3b3d499033 Mon Sep 17 00:00:00 2001
+From: Pascal "Pixel" Rigaux <pascal@rigaux.org>
+Date: Thu, 29 Jan 2009 14:04:27 +0100
+Subject: [PATCH] introduce %apply_patches and lua var "patches_num"
+
+%apply_patches can be used to replace the various "%patchN" lines.
+but it forces all the patches to be "-p1".
+
+%apply_patches could be defined without "patches_num":
+  %apply_patches for i in %patches; do %{_patch} -s -p1 --fuzz=%{_default_patch_fuzz} -i $i; done
+or (less verbose in the rpmbuild log)
+  %apply_patches %{lua: for i, p in ipairs(patches) do print(rpm.expand("%{_patch} -s -p1 --fuzz=%{_default_patch_fuzz} -i " .. p .. "\\n")) end }
+but "patches_num" gives us the possibility to have a patch backup suffix based
+on the patch number. Eg: ".0001" for "Patch1"
+---
+ build/spec.c |   17 +++++++++++++++++
+ macros.in    |    5 +++++
+ 2 files changed, 22 insertions(+), 0 deletions(-)
+
+diff --git a/build/spec.c b/build/spec.c
+index 76b22a2..3343ed6 100644
+--- a/build/spec.c
++++ b/build/spec.c
+@@ -357,6 +357,17 @@ int addSource(rpmSpec spec, Package pkg, const char *field, rpmTag tag)
+ 	var = rpmluavFree(var);
+ 	rpmluaPop(lua);
+ 	}
++	{
++	rpmlua lua = NULL; /* global state */
++	const char * what = (flag & RPMBUILD_ISPATCH) ? "patches_num" : "sources_num";
++	rpmluaPushTable(lua, what);
++	rpmluav var = rpmluavNew();
++	rpmluavSetKey(var, RPMLUAV_STRING, body);
++	rpmluavSetValueNum(var, num);
++	rpmluaSetVar(lua, var);
++	var = rpmluavFree(var);
++	rpmluaPop(lua);
++	}
+ #endif
+ 	body = _free(body);
+     }
+@@ -451,6 +462,10 @@ rpmSpec newSpec(void)
+     rpmlua lua = NULL; /* global state */
+     rpmluaPushTable(lua, "patches");
+     rpmluaPushTable(lua, "sources");
++    rpmluaPushTable(lua, "patches_num");
++    rpmluaPushTable(lua, "sources_num");
++    rpmluaPop(lua);
++    rpmluaPop(lua);
+     rpmluaPop(lua);
+     rpmluaPop(lua);
+     }
+@@ -516,6 +531,8 @@ rpmSpec freeSpec(rpmSpec spec)
+     rpmlua lua = NULL; /* global state */
+     rpmluaDelVar(lua, "patches");
+     rpmluaDelVar(lua, "sources");	
++    rpmluaDelVar(lua, "patches_num");
++    rpmluaDelVar(lua, "sources_num");
+ #endif
+ 
+     spec->sources = freeSources(spec->sources);
+diff --git a/macros.in b/macros.in
+index 28a048c..851936c 100644
+--- a/macros.in
++++ b/macros.in
+@@ -1102,6 +1102,11 @@ done \
+ %patches %{lua: for i, p in ipairs(patches) do print(p.." ") end}
+ %sources %{lua: for i, s in ipairs(sources) do print(s.." ") end}
+ 
++# default patch command:
++%_patch %__patch
++
++%apply_patches %{lua: keys = {}; for i, p in ipairs(patches) do print(rpm.expand("%{_patch} -s -p1 -b --suffix " .. string.format(".%04d~", patches_num[p]) .. " --fuzz=%{_default_patch_fuzz} -i " .. p .. "\\n")) end }
++
+ #------------------------------------------------------------------------------
+ # Useful perl macros (from Artur Frysiak <wiget@t17.ds.pwr.wroc.pl>)
+ #
+-- 
+1.6.2.4
+

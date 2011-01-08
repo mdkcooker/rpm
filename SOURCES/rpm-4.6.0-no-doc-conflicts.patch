@@ -1,0 +1,67 @@
+From b07982c2e495673f17cb68741b68d4ddddcf2688 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 08/35] no doc conflicts
+
+---
+ lib/transaction.c |   30 ++++++++++++++++++++++++++++++
+ 1 files changed, 30 insertions(+), 0 deletions(-)
+
+diff --git a/lib/transaction.c b/lib/transaction.c
+index bf6f0e4..45eeaf3 100644
+--- a/lib/transaction.c
++++ b/lib/transaction.c
+@@ -56,6 +56,22 @@ static int sharedCmp(const void * one, const void * two)
+     return 0;
+ }
+ 
++static int is_a_doc_conflict(rpmfi fi)
++{
++    const char *ignorelist[] = {
++	"/usr/share/man/",
++	"/usr/share/gtk-doc/html/",
++	"/usr/share/gnome/html/",
++	NULL
++    };
++    const char *fn = rpmfiFN(fi);
++    const char **dnp;
++    for (dnp = ignorelist; *dnp != NULL; dnp++)
++	if (strstr(fn, *dnp) == fn) return 1;
++
++    return 0;
++}
++
+ /**
+  * handleInstInstalledFiles.
+  * @param ts		transaction set
+@@ -162,6 +178,13 @@ static int handleInstInstalledFiles(const rpmts ts,
+ 		}
+ 	    }
+ 
++	    /* HACK: always install latest (arch-independent) man
++	       pages and gtk/gnome html doc files. */
++	    if (rConflicts && is_a_doc_conflict(fi)) {
++	        fi->actions[fileNum] = FA_CREATE;
++		rConflicts = 0;
++	    }
++
+ 	    if (rConflicts) {
+ 		rpmpsAppend(ps, RPMPROB_FILE_CONFLICT,
+ 			rpmteNEVRA(p), rpmteKey(p),
+@@ -518,6 +541,13 @@ assert(otherFi != NULL);
+ 		    done = 1;
+ 		}
+ 
++		/* HACK: always install latest (arch-independent) man
++		   pages and gtk/gnome html doc files. */
++		if (rConflicts && is_a_doc_conflict(fi)) {
++		    fi->actions[i] = FA_CREATE;
++		    rConflicts = 0;
++		}
++
+ 		if (rConflicts) {
+ 		    rpmpsAppend(ps, RPMPROB_NEW_FILE_CONFLICT,
+ 			rpmteNEVRA(p), rpmteKey(p),
+-- 
+1.6.1.3
+

@@ -1,0 +1,39 @@
+From a585bd198bcf4c4a9fc3d31b7399ba3146188fde Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 27/35] fix nss detection
+
+---
+ configure.ac |   16 +++-------------
+ 1 files changed, 3 insertions(+), 13 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f12d367..852e33d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -306,19 +306,9 @@ AM_CONDITIONAL(LIBDWARF,[test "$WITH_LIBDWARF" = yes])
+ 
+ #=================
+ # Check for NSS library.
+-# We need nss.h from NSS which needs nspr.h. Unfortunately both glibc and NSS 
+-# have a header named nss.h... so make extra check for NSS's sechash.h 
+-# which we use too and hopefully is slightly more unique to NSS.
+-WITH_NSS_INCLUDE=
+-WITH_NSS_LIB=
+-AC_CHECK_HEADERS([nspr.h nss.h sechash.h], [], [
+-  AC_MSG_ERROR([missing required NSPR / NSS header])
+-])
+-AC_CHECK_LIB(nss3, NSS_NoDB_Init, [
+-  WITH_NSS_LIB=-lnss3
+-], [
+-  AC_MSG_ERROR([missing required NSS library 'nss3'])
+-])
++# We need nss.h from NSS.
++WITH_NSS_INCLUDE=`pkg-config --cflags nss`
++WITH_NSS_LIB=`pkg-config --libs nss`
+ AC_SUBST(WITH_NSS_INCLUDE)
+ AC_SUBST(WITH_NSS_LIB)
+ 
+-- 
+1.6.1.3
+

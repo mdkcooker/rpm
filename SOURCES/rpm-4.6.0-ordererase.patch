@@ -1,0 +1,31 @@
+From 367507cad6f92fdf8a5f4a01fb3ae0770d89b7dc Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 07/35] ordererase
+
+---
+ lib/rpminstall.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/lib/rpminstall.c b/lib/rpminstall.c
+index 4a972eb..ec14dc8 100644
+--- a/lib/rpminstall.c
++++ b/lib/rpminstall.c
+@@ -701,12 +701,14 @@ int rpmErase(rpmts ts, struct rpmInstallArguments_s * ia, ARGV_const_t argv)
+ 	ps = rpmpsFree(ps);
+     }
+ 
++#if 0
+     if (!stopUninstall && !(ia->installInterfaceFlags & INSTALL_NOORDER)) {
+ 	if (rpmtsOrder(ts)) {
+ 	    numFailed += numPackages;
+ 	    stopUninstall = 1;
+ 	}
+     }
++#endif
+ 
+     if (numPackages && !stopUninstall) {
+ 	(void) rpmtsSetFlags(ts, (rpmtsFlags(ts) | RPMTRANS_FLAG_REVERSE));
+-- 
+1.6.1.3
+

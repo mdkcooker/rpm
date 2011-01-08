@@ -1,0 +1,83 @@
+From d352f33416ba2124da26e918ec6786452285be35 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 03/35] syslog
+
+---
+ configure.ac |    6 ++++++
+ lib/psm.c    |   19 +++++++++++++++++++
+ system.h     |    4 ++++
+ 3 files changed, 29 insertions(+), 0 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4eeef5f..94cf792 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -231,6 +231,12 @@ AC_SUBST(WITH_LZMA_LIB)
+ #=================
+ 
+ dnl
++dnl Checking syslog
++dnl
++
++AC_CHECK_HEADERS(syslog.h)
++
++dnl
+ dnl Check for features
+ dnl
+ 
+diff --git a/lib/psm.c b/lib/psm.c
+index 890b223..247df15 100644
+--- a/lib/psm.c
++++ b/lib/psm.c
+@@ -1730,6 +1730,16 @@ assert(psm->mi == NULL);
+ 				NULL, NULL);
+ 
+ 	(void) rpmswExit(rpmtsOp(ts, RPMTS_OP_DBADD), 0);
++#if HAVE_SYSLOG_H
++        {
++	  char *s;
++
++	  s = headerFormat(fi->h, "%{NAME}-%{VERSION}-%{RELEASE}", NULL);
++	  syslog(LOG_NOTICE, "[RPM] %s installed\n", s);
++	  s = _free(s);
++	 }
++#endif
++
+ 	break;
+     case PSM_RPMDB_REMOVE:
+ 	if (rpmtsFlags(ts) & RPMTRANS_FLAG_TEST)	break;
+@@ -1737,6 +1747,15 @@ assert(psm->mi == NULL);
+ 	rc = rpmdbRemove(rpmtsGetRdb(ts), rpmtsGetTid(ts), fi->record,
+ 				NULL, NULL);
+ 	(void) rpmswExit(rpmtsOp(ts, RPMTS_OP_DBREMOVE), 0);
++#if HAVE_SYSLOG_H
++        {
++	  char *s;
++
++	  s = headerFormat(fi->h, "%{NAME}-%{VERSION}-%{RELEASE}", NULL);
++	  syslog(LOG_NOTICE, "[RPM] %s removed\n", s);
++	  s = _free(s);
++	}
++#endif
+ 	break;
+ 
+     default:
+diff --git a/system.h b/system.h
+index 8022fbc..00cbc91 100644
+--- a/system.h
++++ b/system.h
+@@ -9,6 +9,10 @@
+ #include "config.h"
+ #endif
+ 
++#if HAVE_SYSLOG_H
++#include <syslog.h>
++#endif
++
+ #include <sys/types.h>
+ 
+ #include <sys/stat.h>
+-- 
+1.6.1.3
+

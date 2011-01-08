@@ -1,0 +1,29 @@
+--- rpm-4.6.1/build/files.c.1016~	2010-10-02 06:18:55.416527836 +0200
++++ rpm-4.6.1/build/files.c	2010-10-07 00:06:23.527440773 +0200
+@@ -1150,6 +1150,26 @@ static void genCpioListAndHeader(FileLis
+ 	headerPutUint32(h, RPMTAG_FILEFLAGS, &(flp->flags) ,1);
+     }
+ 
++    /* Remove all entries from the list of files to check */
++    for (i = fl->fileListRecsUsed-1, flp--; i >= 0; i--, flp--) {
++	if(i < fl->fileListRecsUsed-1 && !strcmp(flp->cpioPath,flp[1].cpioPath))
++	    flp->flags |= flp[1].flags;
++	if (flp->flags & RPMFILE_EXCLUDE) {
++	    char *buf_stdin = getStringBuf(check_fileList);
++	    size_t len = strlen(flp->diskPath);
++	    char *ptr = NULL;
++	    if((ptr = strstr(buf_stdin, flp->diskPath)) != NULL) {
++		size_t ptr_len = strlen(ptr);
++		char *end = &ptr[ptr_len-len-2];
++		memmove(ptr, ptr+len+1, ptr_len-len-1);
++		memset(&ptr[ptr_len-len-1], ' ', len);
++		*end = '0'; /* Swap out to avoid being stripped */
++		stripTrailingBlanksStringBuf(check_fileList);
++		*end = '\n';
++	    }
++	}
++    }
++
+     if (totalFileSize < UINT32_MAX) {
+ 	rpm_off_t totalsize = totalFileSize;
+ 	headerPutUint32(h, RPMTAG_SIZE, &totalsize, 1);

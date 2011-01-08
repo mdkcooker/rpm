@@ -1,0 +1,28 @@
+From 5f7b4a3de6aea5c575c9cf5c92fbfe02bf0e70ce Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 34/35] transmeta crusoe is 686
+
+---
+ lib/rpmrc.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/lib/rpmrc.c b/lib/rpmrc.c
+index 12d1275..476f45e 100644
+--- a/lib/rpmrc.c
++++ b/lib/rpmrc.c
+@@ -847,6 +847,11 @@ static inline int RPMClass(void)
+ 	
+ 	sigaction(SIGILL, &oldsa, NULL);
+ 
++#define USER686 ((1<<4) | (1<<8) | (1<<15))
++	/* Transmeta Crusoe CPUs say that their CPU family is "5" but they have enough features for i686. */
++	if(cpu == 5 && (cap & USER686) == USER686)
++		return 6;
++
+ 	if (cpu < 6)
+ 		return cpu;
+ 		
+-- 
+1.6.1.3
+

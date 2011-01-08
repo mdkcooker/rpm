@@ -1,0 +1,27 @@
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Fri, 5 Jun 2009 11:56:49 +0000 (+0300)
+Subject: Unbreak isLegacyPreReq()
+X-Git-Url: http://rpm.org/gitweb?p=rpm.git;a=commitdiff_plain;h=9fa5fe5f1a0e67c028c0e7c2bf377125a515a1c9
+
+Unbreak isLegacyPreReq()
+- long long time ago the PREREQ bit was also turned on for scriptlet
+  dependencies etc, this is no longer the case so the old mask doesn't work
+- build part is not affected by the mask change as we never set
+  PREREQ bit by ourselves
+(cherry picked from commit b22fa73fea6873dfc3816433e130820a5d9f33da)
+---
+
+diff --git a/lib/rpmds.h b/lib/rpmds.h
+index 61b4d56..e8b2a33 100644
+--- a/lib/rpmds.h
++++ b/lib/rpmds.h
+@@ -78,7 +78,8 @@ typedef	enum rpmsenseFlags_e {
+     RPMSENSE_SCRIPT_INSTALL | \
+     RPMSENSE_SCRIPT_CLEAN | \
+     RPMSENSE_RPMLIB | \
+-    RPMSENSE_KEYRING )
++    RPMSENSE_KEYRING | \
++    RPMSENSE_PREREQ)
+ 
+ #define	_notpre(_x)		((_x) & ~RPMSENSE_PREREQ)
+ #define	_INSTALL_ONLY_MASK \

@@ -1,0 +1,24 @@
+From f1868b65b9259d2fe01e2eaa896d7c0bf8965f0a Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 11/35] read-macros_d-dot-macros
+
+---
+ lib/rpmrc.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/lib/rpmrc.c b/lib/rpmrc.c
+index bd5744b..12d1275 100644
+--- a/lib/rpmrc.c
++++ b/lib/rpmrc.c
+@@ -35,6 +35,7 @@ const char * macrofiles =
+       RPMCONFIGDIR "/macros"
+   ":" RPMCONFIGDIR "/platform/%{_target}/macros"
+   ":" RPMCONFIGDIR "/" RPMCANONVENDOR "/macros"
++  ":" SYSCONFDIR "/rpm/macros.d/*.macros"
+   ":" SYSCONFDIR "/rpm/macros.*"
+   ":" SYSCONFDIR "/rpm/macros"
+   ":" SYSCONFDIR "/rpm/%{_target}/macros"
+-- 
+1.6.1.3
+

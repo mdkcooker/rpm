@@ -1,0 +1,18 @@
+bogus check: -fstack-protector generates a warning and not an error if it's not supported
+---
+ configure.ac |    2 	1 +	1 -	0 !
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: rpm-4.6.0/configure.ac
+===================================================================
+--- rpm-4.6.0.orig/configure.ac	2009-04-08 08:16:22.000000000 -0400
++++ rpm-4.6.0/configure.ac	2009-04-08 08:22:37.000000000 -0400
+@@ -41,7 +41,7 @@ if test "$GCC" = yes; then
+     old_cflags=$CFLAGS
+     echo
+     for flag in $cflags_to_try; do
+-        CFLAGS="$CFLAGS $flag"
++        CFLAGS="$CFLAGS $flag -Werror"
+         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[return 0;]])],[
+                 echo "   $flag"
+                 RPMCFLAGS="$RPMCFLAGS $flag"

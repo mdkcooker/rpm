@@ -1,0 +1,241 @@
+From a08288c24e968903b7c83934fafda085f7ed2854 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 18/35] weakdeps
+
+---
+ build/parsePreamble.c |   18 ++++++++++++++++++
+ build/parseReqs.c     |    4 ++++
+ build/reqprov.c       |   10 ++++++++++
+ build/rpmfc.c         |   14 ++++++++++++++
+ lib/rpmds.c           |    4 ++++
+ lib/rpmds.h           |    3 ++-
+ lib/rpmtag.h          |   16 ++++++++--------
+ python/rpmmodule.c    |    2 +-
+ rpmpopt.in            |   16 ++++++++++++++++
+ 9 files changed, 77 insertions(+), 10 deletions(-)
+
+diff --git a/build/parsePreamble.c b/build/parsePreamble.c
+index 3309177..1ba7a8e 100644
+--- a/build/parsePreamble.c
++++ b/build/parsePreamble.c
+@@ -122,6 +122,8 @@ static struct tokenBits_s const installScriptBits[] = {
+     { "post",		RPMSENSE_SCRIPT_POST },
+     { "rpmlib",		RPMSENSE_RPMLIB },
+     { "verify",		RPMSENSE_SCRIPT_VERIFY },
++    { "hint",		RPMSENSE_MISSINGOK },
++    { "strong",		RPMSENSE_STRONG },
+     { NULL, 0 }
+ };
+ 
+@@ -132,6 +134,8 @@ static const struct tokenBits_s const buildScriptBits[] = {
+     { "build",		RPMSENSE_SCRIPT_BUILD },
+     { "install",	RPMSENSE_SCRIPT_INSTALL },
+     { "clean",		RPMSENSE_SCRIPT_CLEAN },
++    { "hint",		RPMSENSE_MISSINGOK },
++    { "strong",		RPMSENSE_STRONG },
+     { NULL, 0 }
+ };
+ 
+@@ -626,6 +630,16 @@ static int handlePreambleTag(rpmSpec spec, Package pkg, rpmTag tag,
+ 	if ((rc = parseRCPOT(spec, pkg, field, tag, 0, tagflags)))
+ 	    return rc;
+ 	break;
++    case RPMTAG_SUGGESTSFLAGS:
++    case RPMTAG_ENHANCESFLAGS:
++	tagflags = RPMSENSE_MISSINGOK;
++	if (macro && (!strcmp(macro, "recommends")))
++	    tagflags |= RPMSENSE_STRONG;
++	if (macro && (!strcmp(macro, "supplements")))
++	    tagflags |= RPMSENSE_STRONG;
++	if ((rc = parseRCPOT(spec, pkg, field, tag, 0, tagflags)))
++	    return rc;
++	break;
+     case RPMTAG_EXCLUDEARCH:
+     case RPMTAG_EXCLUSIVEARCH:
+     case RPMTAG_EXCLUDEOS:
+@@ -723,6 +737,10 @@ static struct PreambleRec_s preambleList[] = {
+     {RPMTAG_AUTOPROV,		0, 0, 0, "autoprov"},
+     {RPMTAG_DOCDIR,		0, 0, 0, "docdir"},
+     {RPMTAG_DISTTAG,		0, 0, 0, "disttag"},
++    {RPMTAG_SUGGESTSFLAGS,	0, 0, 0, "recommends"},
++    {RPMTAG_SUGGESTSFLAGS,	0, 0, 0, "suggests"},
++    {RPMTAG_ENHANCESFLAGS,	0, 0, 0, "supplements"},
++    {RPMTAG_ENHANCESFLAGS,	0, 0, 0, "enhances"},
+    	/* LCL: can't add null annotation */
+     {0, 0, 0, 0, 0}
+ };
+diff --git a/build/parseReqs.c b/build/parseReqs.c
+index 54230c7..ca47354 100644
+--- a/build/parseReqs.c
++++ b/build/parseReqs.c
+@@ -86,6 +86,10 @@ rpmRC parseRCPOT(rpmSpec spec, Package pkg, const char *field, rpmTag tagN,
+ 	tagflags |= RPMSENSE_ANY;
+ 	h = spec->buildRestrictions;
+ 	break;
++    case RPMTAG_SUGGESTSFLAGS:
++    case RPMTAG_ENHANCESFLAGS:
++	h = pkg->header;
++	break;
+     default:
+     case RPMTAG_REQUIREFLAGS:
+ 	tagflags |= RPMSENSE_ANY;
+diff --git a/build/reqprov.c b/build/reqprov.c
+index 1e69bd2..415a14e 100644
+--- a/build/reqprov.c
++++ b/build/reqprov.c
+@@ -43,6 +43,16 @@ int addReqProv(rpmSpec spec, Header h, rpmTag tagN,
+ 	flagtag = RPMTAG_TRIGGERFLAGS;
+ 	indextag = RPMTAG_TRIGGERINDEX;
+ 	extra = Flags & RPMSENSE_TRIGGER;
++    } else if (tagN == RPMTAG_SUGGESTSFLAGS) {
++	nametag = RPMTAG_SUGGESTSNAME;
++	versiontag = RPMTAG_SUGGESTSVERSION;
++	flagtag = RPMTAG_SUGGESTSFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
++    } else if (tagN == RPMTAG_ENHANCESFLAGS) {
++	nametag = RPMTAG_ENHANCESNAME;
++	versiontag = RPMTAG_ENHANCESVERSION;
++	flagtag = RPMTAG_ENHANCESFLAGS;
++	extra = Flags & _ALL_REQUIRES_MASK;
+     } else {
+ 	nametag = RPMTAG_REQUIRENAME;
+ 	versiontag = RPMTAG_REQUIREVERSION;
+diff --git a/build/rpmfc.c b/build/rpmfc.c
+index b28a46e..a06b3c6 100644
+--- a/build/rpmfc.c
++++ b/build/rpmfc.c
+@@ -1379,6 +1379,12 @@ static struct DepMsg_s depMsgs[] = {
+   { "Obsoletes",	{ "%{?__find_obsoletes}", NULL, NULL, NULL },
+ 	RPMTAG_OBSOLETENAME, RPMTAG_OBSOLETEVERSION, RPMTAG_OBSOLETEFLAGS,
+ 	0, -1 },
++  { "Enhances",		{ "%{?__find_enhances}", NULL, NULL, NULL },
++	RPMTAG_ENHANCESNAME, RPMTAG_ENHANCESVERSION, RPMTAG_ENHANCESFLAGS,
++	RPMSENSE_STRONG, RPMSENSE_STRONG },
++  { "Supplements",	{ "%{?__find_supplements}", NULL, NULL, NULL },
++	RPMTAG_ENHANCESNAME, RPMTAG_ENHANCESVERSION, RPMTAG_ENHANCESFLAGS,
++	RPMSENSE_STRONG, 0 },
+   { NULL,		{ NULL, NULL, NULL, NULL },	0, 0, 0, 0, 0 }
+ };
+ 
+@@ -1470,6 +1476,14 @@ static int rpmfcGenerateDependsHelper(const rpmSpec spec, Package pkg, rpmfi fi)
+ 	    failnonzero = 0;
+ 	    tagflags = RPMSENSE_FIND_REQUIRES;
+ 	    break;
++ 	case RPMTAG_ENHANCESFLAGS:
++ 	    if (!pkg->autoProv)
++ 		continue;
++ 	    failnonzero = 0;
++ 	    tagflags = RPMSENSE_FIND_REQUIRES | RPMSENSE_MISSINGOK;
++ 	    if (strcmp(dm->msg, "Supplements") == 0)
++ 		tagflags |= RPMSENSE_STRONG;
++ 	    break;
+ 	default:
+ 	    continue;
+ 	    break;
+diff --git a/lib/rpmds.c b/lib/rpmds.c
+index b6e457b..fe329f9 100644
+--- a/lib/rpmds.c
++++ b/lib/rpmds.c
+@@ -74,6 +74,10 @@ static int dsType(rpmTag tag,
+ 	t = "Trigger";
+ 	evr = RPMTAG_TRIGGERVERSION;
+ 	f = RPMTAG_TRIGGERFLAGS;
++    } else if (tag == RPMTAG_ENHANCESNAME) {
++ 	t = "Enhances";
++ 	evr = RPMTAG_ENHANCESVERSION;
++ 	f = RPMTAG_ENHANCESFLAGS;
+     } else {
+ 	rc = 1;
+     } 
+diff --git a/lib/rpmds.h b/lib/rpmds.h
+index d44d1f8..b581e8e 100644
+--- a/lib/rpmds.h
++++ b/lib/rpmds.h
+@@ -56,7 +56,7 @@ typedef	enum rpmsenseFlags_e {
+     RPMSENSE_RPMLIB = ((1 << 24) | RPMSENSE_PREREQ), /*!< rpmlib(feature) dependency. */
+     RPMSENSE_TRIGGERPREIN = (1 << 25),	/*!< %triggerprein dependency. */
+     RPMSENSE_KEYRING	= (1 << 26),
+-    RPMSENSE_PATCHES	= (1 << 27),
++    RPMSENSE_STRONG	= (1 << 27),
+     RPMSENSE_CONFIG	= (1 << 28)
+ } rpmsenseFlags;
+ 
+@@ -74,6 +74,7 @@ typedef	enum rpmsenseFlags_e {
+     RPMSENSE_SCRIPT_POSTUN | \
+     RPMSENSE_SCRIPT_VERIFY | \
+     RPMSENSE_FIND_REQUIRES | \
++    RPMSENSE_STRONG | \
+     RPMSENSE_SCRIPT_PREP | \
+     RPMSENSE_SCRIPT_BUILD | \
+     RPMSENSE_SCRIPT_INSTALL | \
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index a98178a..1692833 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
+@@ -228,14 +228,14 @@ typedef enum rpmTag_e {
+     RPMTAG_PRETRANSPROG		= 1153,	/* s */
+     RPMTAG_POSTTRANSPROG	= 1154,	/* s */
+     RPMTAG_DISTTAG		= 1155,	/* s */
+-    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension (unimplemented) */
+-#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] (unimplemented) */
+-    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension (unimplemented) */
+-    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension (unimplemented) */
+-    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension placeholder (unimplemented) */
+-#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] (unimplemented) */
+-    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension placeholder (unimplemented) */
+-    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension placeholder (unimplemented) */
++    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension */
++#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] */
++    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension */
++    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension */
++    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension */
++#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] */
++    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension */
++    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension */
+     RPMTAG_PRIORITY		= 1162, /* i[] extension placeholder (unimplemented) */
+     RPMTAG_CVSID		= 1163, /* s (unimplemented) */
+ #define	RPMTAG_SVNID	RPMTAG_CVSID	/* s (unimplemented) */
+diff --git a/python/rpmmodule.c b/python/rpmmodule.c
+index 2fa7eef..c96617a 100644
+--- a/python/rpmmodule.c
++++ b/python/rpmmodule.c
+@@ -387,7 +387,7 @@ void init_rpm(void)
+     REGISTER_ENUM(RPMSENSE_RPMLIB);
+     REGISTER_ENUM(RPMSENSE_TRIGGERPREIN);
+     REGISTER_ENUM(RPMSENSE_KEYRING);
+-    REGISTER_ENUM(RPMSENSE_PATCHES);
++    REGISTER_ENUM(RPMSENSE_STRONG);
+     REGISTER_ENUM(RPMSENSE_CONFIG);
+ 
+     REGISTER_ENUM(RPMTRANS_FLAG_TEST);
+diff --git a/rpmpopt.in b/rpmpopt.in
+index bc6a363..60b58aa 100644
+--- a/rpmpopt.in
++++ b/rpmpopt.in
+@@ -65,6 +65,22 @@ rpm	alias --requires	--qf \
+ 	--POPTdesc=$"list capabilities required by package(s)"
+ rpm	alias -R --requires
+ 
++rpm	alias --suggests	--qf \
++  "[%{SUGGESTSNAME} %{SUGGESTSFLAGS:depflags} %{SUGGESTSVERSION}\n]" \
++	--POPTdesc=$"list capabilities this package suggests"
++
++rpm	alias --recommends	--qf \
++  "[%{SUGGESTSNAME} %{SUGGESTSFLAGS:depflags} %{SUGGESTSVERSION}\n]" \
++	--POPTdesc=$"list capabilities this package recommends"
++
++rpm	alias --enhances	--qf \
++  "[%{ENHANCESNAME} %{ENHANCESFLAGS:depflags} %{ENHANCESVERSION}\n]" \
++	--POPTdesc=$"list capabilities this package enhances"
++
++rpm	alias --supplements	--qf \
++  "[%{ENHANCESNAME} %{ENHANCESFLAGS:depflags} %{ENHANCESVERSION}\n]" \
++	--POPTdesc=$"list capabilities this package supplements"
++
+ rpm	alias --info --qf 'Name        : %-27{NAME}  Relocations: %|PREFIXES?{[%{PREFIXES} ]}:{(not relocatable)}|\n\
+ Version     : %-27{VERSION}       Vendor: %{VENDOR}\n\
+ Release     : %-27{RELEASE}   Build Date: %{BUILDTIME:date}\n\
+-- 
+1.6.1.3
+

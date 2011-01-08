@@ -1,0 +1,78 @@
+From ab2085b8632f2f2ebaca433f694f6b610530f7e1 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 33/35] python writeHdlist
+
+---
+ python/header-py.c |   28 ++++++++++++++++++++++++++++
+ python/header-py.h |    1 +
+ python/rpmmodule.c |    2 ++
+ 3 files changed, 31 insertions(+), 0 deletions(-)
+
+diff --git a/python/header-py.c b/python/header-py.c
+index 8ec2cb4..3aa7bc2 100644
+--- a/python/header-py.c
++++ b/python/header-py.c
+@@ -762,6 +762,34 @@ rpmMergeHeadersFromFD(PyObject * self, PyObject * args, PyObject * kwds)
+     return Py_None;
+ }
+ 
++int WriteHeaders(PyObject *hdlist,char *filename)
++{
++  hdrObject *hdr;
++  FD_t  outfdt=0;
++  int   count;
++  
++  outfdt = Fopen(filename, "w.fdio");
++  if ((!outfdt)||(Fileno(outfdt)<0)) return(-1);
++
++  for(count=0;count<PyList_Size(hdlist);count++){
++    hdr = (hdrObject *)PyList_GetItem(hdlist, count);
++    headerWrite(outfdt,hdr->h,HEADER_MAGIC_YES);
++  }
++  Fclose(outfdt);
++  return(0);
++}
++
++PyObject * rpmHeaderToFile(PyObject * self, PyObject * args)
++{
++  PyObject  *hdlist;
++  char  *filename;
++  int ret;
++
++  if (!PyArg_ParseTuple(args,"Os",&hdlist,&filename)) return NULL;
++  ret = WriteHeaders(hdlist,filename);
++  return(Py_BuildValue("i",ret));
++}
++
+ /**
+  */
+ PyObject *
+diff --git a/python/header-py.h b/python/header-py.h
+index b1197b0..2f9d723 100644
+--- a/python/header-py.h
++++ b/python/header-py.h
+@@ -30,6 +30,7 @@ int rpmMergeHeaders(PyObject * list, FD_t fd, int matchTag);
+ PyObject * rpmHeaderFromFile(PyObject * self, PyObject * args, PyObject * kwds);
+ PyObject * rpmHeaderFromFD(PyObject * self, PyObject * args, PyObject * kwds);
+ PyObject * rpmSingleHeaderFromFD(PyObject * self, PyObject * args, PyObject * kwds);
++PyObject * rpmHeaderToFile(PyObject * self, PyObject * args);
+ PyObject * rpmReadHeaders (FD_t fd);
+ PyObject * hdrLoad(PyObject * self, PyObject * args, PyObject * kwds);
+ 
+diff --git a/python/rpmmodule.c b/python/rpmmodule.c
+index c96617a..0717db0 100644
+--- a/python/rpmmodule.c
++++ b/python/rpmmodule.c
+@@ -175,6 +175,8 @@ static PyMethodDef rpmModuleMethods[] = {
+ 	NULL },
+     { "expandMacro", (PyCFunction) rpmmacro_ExpandMacro, METH_VARARGS|METH_KEYWORDS,
+ 	NULL },
++    { "writeHeaderListToFile", (PyCFunction) rpmHeaderToFile, METH_VARARGS,
++        NULL },
+ 
+     { "archscore", (PyCFunction) archScore, METH_VARARGS|METH_KEYWORDS,
+ 	NULL },
+-- 
+1.6.1.3
+
