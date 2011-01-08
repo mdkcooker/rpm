@@ -32,11 +32,11 @@
 %endif
 
 %if %{?distsuffix:0}%{?!distsuffix:1}
-%define distsuffix mdv
+%define distsuffix .mga
 %endif
 
 %if %{?mkrel:0}%{?!mkrel:1}
-%define mkrel(c:) %{-c: 0.%{-c*}.}%{1}%{?distsuffix:%distsuffix}%{?!distsuffix:mdv}%{?mandriva_release:%mandriva_release}%{?subrel:.%subrel}
+%define mkrel(c:) %{-c: 0.%{-c*}.}%{1}%{?distsuffix:%distsuffix}%{?!distsuffix:.mga}%{?mageia_release:%mageia_release}%{?subrel:.%subrel}
 %endif
 
 %if %{?mips:0}%{?!mips:1}
@@ -47,26 +47,19 @@
 %define pyver %(python -V 2>&1 | cut -f2 -d" " | cut -f1,2 -d".")
 %endif
 
-%if %_vendor == Mandriva
-%define __find_requires %{rpmdir}/mandriva/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
-%define __find_provides %{rpmdir}/mandriva/find-provides
-%endif
+%define __find_requires %{rpmdir}/mageia/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
+%define __find_provides %{rpmdir}/mageia/find-provides
 
 %define rpmversion	4.6.1
 %define srcver		%rpmversion
 %define libver		4.6
-%define release			    %mkrel 6
-%define librpmname   %mklibname rpm  %{libver}
-%define librpmnamedevel   %mklibname -d rpm
+%define release		%mkrel 6
+%define librpmname   	%mklibname rpm  %{libver}
+%define librpmnamedevel %mklibname -d rpm
 
 %define buildpython 1
 
-%if %_vendor == Mandriva
-%if %{mdkversion} >= 200710
-# MDV 2007.1 builds with --hash-style=gnu by default
 %define rpmsetup_version 1.34
-%endif
-%endif
 
 %define builddebug 0
 %{?_with_debug:%define builddebug 1}
@@ -274,9 +267,7 @@ BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
 BuildRequires:	magic-devel
-%if %_vendor == Mandriva
-BuildRequires:  rpm-mandriva-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
-%endif
+BuildRequires:  rpm-mageia-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel >= 0.9.8
@@ -294,19 +285,16 @@ Requires:	cpio
 Requires:	gawk
 Requires:	glibc >= 2.1.92
 Requires:	mktemp
-Requires:	setup >= 2.2.0-8mdk
-Requires:	rpm-manbo-setup
-%if %_vendor == Mandriva
-Requires:	rpm-mandriva-setup >= 1.85
-%endif
+Requires:	setup >= 2.2.0-8
+Requires:	rpm-mageia-setup >= 1.85
 Requires:	update-alternatives
 Requires:	%librpmname = %epoch:%version-%release
 Conflicts:	patch < 2.5
-Conflicts:	menu < 2.1.5-29mdk
+Conflicts:	menu < 2.1.5-29
 Conflicts:	locales < 2.3.1.1
-Conflicts:	man-pages-fr < 0.9.7-16mdk
-Conflicts:	man-pages-pl < 0.4-9mdk
-Conflicts:	perl-URPM < 1.63-3mdv2008.0
+Conflicts:	man-pages-fr < 0.9.7-16
+Conflicts:	man-pages-pl < 0.4-9
+Conflicts:	perl-URPM < 1.63-3
 # rpm 4.6.0 dropped support for --repackage, so urpmi-recover can not work anymore:
 Conflicts:	urpmi-recover
 URL:            http://rpm.org/
@@ -323,9 +311,9 @@ Each software package consists of an archive of files along with information
 about the package like its version, a description, etc.
 
 %package -n %librpmname
-Summary: Library used by rpm
-Group:		System/Libraries
-Provides:   librpm = %version-%release
+Summary:  Library used by rpm
+Group:	  System/Libraries
+Provides: librpm = %version-%release
 
 %description -n %librpmname
 RPM is a powerful command line driven package management system capable of
@@ -360,16 +348,14 @@ Requires:	automake
 Requires:	file
 Requires:	gcc-c++
 # We need cputoolize & amd64-* alias to x86_64-* in config.sub
-Requires:	libtool-base >= 1.4.3-5mdk
-Requires:	patch >= 2.5.9-7mdv2009.1
+Requires:	libtool-base >= 1.4.3-5
+Requires:	patch >= 2.5.9-7
 Requires:	make
 Requires:	tar
 Requires:	unzip
 Requires:	elfutils
 Requires:	rpm = %epoch:%{version}-%{release}
-%if %_vendor == Mandriva
-Requires:	rpm-mandriva-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
-%endif
+Requires:	rpm-mageia-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 
 %description build
 This package contains scripts and executable programs that are used to
@@ -381,8 +367,8 @@ Summary:	Python bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	python >= %{pyver}
 Requires:	rpm = %epoch:%{version}-%{release}
-Obsoletes:  rpm-python < %epoch:%version-%release
-Provides:   rpm-python = %version-%release
+Obsoletes:  	rpm-python < %epoch:%version-%release
+Provides:   	rpm-python = %version-%release
 
 %description -n python-rpm
 The rpm-python package contains a module which permits applications
@@ -431,7 +417,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%buildroot install
 
 %ifarch ppc powerpc
-ln -sf ppc-mandriva-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-mandriva-linux
+ln -sf ppc-mageia-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-mageia-linux
 %endif
 
 #mv -f $RPM_BUILD_ROOT/%{rpmdir}/rpmdiff $RPM_BUILD_ROOT/%{_bindir}
@@ -480,11 +466,7 @@ EOF
   rm -f  .%{_bindir}/rpmdiff
 )
 
-%if %_vendor == Mandriva
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
-%else
-%find_lang %{name}
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -503,6 +485,8 @@ fi
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
 
 rm -rf /usr/lib/rpm/*-mandrake-*
+rm -rf /usr/lib/rpm/*-mandriva-*
+
 
 %post
 # nuke __db.00? when updating to this rpm
@@ -521,13 +505,6 @@ fi
 
 %postun
 /usr/share/rpm-helper/del-user rpm $1 rpm
-
-%if %mdkversion < 200900
-%post -n %librpmname -p /sbin/ldconfig
-%endif
-%if %mdkversion < 200900
-%postun -n %librpmname -p /sbin/ldconfig
-%endif
 
 %triggerpostun -- rpm < 1:4.4.2.3-11
 if [ -f /etc/rpm/macros.cdb.rpmsave ]; then
@@ -700,5 +677,3 @@ fi
 %{_libdir}/librpmbuild.la
 %{_libdir}/librpmbuild.so
 %{_libdir}/pkgconfig/rpm.pc
-
-
