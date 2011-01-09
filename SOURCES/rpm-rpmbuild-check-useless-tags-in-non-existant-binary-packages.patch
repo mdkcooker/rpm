@@ -3,7 +3,7 @@ From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
 Subject: [PATCH 25/35] rpmbuild check useless tags in non existant binary packages
 
-Two new fatal errors (during package build, but only for mdv packages and when
+Two new fatal errors (during package build, but only for mga packages and when
 %_missing_subpackage_terminate_build is set):
 
 - "%files foo" for subpackages is now mandatory
@@ -42,9 +42,9 @@ index dad5403..b735204 100644
 +    int res = 0;
 +    struct rpmtd_s td;
 +
-+    /* those checks are Mandriva only (May 2008),
-+       and must not break non Mandriva packages */    
-+    if (strstr(_headerRelease(h), "mdv") == 0) return 0;
++    /* those checks are Mageia only (May 2008),
++       and must not break non Mageia packages */    
++    if (strstr(_headerRelease(h), "mga") == 0) return 0;
 +
 +    /* Check that no %pre, %post ... do not exist in this header, since they will be dropped */
 +    HeaderIterator hi = headerInitIterator(h);
