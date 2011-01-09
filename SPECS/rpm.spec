@@ -267,7 +267,7 @@ BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
 BuildRequires:	magic-devel
-BuildRequires:  rpm-mageia-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
+BuildRequires:  rpm-mandriva-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel >= 0.9.8
@@ -286,7 +286,7 @@ Requires:	gawk
 Requires:	glibc >= 2.1.92
 Requires:	mktemp
 Requires:	setup >= 2.2.0-8
-Requires:	rpm-mageia-setup >= 1.85
+Requires:	rpm-mandriva-setup >= 1.85
 Requires:	update-alternatives
 Requires:	%librpmname = %epoch:%version-%release
 Conflicts:	patch < 2.5
@@ -355,7 +355,7 @@ Requires:	tar
 Requires:	unzip
 Requires:	elfutils
 Requires:	rpm = %epoch:%{version}-%{release}
-Requires:	rpm-mageia-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
+Requires:	rpm-mandriva-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 
 %description build
 This package contains scripts and executable programs that are used to
