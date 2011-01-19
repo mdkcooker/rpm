@@ -31,7 +31,8 @@
 %define mklibname(ds)  %{_lib}%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
 %endif
 
-%define lc_distro %(echo %{distribution} | tr "A-Z" "a-z")
+#define lc_distro %(echo %{distribution} | tr "A-Z" "a-z")
+%define lc_distro mageia
 
 %if %{?distsuffix:0}%{?!distsuffix:1}
 %define distsuffix .mga
