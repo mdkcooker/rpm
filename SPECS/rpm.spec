@@ -55,7 +55,7 @@
 %define rpmversion	4.6.1
 %define srcver		%rpmversion
 %define libver		4.6
-%define release		%mkrel 8
+%define release		%mkrel 9
 %define librpmname   	%mklibname rpm  %{libver}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -98,10 +98,6 @@ Patch31:	rpm-4.6.0-rc1-syslog.patch
 # part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
 # (is it still needed?)
 Patch49:	rpm-4.6.0-rc1-provides-obsoleted.patch
-
-# - force /usr/lib/rpm/manbo/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
-# - read /usr/lib/rpm/manbo/rpmpopt (not only /usr/lib/rpm/rpmpopt)
-Patch64:    rpm-4.6.0-rc2-manbo-rpmrc-rpmpopt.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
