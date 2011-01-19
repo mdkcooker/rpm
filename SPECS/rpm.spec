@@ -32,6 +32,7 @@
 %endif
 
 #define lc_distro %(echo %{distribution} | tr "A-Z" "a-z")
+# FIXME: force distro to mageia to get rid of rpm-manbo-setup*
 %define lc_distro mageia
 
 %if %{?distsuffix:0}%{?!distsuffix:1}
