@@ -31,8 +31,6 @@
 %define mklibname(ds)  %{_lib}%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
 %endif
 
-%define lc_distro %(echo %{distribution} | tr "A-Z" "a-z")
-
 %if %{?distsuffix:0}%{?!distsuffix:1}
 %define distsuffix .mga
 %endif
@@ -49,8 +47,8 @@
 %define pyver %(python -V 2>&1 | cut -f2 -d" " | cut -f1,2 -d".")
 %endif
 
-%define __find_requires %{rpmdir}/%{lc_distro}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
-%define __find_provides %{rpmdir}/%{lc_distro}/find-provides
+%define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
+%define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
 %define rpmversion	4.6.1
 %define srcver		%rpmversion
@@ -269,7 +267,7 @@ BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
 BuildRequires:	magic-devel
-BuildRequires:  rpm-%{lc_distro}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
+BuildRequires:  rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel >= 0.9.8
@@ -288,7 +286,7 @@ Requires:	gawk
 Requires:	glibc >= 2.1.92
 Requires:	mktemp
 Requires:	setup >= 2.2.0-8
-Requires:	rpm-%{lc_distro}-setup >= 1.85
+Requires:	rpm-%{_real_vendor}-setup >= 1.85
 Requires:	update-alternatives
 Requires:	%librpmname = %epoch:%version-%release
 Conflicts:	patch < 2.5
@@ -357,7 +355,7 @@ Requires:	tar
 Requires:	unzip
 Requires:	elfutils
 Requires:	rpm = %epoch:%{version}-%{release}
-Requires:	rpm-%{lc_distro}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
+Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 
 %description build
 This package contains scripts and executable programs that are used to
@@ -419,7 +417,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%buildroot install
 
 %ifarch ppc powerpc
-ln -sf ppc-%{lc_distro}-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-%{lc_distro}-linux
+ln -sf ppc-%{_real_vendor}-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-%{_real_vendor}-linux
 %endif
 
 #mv -f $RPM_BUILD_ROOT/%{rpmdir}/rpmdiff $RPM_BUILD_ROOT/%{_bindir}
@@ -487,7 +485,7 @@ fi
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
 
 rm -rf /usr/lib/rpm/*-mandrake-*
-rm -rf /usr/lib/rpm/*-%{lc_distro}-*
+rm -rf /usr/lib/rpm/*-%{_real_vendor}-*
 
 
 %post
