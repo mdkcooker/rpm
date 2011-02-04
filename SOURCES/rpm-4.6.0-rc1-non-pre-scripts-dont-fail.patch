@@ -1,17 +1,17 @@
-From 237387f1423ed3a1db7ea8f98edf5ea1da5c6ec8 Mon Sep 17 00:00:00 2001
+From 2c23eefbd7a8468ea9f493218f97320872db562f Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 02/35] non pre scripts dont fail
+Subject: [PATCH 02/36] non pre scripts dont fail
 
 ---
  lib/psm.c |   23 ++++++++---------------
  1 files changed, 8 insertions(+), 15 deletions(-)
 
 diff --git a/lib/psm.c b/lib/psm.c
-index 9070c6d..890b223 100644
+index 48b4d34..3a9dd70 100644
 --- a/lib/psm.c
 +++ b/lib/psm.c
-@@ -1398,16 +1398,14 @@ assert(psm->mi == NULL);
+@@ -1273,16 +1273,14 @@ rpmRC rpmpsmStage(rpmpsm psm, pkgStage stage)
  
  	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERUN)) {
  		/* Run triggers in this package other package(s) set off. */
@@ -31,7 +31,7 @@ index 9070c6d..890b223 100644
  	}
  	break;
      case PSM_PROCESS:
-@@ -1542,17 +1540,14 @@ assert(psm->mi == NULL);
+@@ -1420,17 +1418,14 @@ rpmRC rpmpsmStage(rpmpsm psm, pkgStage stage)
  	    psm->countCorrection = 0;
  
  	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOST)) {
@@ -52,7 +52,7 @@ index 9070c6d..890b223 100644
  	    }
  
  	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_APPLYONLY))
-@@ -1567,14 +1562,12 @@ assert(psm->mi == NULL);
+@@ -1445,14 +1440,12 @@ rpmRC rpmpsmStage(rpmpsm psm, pkgStage stage)
  	    psm->countCorrection = -1;
  
  	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOSTUN)) {
@@ -70,5 +70,5 @@ index 9070c6d..890b223 100644
  
  	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_APPLYONLY))
 -- 
-1.6.1.3
+1.6.4.4
 

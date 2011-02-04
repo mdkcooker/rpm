@@ -1,0 +1,24 @@
+From 030db95d0aff730b4c91b83f8eb3a4b4bd2ee37c Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 27/36] serial tag
+
+---
+ build/parsePreamble.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/build/parsePreamble.c b/build/parsePreamble.c
+index 483ac99..9751cdd 100644
+--- a/build/parsePreamble.c
++++ b/build/parsePreamble.c
+@@ -726,6 +727,7 @@ static struct PreambleRec_s const preambleList[] = {
+     {RPMTAG_VERSION,		0, 0, LEN_AND_STR("version")},
+     {RPMTAG_RELEASE,		0, 0, LEN_AND_STR("release")},
+     {RPMTAG_EPOCH,		0, 0, LEN_AND_STR("epoch")},
++    {RPMTAG_EPOCH,		0, 0, LEN_AND_STR("serial")},
+     {RPMTAG_SUMMARY,		1, 0, LEN_AND_STR("summary")},
+     {RPMTAG_LICENSE,		0, 0, LEN_AND_STR("license")},
+     {RPMTAG_DISTRIBUTION,	0, 0, LEN_AND_STR("distribution")},
+-- 
+1.6.4.4
+

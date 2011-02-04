@@ -1,20 +1,20 @@
-From ab2085b8632f2f2ebaca433f694f6b610530f7e1 Mon Sep 17 00:00:00 2001
+From f57cd4dcf3fe2ab90a4a63423babca06b4cb8ef2 Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 33/35] python writeHdlist
+Subject: [PATCH 29/36] python writeHdlist
 
 ---
- python/header-py.c |   28 ++++++++++++++++++++++++++++
+ python/header-py.c |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++++
  python/header-py.h |    1 +
- python/rpmmodule.c |    2 ++
- 3 files changed, 31 insertions(+), 0 deletions(-)
+ python/rpmmodule.c |    2 +
+ 3 files changed, 77 insertions(+), 0 deletions(-)
 
 diff --git a/python/header-py.c b/python/header-py.c
-index 8ec2cb4..3aa7bc2 100644
+index 539db0d..d3ae786 100644
 --- a/python/header-py.c
 +++ b/python/header-py.c
-@@ -762,6 +762,34 @@ rpmMergeHeadersFromFD(PyObject * self, PyObject * args, PyObject * kwds)
-     return Py_None;
+@@ -801,6 +801,80 @@ rpmMergeHeadersFromFD(PyObject * self, PyObject * args, PyObject * kwds)
+     Py_RETURN_NONE;
  }
  
 +int WriteHeaders(PyObject *hdlist,char *filename)
@@ -45,34 +45,78 @@ index 8ec2cb4..3aa7bc2 100644
 +  return(Py_BuildValue("i",ret));
 +}
 +
- /**
-  */
- PyObject *
++/**
++ */
++PyObject *
++rpmSingleHeaderFromFD(PyObject * self, PyObject * args, PyObject * kwds)
++{
++    FD_t fd;
++    int fileno;
++    off_t offset;
++    PyObject * tuple;
++    Header h;
++    char * kwlist[] = {"fd", NULL};
++
++    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i", kwlist, &fileno))
++	return NULL;
++
++    offset = lseek(fileno, 0, SEEK_CUR);
++
++    fd = fdDup(fileno);
++
++    if (!fd) {
++	PyErr_SetFromErrno(pyrpmError);
++	return NULL;
++    }
++
++    Py_BEGIN_ALLOW_THREADS
++    h = headerRead(fd, HEADER_MAGIC_YES);
++    Py_END_ALLOW_THREADS
++
++    Fclose(fd);
++
++    tuple = PyTuple_New(2);
++
++    if (h && tuple) {
++	PyTuple_SET_ITEM(tuple, 0, (PyObject *) hdr_Wrap(h));
++	PyTuple_SET_ITEM(tuple, 1, PyLong_FromLong(offset));
++	h = headerFree(h);
++    } else {
++	Py_INCREF(Py_None);
++	Py_INCREF(Py_None);
++	PyTuple_SET_ITEM(tuple, 0, Py_None);
++	PyTuple_SET_ITEM(tuple, 1, Py_None);
++    }
++
++    return tuple;
++}
++
+ PyObject * versionCompare (PyObject * self, PyObject * args, PyObject * kwds)
+ {
+     hdrObject * h1, * h2;
 diff --git a/python/header-py.h b/python/header-py.h
-index b1197b0..2f9d723 100644
+index 28378ac..42758b5 100644
 --- a/python/header-py.h
 +++ b/python/header-py.h
-@@ -30,6 +30,7 @@ int rpmMergeHeaders(PyObject * list, FD_t fd, int matchTag);
- PyObject * rpmHeaderFromFile(PyObject * self, PyObject * args, PyObject * kwds);
- PyObject * rpmHeaderFromFD(PyObject * self, PyObject * args, PyObject * kwds);
- PyObject * rpmSingleHeaderFromFD(PyObject * self, PyObject * args, PyObject * kwds);
+@@ -23,4 +23,5 @@ int tagNumFromPyObject (PyObject *item, rpmTag *tagp);
+ PyObject * labelCompare (PyObject * self, PyObject * args);
+ PyObject * versionCompare (PyObject * self, PyObject * args, PyObject * kwds);
+ PyObject * rpmMergeHeadersFromFD(PyObject * self, PyObject * args, PyObject * kwds);
 +PyObject * rpmHeaderToFile(PyObject * self, PyObject * args);
- PyObject * rpmReadHeaders (FD_t fd);
- PyObject * hdrLoad(PyObject * self, PyObject * args, PyObject * kwds);
- 
+ #endif
 diff --git a/python/rpmmodule.c b/python/rpmmodule.c
-index c96617a..0717db0 100644
+index 9abdd00..0ccbaa1 100644
 --- a/python/rpmmodule.c
 +++ b/python/rpmmodule.c
-@@ -175,6 +175,8 @@ static PyMethodDef rpmModuleMethods[] = {
+@@ -122,6 +122,8 @@ static PyMethodDef rpmModuleMethods[] = {
  	NULL },
      { "expandMacro", (PyCFunction) rpmmacro_ExpandMacro, METH_VARARGS|METH_KEYWORDS,
  	NULL },
 +    { "writeHeaderListToFile", (PyCFunction) rpmHeaderToFile, METH_VARARGS,
 +        NULL },
  
-     { "archscore", (PyCFunction) archScore, METH_VARARGS|METH_KEYWORDS,
+     { "archscore", (PyCFunction) archScore, METH_O,
  	NULL },
 -- 
-1.6.1.3
+1.6.4.4
 

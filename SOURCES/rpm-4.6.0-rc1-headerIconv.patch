@@ -1,32 +1,30 @@
-From 6e46b147b462a226c833e055fc0368eb86766a1a Mon Sep 17 00:00:00 2001
-From: unknown author <cooker@mandrivalinux.org>
-Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 20/35] headerIconv
+commit 72582cbd92b17b2bd1c1de3c0ee6d012470e4756
+Author: unknown author <cooker@mandrivalinux.org>
+Date:   Mon Jan 5 13:29:57 2009 +0000
 
-- Make the spec as follows
-...
-Summary: default summary
-Summary(ja_JP.eucJP): [some strings encoded in euc-jp]
-Name:hogefuga
-...
-- Show summary in each locale.
-$ LANG=ja_JP.utf8 rpm -qp --qf "%{SUMMARY}\n" hogefuga.rpm
-[some strings encoded in euc-jp]
-
-do not display in UTF-8.
-
-This patch improve the parser of spec-file which are written in multi-languages.
-In case the language code is ja_JP , as you know ja_JP use some different encodings
-such as ja_JP.eucJP,ja_JP.sjis,ja_JP.utf8...
-When the spec-file are written in eucJP but the local LANG environment is UTF-8,
-rpm will display encoded characters not same as LANG environment(a.k.a Mojibake).
-So this patch will convert the data to a specific encoding which used in the selected locale.
----
- lib/header.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 54 insertions(+), 8 deletions(-)
+    headerIconv
+    
+    - Make the spec as follows
+    ...
+    Summary: default summary
+    Summary(ja_JP.eucJP): [some strings encoded in euc-jp]
+    Name:hogefuga
+    ...
+    - Show summary in each locale.
+    $ LANG=ja_JP.utf8 rpm -qp --qf "%{SUMMARY}\n" hogefuga.rpm
+    [some strings encoded in euc-jp]
+    
+    do not display in UTF-8.
+    
+    This patch improve the parser of spec-file which are written in multi-languages.
+    In case the language code is ja_JP , as you know ja_JP use some different encodings
+    such as ja_JP.eucJP,ja_JP.sjis,ja_JP.utf8...
+    When the spec-file are written in eucJP but the local LANG environment is UTF-8,
+    rpm will display encoded characters not same as LANG environment(a.k.a Mojibake).
+    So this patch will convert the data to a specific encoding which used in the selected locale.
 
 diff --git a/lib/header.c b/lib/header.c
-index fb9602b..42d017d 100644
+index 77e2473..876a246 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -9,6 +9,8 @@
@@ -38,7 +36,7 @@ index fb9602b..42d017d 100644
  
  #include <rpm/rpmtypes.h>
  #include <rpm/rpmstring.h>
-@@ -1293,6 +1295,54 @@ static int headerMatchLocale(const char *td, const char *l, const char *le)
+@@ -1214,6 +1216,54 @@ static int headerMatchLocale(const char *td, const char *l, const char *le)
      return 0;
  }
  
@@ -93,16 +91,15 @@ index fb9602b..42d017d 100644
  /**
   * Return i18n string from header that matches locale.
   * @param h		header
-@@ -1324,7 +1374,7 @@ static int copyI18NEntry(Header h, indexEntry entry, rpmtd td,
- 
+@@ -1246,6 +1296,7 @@ static int copyI18NEntry(Header h, indexEntry entry, rpmtd td,
      for (l = lang; *l != '\0'; l = le) {
  	const char *t;
--	char *ed, *ed_weak = NULL;
-+	char *ed, *ed_weak = NULL, *t_weak = NULL;
+ 	char *ed, *ed_weak = NULL;
++	const char *t_weak = NULL;
  	int langNum;
  
  	while (*l && *l == ':')			/* skip leading colons */
-@@ -1341,24 +1391,20 @@ static int copyI18NEntry(Header h, indexEntry entry, rpmtd td,
+@@ -1262,24 +1313,20 @@ static int copyI18NEntry(Header h, indexEntry entry, rpmtd td,
  
  	    int match = headerMatchLocale(t, l, le);
  	    if (match == 1) {
@@ -130,6 +127,3 @@ index fb9602b..42d017d 100644
      return 1;
  }
  
--- 
-1.6.1.3
-

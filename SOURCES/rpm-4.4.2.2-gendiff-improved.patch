@@ -1,7 +1,7 @@
-From 29cde650fb21cd3ff6cade1d55f10bead8d3b5f1 Mon Sep 17 00:00:00 2001
+From aa600c8f9c21d92dc0065692a0c9c06b885e41cb Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 01/35] gendiff improved
+Subject: [PATCH 01/36] gendiff improved
 
 ---
  scripts/gendiff |   49 ++++++++++++++++++++++++++++++++++++++++---------
@@ -77,5 +77,5 @@ index d9b0c21..ea9d190 100644
 +    fi    
  done
 -- 
-1.6.1.3
+1.6.4.4
 

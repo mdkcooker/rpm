@@ -1,18 +1,18 @@
-From b07982c2e495673f17cb68741b68d4ddddcf2688 Mon Sep 17 00:00:00 2001
+From d2cd70c4a7057fe75361646599b6a08ecf80f61e Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 08/35] no doc conflicts
+Subject: [PATCH 08/36] no doc conflicts
 
 ---
- lib/transaction.c |   30 ++++++++++++++++++++++++++++++
- 1 files changed, 30 insertions(+), 0 deletions(-)
+ lib/transaction.c |   31 +++++++++++++++++++++++++++++++
+ 1 files changed, 31 insertions(+), 0 deletions(-)
 
 diff --git a/lib/transaction.c b/lib/transaction.c
-index bf6f0e4..45eeaf3 100644
+index e4f282b..54eeb1e 100644
 --- a/lib/transaction.c
 +++ b/lib/transaction.c
-@@ -56,6 +56,22 @@ static int sharedCmp(const void * one, const void * two)
-     return 0;
+@@ -262,6 +262,22 @@ static uint64_t countFiles(rpmts ts)
+     return fc;
  }
  
 +static int is_a_doc_conflict(rpmfi fi)
@@ -34,28 +34,29 @@ index bf6f0e4..45eeaf3 100644
  /**
   * handleInstInstalledFiles.
   * @param ts		transaction set
-@@ -162,6 +178,13 @@ static int handleInstInstalledFiles(const rpmts ts,
- 		}
+@@ -302,6 +318,13 @@ static int handleInstInstalledFile(const rpmts ts, rpmte p, rpmfi fi,
  	    }
+ 	}
  
-+	    /* HACK: always install latest (arch-independent) man
-+	       pages and gtk/gnome html doc files. */
-+	    if (rConflicts && is_a_doc_conflict(fi)) {
-+	        fi->actions[fileNum] = FA_CREATE;
-+		rConflicts = 0;
-+	    }
++	/* HACK: always install latest (arch-independent) man
++	   pages and gtk/gnome html doc files. */
++	if (rConflicts && is_a_doc_conflict(fi)) {
++	    rpmfsSetAction(fs, fx, FA_CREATE);
++	    rConflicts = 0;
++	}
 +
- 	    if (rConflicts) {
- 		rpmpsAppend(ps, RPMPROB_FILE_CONFLICT,
- 			rpmteNEVRA(p), rpmteKey(p),
-@@ -518,6 +541,13 @@ assert(otherFi != NULL);
+ 	if (rConflicts) {
+ 	    char *altNEVR = headerGetAsString(otherHeader, RPMTAG_NEVRA);
+ 	    rpmps ps = rpmtsProblems(ts);
+@@ -481,6 +504,14 @@ assert(otherFi != NULL);
+ 		    }
  		    done = 1;
  		}
- 
++
 +		/* HACK: always install latest (arch-independent) man
 +		   pages and gtk/gnome html doc files. */
 +		if (rConflicts && is_a_doc_conflict(fi)) {
-+		    fi->actions[i] = FA_CREATE;
++		    rpmfsSetAction(fs, i, FA_CREATE);
 +		    rConflicts = 0;
 +		}
 +
@@ -63,5 +64,5 @@ index bf6f0e4..45eeaf3 100644
  		    rpmpsAppend(ps, RPMPROB_NEW_FILE_CONFLICT,
  			rpmteNEVRA(p), rpmteKey(p),
 -- 
-1.6.1.3
+1.6.4.4
 

@@ -1,7 +1,7 @@
-From 15609e15e64dc382b55d780973632ec53156b22e Mon Sep 17 00:00:00 2001
+From cb421f706acd23f6b2c06a0cf3357ef49c4f7041 Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 10/35] check file trim double slash in buildroot
+Subject: [PATCH 10/36] check file trim double slash in buildroot
 
 ---
  scripts/check-files |    6 ++++--
@@ -29,5 +29,5 @@ index b397f1c..31e92fe 100755
  diff -d "$FILES_DISK" "$FILES_RPM" | grep "^< " | cut -c3- | 
  while read f; do
 -- 
-1.6.1.3
+1.6.4.4
 

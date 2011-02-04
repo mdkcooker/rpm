@@ -1,42 +1,41 @@
-From 03e26967acaae0db3da3260fd18c8628a1d137ce Mon Sep 17 00:00:00 2001
-From: unknown author <cooker@mandrivalinux.org>
-Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 26/35] protect against non robust futex
+commit 115e413d9708799a8ada6643b35022f9a99cad0c
+Author: unknown author <cooker@mandrivalinux.org>
+Date:   Mon Jan 5 13:29:57 2009 +0000
 
-The basic idea is to workaround libdb using futex (through pthread_mutex)
-which are not "robust" (ie when a process dies, a futex may still be lying
-around, uselessly blocking, until a reboot is done).
-
-the workaround is to ensure __db* are removed when unused:
-- when we open the db, we share lock (through flock) __db.001
-- when the db is closed, __db* are removed if nobody locks __db.001 anymore
-- when the db is opened, __db* are removed if nobody locks __db.001:
-  this is useful to rip stale locks
-
-this fixes #41868, but it doesn't explain why stale locks are lying around :-/
-
-PS: another solution would be to patch libdb to use "robust futex", but the
-solution above is considered safer (since it won't impact the other programs
-of libdb)
-
-Signed-off-by: Pascal "Pixel" Rigaux <pixel@mandriva.com>
----
- lib/backend/db3.c |  104 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 104 insertions(+), 0 deletions(-)
+    protect against non robust futex
+    
+    The basic idea is to workaround libdb using futex (through pthread_mutex)
+    which are not "robust" (ie when a process dies, a futex may still be lying
+    around, uselessly blocking, until a reboot is done).
+    
+    the workaround is to ensure __db* are removed when unused:
+    - when we open the db, we share lock (through flock) __db.001
+    - when the db is closed, __db* are removed if nobody locks __db.001 anymore
+    - when the db is opened, __db* are removed if nobody locks __db.001:
+      this is useful to rip stale locks
+    
+    this fixes #41868, but it doesn't explain why stale locks are lying around :-/
+    
+    PS: another solution would be to patch libdb to use "robust futex", but the
+    solution above is considered safer (since it won't impact the other programs
+    of libdb)
+    
+    Signed-off-by: Pascal "Pixel" Rigaux <pixel@mandriva.com>
 
 diff --git a/lib/backend/db3.c b/lib/backend/db3.c
-index ed6f2a0..a36798f 100644
+index bc3b8a4..73216e4 100644
 --- a/lib/backend/db3.c
 +++ b/lib/backend/db3.c
-@@ -9,6 +9,7 @@ static int _debug = 1;	/* XXX if < 0 debugging, > 0 unusual error returns */
- #if defined(HAVE_FTOK) && defined(HAVE_SYS_IPC_H)
+@@ -10,6 +10,8 @@ static int _debug = 1;	/* XXX if < 0 debugging, > 0 unusual error returns */
  #include <sys/ipc.h>
  #endif
-+#include <sys/file.h>
  
++#include <sys/file.h>
++
  #include <rpm/rpmtypes.h>
  #include <rpm/rpmmacro.h>
-@@ -635,6 +636,100 @@ assert(db != NULL);
+ #include <rpm/rpmfileutil.h>
+@@ -384,6 +386,100 @@ static int db3stat(dbiIndex dbi, unsigned int flags)
      return rc;
  }
  
@@ -137,15 +136,15 @@ index ed6f2a0..a36798f 100644
  static int db3close(dbiIndex dbi, unsigned int flags)
  {
      rpmdb rpmdb = dbi->dbi_rpmdb;
-@@ -685,6 +780,7 @@ static int db3close(dbiIndex dbi, unsigned int flags)
+@@ -408,6 +504,7 @@ static int db3close(dbiIndex dbi, unsigned int flags)
  
      if (rpmdb->db_dbenv != NULL && dbi->dbi_use_dbenv) {
  	if (rpmdb->db_opens == 1) {
 +	    release_extra_lock_may_clean(dbhome, (int) ((DB_ENV *) rpmdb->db_dbenv)->app_private);
- 	    xx = db_fini(dbi, (dbhome ? dbhome : ""), dbfile, dbsubfile);
+ 	    xx = db_fini(dbi, (dbhome ? dbhome : ""));
  	    rpmdb->db_dbenv = NULL;
  	}
-@@ -845,6 +941,7 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
+@@ -534,6 +631,7 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
      /*
       * Avoid incompatible DB_CREATE/DB_RDONLY flags on DBENV->open.
       */
@@ -153,7 +152,7 @@ index ed6f2a0..a36798f 100644
      if (dbi->dbi_use_dbenv) {
  
  	if (access(dbhome, W_OK) == -1) {
-@@ -876,6 +973,9 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
+@@ -565,6 +663,9 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
  	    }
  
  	} else {	/* dbhome is writable, check for persistent dbenv. */
@@ -163,7 +162,7 @@ index ed6f2a0..a36798f 100644
  	    char * dbf = rpmGetPath(dbhome, "/__db.001", NULL);
  
  	    if (access(dbf, F_OK) == -1) {
-@@ -933,6 +1033,10 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
+@@ -621,6 +722,10 @@ static int db3open(rpmdb rpmdb, rpmTag rpmtag, dbiIndex * dbip)
  	    if (rc == 0) {
  		rpmdb->db_dbenv = dbenv;
  		rpmdb->db_opens = 1;
@@ -174,6 +173,3 @@ index ed6f2a0..a36798f 100644
  	    }
  	} else {
  	    dbenv = rpmdb->db_dbenv;
--- 
-1.6.1.3
-

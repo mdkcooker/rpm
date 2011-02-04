@@ -50,11 +50,12 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.6.1
+%define rpmversion	4.8.0
 %define srcver		%rpmversion
-%define libver		4.6
-%define release		%mkrel 10
-%define librpmname   	%mklibname rpm  %{libver}
+%define libver		4.8
+%define libmajor	1
+%define release		%mkrel 1
+%define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
 %define buildpython 1
@@ -109,7 +110,9 @@ Patch70:	rpm-4.6.0-rc1-bb-shortcircuit.patch
 # http://www.redhat.com/archives/rpm-list/2005-April/msg00131.html
 # http://www.redhat.com/archives/rpm-list/2005-April/msg00132.html
 # is this useful? "at least erasure ordering is just as non-existent as it was in 4.4.x" says Panu
-Patch71:    rpm-4.6.0-ordererase.patch
++#with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
++#Patch71:    rpm-4.6.0-ordererase.patch#with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
+#Patch71:    rpm-4.6.0-ordererase.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
@@ -126,14 +129,14 @@ Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 Patch114: rpm-4.6.0-rc1-read-macros_d-dot-macros.patch
 
 # remove unused skipDir functionality that conflicts with patch124 below
-Patch1124: rpm-4.6.0-rc1-revert-unused-skipDir-functionality.patch
+#Patch1124: rpm-4.6.0-rc1-revert-unused-skipDir-functionality.patch
 
 # [pixel] without this patch, "rpm -e" or "rpm -U" will need to stat(2) every dirnames of
 # files from the package (eg COPYING) in the db. This is quite costly when not in cache 
 # (eg on a test here: >300 stats, and so 3 seconds after a "echo 3 > /proc/sys/vm/drop_caches")
 # this breaks urpmi test case test_rpm_i_fail('gd') in superuser--file-conflicts.t,
 # but this is bad design anyway
-Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
+#Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
 Patch133: rpm-4.6.0-rc1-weakdeps.patch
@@ -141,10 +144,8 @@ Patch133: rpm-4.6.0-rc1-weakdeps.patch
 # convert data in the header to a specific encoding which used in the selected locale.
 Patch137: rpm-4.6.0-rc1-headerIconv.patch
 
-Patch140: rpm-russian-translation.patch
-
 # Mandriva does not need the (broken) ldconfig hack since it uses filetriggers
-Patch141: rpm-4.6.0-rc1-drop-skipping-ldconfig-hack.patch
+#Patch141: rpm-4.6.0-rc1-drop-skipping-ldconfig-hack.patch
 
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
@@ -165,13 +166,6 @@ Patch157: introduce-_after_setup-which-is-called-after-setup.patch
 Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
-# fixes backported from 4.7.1, see patch files for full changelog entries
-# fixes ignored Requires(pre) and (post) when they have a plain Requires counterpart
-Patch161: rpm-fix-corequisites.patch
-Patch162: rpm-fix-islegacyprereq.patch
-# map PreReq into Requires(pre,preun) at build
-Patch163: rpm-map-prereq.patch
-
 # avoid "canonicalization unexpectedly shrank by one character" error from 
 # debugedit by adding '/' to the end of the string when the error would be
 # triggered
@@ -186,9 +180,6 @@ Patch165: rpm-4.6.0-fix-debugedit-canonicalization-error.patch
 # default behaviour in rpm-jbj >= 4.4.6
 Patch1005: rpm-allow-conflicting-ghost-files.patch
 
-# (nb: see the patch for more info about this issue)
-Patch1006: rpm-4.6.0-rc1-compat-PayloadIsLzma.patch
-
 Patch1007: rpm-4.6.0-rc3-xz-support.patch
 
 # Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
@@ -199,9 +190,6 @@ Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 # break when these unknown tags might be found in the rpmdb. Notice that this
 # will only make rpm recognize these, not implement actual support for them..
 Patch1009: rpm-4.6.0-rpm5-tags.patch
-
-# Avoid adding Lua sources/patches twice when recursing. (backport from upstream git)
-Patch1010: rpm-4.6.0-lua-add-sources-and-patches-only-once.patch
 
 # Check chroot return code before running lua script
 Patch1011: rpm-4.6.0-do-not-run-lua-scripts-when-chroot-fails.patch
@@ -233,7 +221,7 @@ PAtch1018: rpm-4.6.1-setup-rubygems.patch
 
 # Turbolinux patches
 # add writeHeaderListTofile function into rpm-python (needed by "buildman" build system) (Toshihiro, 2003)
-Patch2002: rpm-4.6.0-rc1-python-writeHdlist.patch
+#Patch2002: rpm-4.6.0-rc1-python-writeHdlist.patch
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
@@ -625,10 +613,12 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/brp-*
 %rpmattr	%{_prefix}/lib/rpm/check-files
 %rpmattr	%{_prefix}/lib/rpm/debugedit
+%rpmattr	%{_prefix}/lib/rpm/desktop-file.prov 
 %rpmattr	%{_prefix}/lib/rpm/find-debuginfo.sh
 %rpmattr	%{_prefix}/lib/rpm/find-lang.sh
 %rpmattr	%{_prefix}/lib/rpm/find-provides
 %rpmattr	%{_prefix}/lib/rpm/find-requires
+%rpmattr	%{_prefix}/lib/rpm/fontconfig.prov
 %rpmattr	%{_prefix}/lib/rpm/perldeps.pl
 %rpmattr	%{_prefix}/lib/rpm/perl.prov
 %rpmattr	%{_prefix}/lib/rpm/perl.req
@@ -644,6 +634,8 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/macros.python
 %rpmattr	%{_prefix}/lib/rpm/mono-find-provides
 %rpmattr	%{_prefix}/lib/rpm/mono-find-requires
+%rpmattr	%{_prefix}/lib/rpm/ocaml-find-provides.sh
+%rpmattr	%{_prefix}/lib/rpm/ocaml-find-requires.sh
 %rpmattr	%{_prefix}/lib/rpm/osgideps.pl
 %rpmattr	%{_prefix}/lib/rpm/pkgconfigdeps.sh
 %rpmattr	%{_prefix}/lib/rpm/rpmdiff
@@ -663,9 +655,9 @@ fi
 
 %files -n %librpmname
 %defattr(-,root,root)
-%{_libdir}/librpm-%{libver}.so
-%{_libdir}/librpmio-%{libver}.so
-%{_libdir}/librpmbuild-%{libver}.so
+%{_libdir}/librpm.so.%{libmajor}*
+%{_libdir}/librpmio.so.%{libmajor}*
+%{_libdir}/librpmbuild.so.%{libmajor}*
 
 %files -n %librpmnamedevel
 %defattr(-,root,root)

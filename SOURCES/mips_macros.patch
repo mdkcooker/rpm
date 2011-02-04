@@ -1,8 +1,17 @@
-Index: rpm-4.6.0/macros.in
-===================================================================
---- rpm-4.6.0.orig/macros.in	1970-01-01 00:00:08.000000000 +0000
-+++ rpm-4.6.0/macros.in	2009-03-23 17:37:19.000000000 +0000
-@@ -1160,6 +1160,10 @@
+From 4436b2ece8b521a1ed80a7d7517a1d8d28cc1f43 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Thu, 11 Feb 2010 14:38:59 +0000
+Subject: [PATCH 32/36] mips macros
+
+---
+ macros.in |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
+
+diff --git a/macros.in b/macros.in
+index 9e18cdc..d045e2e 100644
+--- a/macros.in
++++ b/macros.in
+@@ -1180,6 +1180,10 @@ done \
  # arch macro for all supported Alpha processors
  %alpha	alpha alphaev56 alphaev6 alphaev67
  
@@ -13,3 +22,6 @@ Index: rpm-4.6.0/macros.in
  #------------------------------------------------------------------------
  # Use in %install to generate locale specific file lists. For example,
  #
+-- 
+1.6.4.4
+

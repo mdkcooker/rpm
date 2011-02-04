@@ -1,7 +1,7 @@
-From a08288c24e968903b7c83934fafda085f7ed2854 Mon Sep 17 00:00:00 2001
+From 2dfdacaf172840f09a3467e7c04aa8eb2c2d02da Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 18/35] weakdeps
+Subject: [PATCH 12/36] weakdeps
 
 ---
  build/parsePreamble.c |   18 ++++++++++++++++++
@@ -16,10 +16,10 @@ Subject: [PATCH 18/35] weakdeps
  9 files changed, 77 insertions(+), 10 deletions(-)
 
 diff --git a/build/parsePreamble.c b/build/parsePreamble.c
-index 3309177..1ba7a8e 100644
+index b5f1780..483ac99 100644
 --- a/build/parsePreamble.c
 +++ b/build/parsePreamble.c
-@@ -122,6 +122,8 @@ static struct tokenBits_s const installScriptBits[] = {
+@@ -124,6 +124,8 @@ static struct tokenBits_s const installScriptBits[] = {
      { "post",		RPMSENSE_SCRIPT_POST },
      { "rpmlib",		RPMSENSE_RPMLIB },
      { "verify",		RPMSENSE_SCRIPT_VERIFY },
@@ -28,7 +28,7 @@ index 3309177..1ba7a8e 100644
      { NULL, 0 }
  };
  
-@@ -132,6 +134,8 @@ static const struct tokenBits_s const buildScriptBits[] = {
+@@ -134,6 +136,8 @@ static const struct tokenBits_s const buildScriptBits[] = {
      { "build",		RPMSENSE_SCRIPT_BUILD },
      { "install",	RPMSENSE_SCRIPT_INSTALL },
      { "clean",		RPMSENSE_SCRIPT_CLEAN },
@@ -37,7 +37,7 @@ index 3309177..1ba7a8e 100644
      { NULL, 0 }
  };
  
-@@ -626,6 +630,16 @@ static int handlePreambleTag(rpmSpec spec, Package pkg, rpmTag tag,
+@@ -649,6 +653,16 @@ static int handlePreambleTag(rpmSpec spec, Package pkg, rpmTag tag,
  	if ((rc = parseRCPOT(spec, pkg, field, tag, 0, tagflags)))
  	    return rc;
  	break;
@@ -54,22 +54,22 @@ index 3309177..1ba7a8e 100644
      case RPMTAG_EXCLUDEARCH:
      case RPMTAG_EXCLUSIVEARCH:
      case RPMTAG_EXCLUDEOS:
-@@ -723,6 +737,10 @@ static struct PreambleRec_s preambleList[] = {
-     {RPMTAG_AUTOPROV,		0, 0, 0, "autoprov"},
-     {RPMTAG_DOCDIR,		0, 0, 0, "docdir"},
-     {RPMTAG_DISTTAG,		0, 0, 0, "disttag"},
-+    {RPMTAG_SUGGESTSFLAGS,	0, 0, 0, "recommends"},
-+    {RPMTAG_SUGGESTSFLAGS,	0, 0, 0, "suggests"},
-+    {RPMTAG_ENHANCESFLAGS,	0, 0, 0, "supplements"},
-+    {RPMTAG_ENHANCESFLAGS,	0, 0, 0, "enhances"},
-    	/* LCL: can't add null annotation */
-     {0, 0, 0, 0, 0}
+@@ -748,6 +762,10 @@ static struct PreambleRec_s const preambleList[] = {
+     {RPMTAG_DOCDIR,		0, 0, LEN_AND_STR("docdir")},
+     {RPMTAG_DISTTAG,		0, 0, LEN_AND_STR("disttag")},
+     {RPMTAG_BUGURL,		0, 0, LEN_AND_STR("bugurl")},
++    {RPMTAG_SUGGESTSFLAGS,	0, 0, LEN_AND_STR("recommends")},
++    {RPMTAG_SUGGESTSFLAGS,	0, 0, LEN_AND_STR("suggests")},
++    {RPMTAG_ENHANCESFLAGS,	0, 0, LEN_AND_STR("supplements")},
++    {RPMTAG_ENHANCESFLAGS,	0, 0, LEN_AND_STR("enhances")},
+     {0, 0, 0, 0}
  };
+ 
 diff --git a/build/parseReqs.c b/build/parseReqs.c
-index 54230c7..ca47354 100644
+index d12aca3..6d91ea1 100644
 --- a/build/parseReqs.c
 +++ b/build/parseReqs.c
-@@ -86,6 +86,10 @@ rpmRC parseRCPOT(rpmSpec spec, Package pkg, const char *field, rpmTag tagN,
+@@ -85,6 +85,10 @@ rpmRC parseRCPOT(rpmSpec spec, Package pkg, const char *field, rpmTag tagN,
  	tagflags |= RPMSENSE_ANY;
  	h = spec->buildRestrictions;
  	break;
@@ -81,10 +81,10 @@ index 54230c7..ca47354 100644
      case RPMTAG_REQUIREFLAGS:
  	tagflags |= RPMSENSE_ANY;
 diff --git a/build/reqprov.c b/build/reqprov.c
-index 1e69bd2..415a14e 100644
+index 9c48b11..761bef4 100644
 --- a/build/reqprov.c
 +++ b/build/reqprov.c
-@@ -43,6 +43,16 @@ int addReqProv(rpmSpec spec, Header h, rpmTag tagN,
+@@ -75,6 +75,16 @@ int addReqProv(rpmSpec spec, Header h, rpmTag tagN,
  	flagtag = RPMTAG_TRIGGERFLAGS;
  	indextag = RPMTAG_TRIGGERINDEX;
  	extra = Flags & RPMSENSE_TRIGGER;
@@ -102,10 +102,10 @@ index 1e69bd2..415a14e 100644
  	nametag = RPMTAG_REQUIRENAME;
  	versiontag = RPMTAG_REQUIREVERSION;
 diff --git a/build/rpmfc.c b/build/rpmfc.c
-index b28a46e..a06b3c6 100644
+index ac19e82..e6fab51 100644
 --- a/build/rpmfc.c
 +++ b/build/rpmfc.c
-@@ -1379,6 +1379,12 @@ static struct DepMsg_s depMsgs[] = {
+@@ -1405,6 +1405,12 @@ static struct DepMsg_s depMsgs[] = {
    { "Obsoletes",	{ "%{?__find_obsoletes}", NULL, NULL, NULL },
  	RPMTAG_OBSOLETENAME, RPMTAG_OBSOLETEVERSION, RPMTAG_OBSOLETEFLAGS,
  	0, -1 },
@@ -118,7 +118,7 @@ index b28a46e..a06b3c6 100644
    { NULL,		{ NULL, NULL, NULL, NULL },	0, 0, 0, 0, 0 }
  };
  
-@@ -1470,6 +1476,14 @@ static int rpmfcGenerateDependsHelper(const rpmSpec spec, Package pkg, rpmfi fi)
+@@ -1490,6 +1496,14 @@ static int rpmfcGenerateDependsHelper(const rpmSpec spec, Package pkg, rpmfi fi)
  	    failnonzero = 0;
  	    tagflags = RPMSENSE_FIND_REQUIRES;
  	    break;
@@ -134,10 +134,10 @@ index b28a46e..a06b3c6 100644
  	    continue;
  	    break;
 diff --git a/lib/rpmds.c b/lib/rpmds.c
-index b6e457b..fe329f9 100644
+index 3f92ab8..6db3163 100644
 --- a/lib/rpmds.c
 +++ b/lib/rpmds.c
-@@ -74,6 +74,10 @@ static int dsType(rpmTag tag,
+@@ -66,6 +66,10 @@ static int dsType(rpmTag tag,
  	t = "Trigger";
  	evr = RPMTAG_TRIGGERVERSION;
  	f = RPMTAG_TRIGGERFLAGS;
@@ -149,11 +149,11 @@ index b6e457b..fe329f9 100644
  	rc = 1;
      } 
 diff --git a/lib/rpmds.h b/lib/rpmds.h
-index d44d1f8..b581e8e 100644
+index e8b2a33..7097107 100644
 --- a/lib/rpmds.h
 +++ b/lib/rpmds.h
-@@ -56,7 +56,7 @@ typedef	enum rpmsenseFlags_e {
-     RPMSENSE_RPMLIB = ((1 << 24) | RPMSENSE_PREREQ), /*!< rpmlib(feature) dependency. */
+@@ -55,7 +55,7 @@ typedef	enum rpmsenseFlags_e {
+     RPMSENSE_RPMLIB = (1 << 24),	/*!< rpmlib(feature) dependency. */
      RPMSENSE_TRIGGERPREIN = (1 << 25),	/*!< %triggerprein dependency. */
      RPMSENSE_KEYRING	= (1 << 26),
 -    RPMSENSE_PATCHES	= (1 << 27),
@@ -161,7 +161,7 @@ index d44d1f8..b581e8e 100644
      RPMSENSE_CONFIG	= (1 << 28)
  } rpmsenseFlags;
  
-@@ -74,6 +74,7 @@ typedef	enum rpmsenseFlags_e {
+@@ -73,6 +73,7 @@ typedef	enum rpmsenseFlags_e {
      RPMSENSE_SCRIPT_POSTUN | \
      RPMSENSE_SCRIPT_VERIFY | \
      RPMSENSE_FIND_REQUIRES | \
@@ -170,7 +170,7 @@ index d44d1f8..b581e8e 100644
      RPMSENSE_SCRIPT_BUILD | \
      RPMSENSE_SCRIPT_INSTALL | \
 diff --git a/lib/rpmtag.h b/lib/rpmtag.h
-index a98178a..1692833 100644
+index eb3b1ad..e94bdcb 100644
 --- a/lib/rpmtag.h
 +++ b/lib/rpmtag.h
 @@ -228,14 +228,14 @@ typedef enum rpmTag_e {
@@ -197,10 +197,10 @@ index a98178a..1692833 100644
      RPMTAG_CVSID		= 1163, /* s (unimplemented) */
  #define	RPMTAG_SVNID	RPMTAG_CVSID	/* s (unimplemented) */
 diff --git a/python/rpmmodule.c b/python/rpmmodule.c
-index 2fa7eef..c96617a 100644
+index 2bb087a..9abdd00 100644
 --- a/python/rpmmodule.c
 +++ b/python/rpmmodule.c
-@@ -387,7 +387,7 @@ void init_rpm(void)
+@@ -373,7 +373,7 @@ static int initModule(PyObject *m)
      REGISTER_ENUM(RPMSENSE_RPMLIB);
      REGISTER_ENUM(RPMSENSE_TRIGGERPREIN);
      REGISTER_ENUM(RPMSENSE_KEYRING);
@@ -210,7 +210,7 @@ index 2fa7eef..c96617a 100644
  
      REGISTER_ENUM(RPMTRANS_FLAG_TEST);
 diff --git a/rpmpopt.in b/rpmpopt.in
-index bc6a363..60b58aa 100644
+index 1d8816a..de930cb 100644
 --- a/rpmpopt.in
 +++ b/rpmpopt.in
 @@ -65,6 +65,22 @@ rpm	alias --requires	--qf \
@@ -237,5 +237,5 @@ index bc6a363..60b58aa 100644
  Version     : %-27{VERSION}       Vendor: %{VENDOR}\n\
  Release     : %-27{RELEASE}   Build Date: %{BUILDTIME:date}\n\
 -- 
-1.6.1.3
+1.6.4.4
 

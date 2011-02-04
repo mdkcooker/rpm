@@ -1,17 +1,17 @@
-From e3fc88544e38da33480a5d6b70c6becbbe0cd0ff Mon Sep 17 00:00:00 2001
+From 16543b7bab95060a850394603f7144950333f51a Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 22/35] drop skipping ldconfig hack
+Subject: [PATCH 15/31] drop skipping ldconfig hack
 
 ---
  lib/psm.c |   23 -----------------------
  1 files changed, 0 insertions(+), 23 deletions(-)
 
 diff --git a/lib/psm.c b/lib/psm.c
-index 0d0aa7a..c7445d5 100644
+index 2c1861c..b4a30db 100644
 --- a/lib/psm.c
 +++ b/lib/psm.c
-@@ -569,10 +569,6 @@ static rpmRC runLuaScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t argv,
+@@ -514,10 +514,6 @@ static rpmRC runLuaScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t argv,
  
  /**
   */
@@ -22,7 +22,7 @@ index 0d0aa7a..c7445d5 100644
  static void doScriptExec(rpmts ts, ARGV_const_t argv, rpmtd prefixes,
  			FD_t scriptFd, FD_t out)
  {
-@@ -714,27 +710,11 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
+@@ -655,27 +651,11 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
  
      psm->sq.reaper = 1;
  
@@ -50,7 +50,7 @@ index 0d0aa7a..c7445d5 100644
      }
  
  
-@@ -761,9 +741,6 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
+@@ -702,9 +682,6 @@ static rpmRC runScript(rpmpsm psm, Header h, rpmTag stag, ARGV_t * argvp,
  	    xx = Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
  	}
  
@@ -61,5 +61,5 @@ index 0d0aa7a..c7445d5 100644
  	xx = Fclose(fd);
  
 -- 
-1.6.1.3
+1.6.2.4
 

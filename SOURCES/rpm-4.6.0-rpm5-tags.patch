@@ -1,6 +1,16 @@
-diff -p -up rpm-4.6.0/lib/rpmtag.h.rpm5_tags~ rpm-4.6.0/lib/rpmtag.h
---- rpm-4.6.0/lib/rpmtag.h.rpm5_tags~	2009-05-22 11:28:23.605844290 -0400
-+++ rpm-4.6.0/lib/rpmtag.h	2009-05-22 11:28:29.496942572 -0400
+From 6a91cc3c7e19928e936674e265b27de1f8eb9a82 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Wed, 10 Jun 2009 16:47:05 +0000
+Subject: [PATCH 26/36] rpm5 tags
+
+---
+ lib/rpmtag.h |   24 +++++++++++++++++++++++-
+ 1 files changed, 23 insertions(+), 1 deletions(-)
+
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index e94bdcb..2f34039 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
 @@ -259,7 +259,7 @@ typedef enum rpmTag_e {
      RPMTAG_REPOTAG		= 1181,	/* s (unimplemented) */
      RPMTAG_KEYWORDS		= 1182,	/* s[] (unimplemented) */
@@ -10,12 +20,10 @@ diff -p -up rpm-4.6.0/lib/rpmtag.h.rpm5_tags~ rpm-4.6.0/lib/rpmtag.h
      RPMTAG_PACKAGEPREFCOLOR	= 1185, /* i (unimplemented) */
      RPMTAG_XATTRSDICT		= 1186, /* s[] (unimplemented) */
      RPMTAG_FILEXATTRSX		= 1187, /* i[] (unimplemented) */
-@@ -270,6 +270,31 @@ typedef enum rpmTag_e {
-     RPMTAG_REQUIREATTRSX	= 1192, /* i[] (unimplemented) */
-     RPMTAG_BUILDPROVIDES	= 1193, /* internal */
+@@ -272,6 +272,28 @@ typedef enum rpmTag_e {
      RPMTAG_BUILDOBSOLETES	= 1194, /* internal */
-+    RPMTAG_DBINSTANCE		= 1195, /* i */
-+    RPMTAG_NVRA			= 1196, /* s */
+     RPMTAG_DBINSTANCE		= 1195, /* i extension */
+     RPMTAG_NVRA			= 1196, /* s extension */
 +    RPMTAG_FILEPATHS		= 1197, /* s[] */
 +    RPMTAG_ORIGPATHS		= 1198, /* s[] */
 +    RPMTAG_RPMLIBVERSION	= 1199, /* i */
@@ -38,7 +46,9 @@ diff -p -up rpm-4.6.0/lib/rpmtag.h.rpm5_tags~ rpm-4.6.0/lib/rpmtag.h
 +    RPMTAG_PACKAGESTAT		= 1216,	/* x */
 +    RPMTAG_PACKAGEBASEURL	= 1217,	/* s */
 +    RPMTAG_DISTEPOCH		= 1218, /* s */
-+
      RPMTAG_FILENAMES		= 5000, /* s[] extension */
      RPMTAG_FILEPROVIDE		= 5001, /* s[] extension */
      RPMTAG_FILEREQUIRE		= 5002, /* s[] extension */
+-- 
+1.6.4.4
+

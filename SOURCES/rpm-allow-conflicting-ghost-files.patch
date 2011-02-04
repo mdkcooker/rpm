@@ -1,17 +1,17 @@
-From 0bf391f94e85851d35a7adb4f1fcff17253825fe Mon Sep 17 00:00:00 2001
+From 295cb0eda14d8a4299cdfde559216b50412116f1 Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 14/35] allow conflicting ghost files
+Subject: [PATCH 23/36] allow conflicting ghost files
 
 ---
  lib/rpmfi.c |    3 +++
  1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/lib/rpmfi.c b/lib/rpmfi.c
-index 6055a24..76f6626 100644
+index f72ab1e..8c17342 100644
 --- a/lib/rpmfi.c
 +++ b/lib/rpmfi.c
-@@ -472,6 +472,9 @@ int rpmfiCompare(const rpmfi afi, const rpmfi bfi)
+@@ -581,6 +581,9 @@ int rpmfiCompare(const rpmfi afi, const rpmfi bfi)
      if ((rpmfiFFlags(afi) & RPMFILE_GHOST) ||
  	(rpmfiFFlags(bfi) & RPMFILE_GHOST)) return 0;
  
@@ -22,5 +22,5 @@ index 6055a24..76f6626 100644
  
      if (awhat == LINK) {
 -- 
-1.6.1.3
+1.6.4.4
 

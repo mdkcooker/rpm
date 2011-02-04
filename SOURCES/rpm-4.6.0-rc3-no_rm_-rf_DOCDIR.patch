@@ -1,17 +1,17 @@
-From 5f6948bee7dd71bd13c997139f3396e2ca8c5532 Mon Sep 17 00:00:00 2001
+From ad54228adbb30f40393637172bdffc56fe5486de Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Thu, 12 Feb 2009 10:59:31 +0000
-Subject: [PATCH 17/35] no_rm_-rf_DOCDIR
+Subject: [PATCH 25/36] no_rm_-rf_DOCDIR
 
 ---
  build/files.c |    1 -
  1 files changed, 0 insertions(+), 1 deletions(-)
 
 diff --git a/build/files.c b/build/files.c
-index 60c1dcb..e966f50 100644
+index 7db729a..ff46783 100644
 --- a/build/files.c
 +++ b/build/files.c
-@@ -867,7 +867,6 @@ static rpmRC parseForSimple(rpmSpec spec, Package pkg, char * buf,
+@@ -935,7 +935,6 @@ static rpmRC parseForSimple(rpmSpec spec, Package pkg, char * buf,
  		appendStringBuf(pkg->specialDoc, "DOCDIR=$RPM_BUILD_ROOT");
  		appendLineStringBuf(pkg->specialDoc, pkg->specialDocDir);
  		appendLineStringBuf(pkg->specialDoc, "export DOCDIR");
@@ -20,5 +20,5 @@ index 60c1dcb..e966f50 100644
  
  		*fileName = pkg->specialDocDir;
 -- 
-1.6.1.3
+1.6.4.4
 

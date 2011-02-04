@@ -1,17 +1,17 @@
-From d7390b31ac03f11365a2dde2a3963421565df323 Mon Sep 17 00:00:00 2001
+From 7912341b11e3985e035aead29961cabf8b3766c5 Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 23/35] forbid badly commented define in spec
+Subject: [PATCH 15/36] forbid badly commented define in spec
 
 ---
  build/parseSpec.c |   23 +++++++++++++++++++++++
  1 files changed, 23 insertions(+), 0 deletions(-)
 
 diff --git a/build/parseSpec.c b/build/parseSpec.c
-index cf22db3..dad5403 100644
+index 816aa81..ceb59c6 100644
 --- a/build/parseSpec.c
 +++ b/build/parseSpec.c
-@@ -104,6 +104,24 @@ void handleComments(char *s)
+@@ -94,6 +94,24 @@ void handleComments(char *s)
  	*s = '\0';
  }
  
@@ -36,7 +36,7 @@ index cf22db3..dad5403 100644
  /**
   */
  static void forceIncludeFile(rpmSpec spec, const char * fileName)
-@@ -145,6 +163,11 @@ static int copyNextLineFromOFI(rpmSpec spec, OFI_t *ofi)
+@@ -135,6 +153,11 @@ static int copyNextLineFromOFI(rpmSpec spec, OFI_t *ofi)
  	*to++ = '\0';
  	ofi->readPtr = from;
  
@@ -49,5 +49,5 @@ index cf22db3..dad5403 100644
  	for (p = spec->lbuf; *p; p++) {
  	    switch (*p) {
 -- 
-1.6.1.3
+1.6.4.4
 
