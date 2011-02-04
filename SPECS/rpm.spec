@@ -50,7 +50,7 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.8.0
+%define rpmversion	4.8.1
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
