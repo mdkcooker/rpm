@@ -206,10 +206,6 @@ Patch1014: rpm-4.6.0-bdb-xa-removal.patch
 # Refuse to build a rpm with 2 identical triggers (#60699)
 #Patch1015: rpm-4.6.0-duplicate-triggers.patch
 
-# make rpmvercmp handle missing values and make versioned conflicts behave
-# consistently with requires. (#55810)
-Patch1017: rpm-4.6.0-rpmvercmp-handle-missing-values.patch
-
 # Automatically handle ruby gem extraction in %setup
 PAtch1018: rpm-4.6.1-setup-rubygems.patch
 
