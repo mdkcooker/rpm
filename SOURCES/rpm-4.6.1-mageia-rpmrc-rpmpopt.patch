@@ -1,7 +1,7 @@
 From e6a21a0d6f0cf0baa471caa9bfbd1a3a92031cd4 Mon Sep 17 00:00:00 2001
 From: unknown author <cooker@mandrivalinux.org>
 Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 05/36] manbo rpmrc rpmpopt
+Subject: [PATCH 05/36] mageia rpmrc rpmpopt
 
 ---
  Makefile.am     |    1 +
@@ -19,7 +19,7 @@ index 587cfa7..1b29d08 100644
  AM_CPPFLAGS += @WITH_LIBELF_INCLUDE@
  AM_CPPFLAGS += -DLOCALEDIR="\"$(localedir)\""
  AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"rpmpopt-${VERSION}\""
-+AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"manbo/rpmpopt\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"mageia/rpmpopt\""
  
  pkginclude_HEADERS =
  nodist_pkginclude_HEADERS =
@@ -31,7 +31,7 @@ index b378669..6b057a1 100644
  AM_CPPFLAGS += -DSYSCONFDIR="\"$(sysconfdir)\""
  AM_CPPFLAGS += -DLOCALSTATEDIR="\"$(localstatedir)\""
  AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"rpmpopt-${VERSION}\""
-+AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"manbo/rpmpopt\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"mageia/rpmpopt\""
  
  check_PROGRAMS =
  CLEANFILES =
@@ -60,7 +60,7 @@ index 0818deb..ac6ec5c 100644
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
 -				confdir, "/" RPMCANONVENDOR "/rpmrc", ":",
-+				confdir, "/" "manbo" "/rpmrc", ":",
++				confdir, "/" "mageia" "/rpmrc", ":",
  				SYSCONFDIR "/rpmrc", ":",
  			  	"~/.rpmrc", NULL);
      }
