@@ -72,7 +72,8 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:	%{rpmversion}
-Release:	%{release}
+#Do not enable until perl-RPM4 is ported
+#Release:	%{release}
 Group:		System/Configuration/Packaging
 
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
