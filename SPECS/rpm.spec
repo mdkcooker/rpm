@@ -343,6 +343,9 @@ programs that will manipulate RPM packages and databases.
 
 %build
 
+# Remove me when we will upload rpm
+exit 1
+
 autoreconf
 
 %if %builddebug
