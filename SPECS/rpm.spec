@@ -73,7 +73,7 @@ Name:		rpm
 Epoch:		1
 Version:	%{rpmversion}
 #Do not enable until perl-RPM4 is ported
-#Release:	%{release}
+Release:	%{release}
 Group:		System/Configuration/Packaging
 
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
@@ -113,7 +113,6 @@ Patch70:	rpm-4.6.0-rc1-bb-shortcircuit.patch
 # is this useful? "at least erasure ordering is just as non-existent as it was in 4.4.x" says Panu
 #with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
 #Patch71:    rpm-4.6.0-ordererase.patch#with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
-#Patch71:    rpm-4.6.0-ordererase.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
@@ -142,6 +141,9 @@ Patch114: rpm-4.6.0-rc1-read-macros_d-dot-macros.patch
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
 Patch133: rpm-4.6.0-rc1-weakdeps.patch
 
+# (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
+Patch135: rpm-4.4.2.3-rc1-fix-debugedit.patch
+
 # convert data in the header to a specific encoding which used in the selected locale.
 Patch137: rpm-4.6.0-rc1-headerIconv.patch
 
@@ -167,15 +169,6 @@ Patch157: introduce-_after_setup-which-is-called-after-setup.patch
 Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
-# avoid "canonicalization unexpectedly shrank by one character" error from 
-# debugedit by adding '/' to the end of the string when the error would be
-# triggered
-# see https://bugzilla.redhat.com/show_bug.cgi?id=304121 and 
-# https://bugzilla.redhat.com/show_bug.cgi?id=482903
-
-Patch164: rpm-4.6.1-updated-debugedit-for-debug_pubtypes-section.patch
-Patch165: rpm-4.6.0-fix-debugedit-canonicalization-error.patch
-
 #Patch1001: rpm-4.6.0-rc1-new-liblzma.patch
 
 # default behaviour in rpm-jbj >= 4.4.6
@@ -192,24 +185,6 @@ Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 # will only make rpm recognize these, not implement actual support for them..
 Patch1009: rpm-4.6.0-rpm5-tags.patch
 
-# Check chroot return code before running lua script
-Patch1011: rpm-4.6.0-do-not-run-lua-scripts-when-chroot-fails.patch
-
-# Check chroot return code before running external script
-Patch1012: rpm-4.6.0-do-not-run-scripts-when-chroot-fails.patch
-
-# Make sure files in debug packages have good default perms, fixes bug #57758
-Patch1013: rpm-4.6.0-fix-debug-info-default-permissions.patch
-
-# Remove BDB XA support to fix compilation with db 4.8 (upstream)
-Patch1014: rpm-4.6.0-bdb-xa-removal.patch
-
-# Refuse to build a rpm with 2 identical triggers (#60699)
-#Patch1015: rpm-4.6.0-duplicate-triggers.patch
-
-# Automatically handle ruby gem extraction in %setup
-PAtch1018: rpm-4.6.1-setup-rubygems.patch
-
 # Turbolinux patches
 # add writeHeaderListTofile function into rpm-python (needed by "buildman" build system) (Toshihiro, 2003)
 #Patch2002: rpm-4.6.0-rc1-python-writeHdlist.patch
@@ -224,10 +199,14 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 # display characters which you expected.
 Patch2005: rpm-4.6.0-rc1-buildlang.patch
 
+Patch2000: rpm-4.6.0-rc1-serial-tag.patch
+# re-enable "copyright" tag (Kiichiro, 2005)
+Patch2001: rpm-4.6.0-rc1-copyright-tag.patch
+
 Patch3000: mips_macros.patch
 Patch3001: fix_stack_protector_check.patch
-Patch3002: rpm-4.6.1-mips_define_isa_macros.patch
-Patch3003: rpm-4.6.1-arm_mips_isa_macros.patch
+Patch3002: mips_define_isa_macros.patch
+Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
 License:	GPL
