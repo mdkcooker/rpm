@@ -72,7 +72,6 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:	%{rpmversion}
-#Do not enable until perl-RPM4 is ported
 Release:	%{release}
 Group:		System/Configuration/Packaging
 
@@ -342,9 +341,6 @@ programs that will manipulate RPM packages and databases.
 %apply_patches
 
 %build
-
-# Remove me when we will upload rpm
-exit 1
 
 autoreconf
 
