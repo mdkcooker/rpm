@@ -104,7 +104,8 @@ Patch64:    rpm-4.6.1-mageia-rpmrc-rpmpopt.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
-# http://qa.mandriva.com/show_bug.cgi?id=15896
+# http://qa.mandriva.com/show_bug.cgi?id=15896Z
+# (A different implementation has landed in rpm-4.9)
 Patch70:	rpm-4.6.0-rc1-bb-shortcircuit.patch
 
 # http://www.redhat.com/archives/rpm-list/2005-April/msg00131.html
