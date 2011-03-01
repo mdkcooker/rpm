@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 1
+%define release		%mkrel 2
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -185,6 +185,9 @@ Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 # break when these unknown tags might be found in the rpmdb. Notice that this
 # will only make rpm recognize these, not implement actual support for them..
 Patch1009: rpm-4.6.0-rpm5-tags.patch
+
+# Automatically handle ruby gem extraction in %setup
+Patch1018: rpm-4.8.1-setup-rubygems.patch
 
 # Turbolinux patches
 # add writeHeaderListTofile function into rpm-python (needed by "buildman" build system) (Toshihiro, 2003)
