@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 2
+%define release		%mkrel 3
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -79,7 +79,7 @@ Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 
 # Add some undocumented feature to gendiff
 ## To be dropped.
-Patch17:	rpm-4.4.2.2-gendiff-improved.patch
+#Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 
 # if %post of foo-2 fails,
 # or if %preun of foo-1 fails,
