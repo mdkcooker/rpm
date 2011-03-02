@@ -77,10 +77,6 @@ Group:		System/Configuration/Packaging
 
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 
-# Add some undocumented feature to gendiff
-## To be dropped.
-#Patch17:	rpm-4.4.2.2-gendiff-improved.patch
-
 # if %post of foo-2 fails,
 # or if %preun of foo-1 fails,
 # or if %postun of foo-1 fails,
