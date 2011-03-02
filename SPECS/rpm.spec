@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 3
+%define release		%mkrel 4
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -93,7 +93,7 @@ Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Patch22:        rpm-4.6.0-rc1-non-pre-scripts-dont-fail.patch
 
 # (fredl) add loging facilities through syslog
-Patch31:	rpm-4.6.0-rc1-syslog.patch
+Patch31:	rpm-4.8.1-syslog.patch
 
 # part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
 # (is it still needed?)
