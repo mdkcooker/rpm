@@ -89,6 +89,8 @@ Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Patch22:        rpm-4.6.0-rc1-non-pre-scripts-dont-fail.patch
 
 # (fredl) add loging facilities through syslog
+# Patch sent to upstream for inclusion
+# http://lists.rpm.org/pipermail/rpm-maint/2011-March/002994.htm
 Patch31:	rpm-4.8.1-syslog.patch
 
 # part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
