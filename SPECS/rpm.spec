@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 4
+%define release		%mkrel 5
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 

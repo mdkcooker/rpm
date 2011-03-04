@@ -404,11 +404,10 @@ index e2a5453..0bce564 100644
  #ifdef __cplusplus
  }
  #endif
-diff --git a/lib/transaction.c b/lib/transaction.c
-index 54eeb1e..e585fc2 100644
+
 --- a/lib/transaction.c
-+++ b/lib/transaction.c
-@@ -1421,7 +1390,14 @@ static int rpmtsProcess(rpmts ts)
++++ b/lib/transaction.c	2011-03-04 19:01:06.344396783 +0100
+@@ -1470,6 +1470,12 @@
  	if (failed) {
  	    rpmteMarkFailed(p, ts);
  	    rc++;
@@ -419,21 +418,28 @@ index 54eeb1e..e585fc2 100644
 +			             	          install_or_erase);
 +	    }
  	}
-+
  	(void) rpmdbSync(rpmtsGetRdb(ts));
      }
-     pi = rpmtsiFree(pi);
-@@ -1480,6 +1456,10 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rpmprobFilterFlags ignoreSet)
+@@ -1524,15 +1530,19 @@
+ 	goto exit;
+     }
  
+-    /* Actually install and remove packages, get final exit code */
+-    rc = rpmtsProcess(ts) ? -1 : 0;
+-
      /* Run post-transaction scripts unless disabled */
      if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_TEST|RPMTRANS_FLAG_NOPOST))) {
 +	if ((rpmtsFlags(ts) & _noTransTriggers) != _noTransTriggers) {
 +	    rpmRunFileTriggers(rpmtsRootDir(ts));
 +	}
-+
  	rpmlog(RPMLOG_DEBUG, "running post-transaction scripts\n");
  	runTransScripts(ts, RPMTAG_POSTTRANS);
      }
--- 
-1.6.4.4
-
+ 
++    /* Actually install and remove packages, get final exit code */
++    rc = rpmtsProcess(ts) ? -1 : 0;
++
++
+     /* Finish up... */
+     (void) rpmtsFinish(ts);
+ 
