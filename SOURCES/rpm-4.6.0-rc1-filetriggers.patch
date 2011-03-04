@@ -406,27 +406,30 @@ index e2a5453..0bce564 100644
  #endif
 
 --- a/lib/transaction.c
-+++ b/lib/transaction.c	2011-03-04 19:01:06.344396783 +0100
-@@ -1470,6 +1470,12 @@
++++ b/lib/transaction.c	2011-03-04 19:43:00.998583785 +0100
+@@ -1465,11 +1465,19 @@
+ 	    failed = rpmpsmStage(psm, stage);
+ 	    (void) rpmswExit(rpmtsOp(ts, op), 0);
+ 	    psm = rpmpsmFree(psm);
+-	    rpmteClose(p, ts, 1);
++	    rpmteClose(p, ts, 0);
+ 	}
  	if (failed) {
  	    rpmteMarkFailed(p, ts);
  	    rc++;
++	    rpmteSetFI(p, NULL);
 +	} else {
 +	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_TEST)) {
 +		int install_or_erase = (tetype == TR_ADDED)?1:0;
 +		mayAddToFilesAwaitingFiletriggers(rpmtsRootDir(ts), rpmteFI(p),
 +			             	          install_or_erase);
 +	    }
++	    rpmteSetFI(p, NULL);
  	}
  	(void) rpmdbSync(rpmtsGetRdb(ts));
      }
-@@ -1524,15 +1530,19 @@
- 	goto exit;
-     }
+@@ -1529,6 +1537,9 @@
  
--    /* Actually install and remove packages, get final exit code */
--    rc = rpmtsProcess(ts) ? -1 : 0;
--
      /* Run post-transaction scripts unless disabled */
      if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_TEST|RPMTRANS_FLAG_NOPOST))) {
 +	if ((rpmtsFlags(ts) & _noTransTriggers) != _noTransTriggers) {
@@ -435,11 +438,3 @@ index e2a5453..0bce564 100644
  	rpmlog(RPMLOG_DEBUG, "running post-transaction scripts\n");
  	runTransScripts(ts, RPMTAG_POSTTRANS);
      }
- 
-+    /* Actually install and remove packages, get final exit code */
-+    rc = rpmtsProcess(ts) ? -1 : 0;
-+
-+
-     /* Finish up... */
-     (void) rpmtsFinish(ts);
- 
