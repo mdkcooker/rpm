@@ -235,7 +235,7 @@ BuildRequires:  openssl-devel >= 0.9.8
 BuildRequires:  lua-devel
 # Need for doc
 #BuildRequires:	graphviz
-BuildRequires:	tetex
+BuildRequires:	texlive
 %if %buildpython
 BuildRequires:	python-devel
 %endif
