@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 7
+%define release		%mkrel 8
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -211,6 +211,8 @@ Patch3001: fix_stack_protector_check.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
+# This patch allow to fix build of rpm on other arch like ARM
+Patch3005: rpm_fix_platformdir.patch
 
 License:	GPL
 BuildRequires:	autoconf >= 2.57
