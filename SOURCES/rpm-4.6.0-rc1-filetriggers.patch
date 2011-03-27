@@ -1,21 +1,4 @@
-From bfcfc459bcdc3c51180aa0072826053200c5d3f0 Mon Sep 17 00:00:00 2001
-From: unknown author <cooker@mandrivalinux.org>
-Date: Mon, 5 Jan 2009 13:29:57 +0000
-Subject: [PATCH 16/36] filetriggers
-
----
- doc/manual/filetriggers |   88 ++++++++++++++++
- lib/Makefile.am         |    3 +-
- lib/filetriggers.c      |  259 +++++++++++++++++++++++++++++++++++++++++++++++
- lib/misc.h              |    5 +
- lib/transaction.c       |   42 ++------
- 5 files changed, 365 insertions(+), 32 deletions(-)
- create mode 100644 doc/manual/filetriggers
- create mode 100644 lib/filetriggers.c
-
-diff --git a/doc/manual/filetriggers b/doc/manual/filetriggers
-new file mode 100644
-index 0000000..5876afb
+unchanged:
 --- /dev/null
 +++ b/doc/manual/filetriggers
 @@ -0,0 +1,88 @@
@@ -107,28 +90,22 @@ index 0000000..5876afb
 +* what may get in rpm.org:
 +** http://www.mail-archive.com/rpm-maint@lists.rpm.org/msg00789.html
 +** http://www.mail-archive.com/rpm-maint@lists.rpm.org/msg00788.html
-diff --git a/lib/Makefile.am b/lib/Makefile.am
-index 6b057a1..460b12a 100644
+unchanged:
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
-@@ -33,9 +33,10 @@ librpm_la_SOURCES = \
+@@ -34,7 +34,7 @@ librpm_la_SOURCES = \
  	rpmlead.c rpmlead.h rpmps.c rpmrc.c \
  	rpmte.c rpmte_internal.h rpmts.c \
  	rpmvercmp.c signature.c signature.h transaction.c \
 -	verify.c rpmlock.c rpmlock.h misc.h \
 +	filetriggers.c verify.c rpmlock.c rpmlock.h misc.h \
- 	legacy.c merge.c \
- 	rpmliblua.c rpmliblua.h
-+
+ 	legacy.c merge.c
  if SQLITE3
  librpm_la_SOURCES += backend/sqlite.c
- endif
-diff --git a/lib/filetriggers.c b/lib/filetriggers.c
-new file mode 100644
-index 0000000..262fddf
---- /dev/null
-+++ b/lib/filetriggers.c
-@@ -0,0 +1,259 @@
+diff -u b/lib/filetriggers.c rpm-4.6.0/lib/filetriggers.c
+--- b/lib/filetriggers.c
++++ rpm-4.6.0/lib/filetriggers.c	2010-04-16 16:58:09.244840369 +0200
+@@ -0,0 +1,266 @@
 +#include "system.h"
 +#include <rpm/rpmlib.h>
 +#include <rpm/rpmlog.h>
@@ -300,14 +277,21 @@ index 0000000..262fddf
 +static int popen_with_root(const char *rootDir, const char *cmd, int *pid)
 +{
 +     int pipes[2];
++     long fd_attrs;
 +
 +     if (pipe(pipes) != 0) return 0;
-+
++     fd_attrs = fcntl(pipes[1], F_GETFD);
++     if (fd_attrs == -1) {
++	 rpmlog(RPMLOG_ERR, "failed to set CLOEXEC on pipe write FD");
++         return 0;
++     }
++     fcntl(pipes[1], F_SETFD, fd_attrs | FD_CLOEXEC);
 +     *pid = fork();
 +     if (*pid == 0) {
-+	  close(pipes[1]);
 +	  dup2(pipes[0], STDIN_FILENO);
-+	  close(pipes[0]);
++	  if (pipes[0] != STDIN_FILENO) {
++	       close(pipes[0]);
++	  }
 +
 +	  if (rootDir != NULL && strcmp(rootDir, "/") != 0) {
 +	       if (chroot(rootDir) != 0) {
@@ -388,6 +372,7 @@ index 0000000..262fddf
 +     unlink(file);
 +     _free(file);
 +}
+unchanged:
 diff --git a/lib/misc.h b/lib/misc.h
 index e2a5453..0bce564 100644
 --- a/lib/misc.h
