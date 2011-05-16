@@ -38,7 +38,7 @@ index ceb59c6..2da496d 100644
 +
 +    /* those checks are Mandriva only (May 2008),
 +       and must not break non Mandriva packages */    
-+    if (strstr(_headerRelease(h), "mdv") == 0) return 0;
++    if ((strstr(_headerRelease(h), "mdv") == 0) || (strstr(_headerRelease(h), "mga") == 0)) return 0;
 +
 +    /* Check that no %pre, %post ... do not exist in this header, since they will be dropped */
 +    HeaderIterator hi = headerInitIterator(h);
