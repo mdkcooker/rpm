@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 10
+%define release		%mkrel 11
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -241,6 +241,7 @@ BuildRequires:	texlive
 %if %buildpython
 BuildRequires:	python-devel
 %endif
+BuildRequires: libcap-devel
 
 Requires:	bzip2 >= 0.9.0c-2
 Requires:	lzma
@@ -370,7 +371,8 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %endif
         --with-glob \
         --without-selinux \
-        --without-apidocs 
+        --without-apidocs  \
+	--with-cap
 
 %make
 
