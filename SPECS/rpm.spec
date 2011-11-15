@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 12
+%define release		%mkrel 13
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -318,6 +318,7 @@ Requires:	make
 Requires:	tar
 Requires:	unzip
 Requires:	elfutils
+Requires:	perl(CPAN::Meta) >= 2.112.150
 Requires:	perl(ExtUtils::MakeMaker) >= 6.570_700
 Requires:	rpm = %epoch:%{version}-%{release}
 Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
