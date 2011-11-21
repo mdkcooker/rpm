@@ -54,7 +54,7 @@
 %define srcver		%rpmversion
 %define libver		4.8
 %define libmajor	1
-%define release		%mkrel 14
+%define release		%mkrel 15
 %define librpmname   %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 
@@ -380,9 +380,10 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %make
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=%buildroot install
+
+find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
 %ifarch ppc powerpc
 ln -sf ppc-%{_real_vendor}-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-%{_real_vendor}-linux
@@ -642,10 +643,7 @@ fi
 %files -n %librpmnamedevel
 %defattr(-,root,root)
 %{_includedir}/rpm
-%{_libdir}/librpm.la
 %{_libdir}/librpm.so
-%{_libdir}/librpmio.la
 %{_libdir}/librpmio.so
-%{_libdir}/librpmbuild.la
 %{_libdir}/librpmbuild.so
 %{_libdir}/pkgconfig/rpm.pc
