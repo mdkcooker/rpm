@@ -1,0 +1,80 @@
+diff --git a/build/parsePrep.c b/build/parsePrep.c
+index 3dab37f..81618e6 100644
+--- a/build/parsePrep.c
++++ b/build/parsePrep.c
+@@ -137,8 +137,9 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ {
+     char *fn;
+     char *buf = NULL;
+-    char *tar;
+-    const char *taropts = ((rpmIsVerbose() && !quietly) ? "-xvvf" : "-xf");
++    char *tar, taropts[8];
++    char *t;
++    int rubygem = 0;
+     struct Source *sp;
+     rpmCompressedMagic compressed = COMPRESSED_NOT;
+ 
+@@ -158,6 +159,17 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ 
+     fn = rpmGetPath("%{_sourcedir}/", sp->source, NULL);
+ 
++    t = rindex(sp->source, '.');
++    if(t && !strcasecmp(t, ".gem"))
++       rubygem = 1;
++
++    t = stpcpy(taropts, "-x");
++    if(rpmIsVerbose() && !quietly)
++       t = stpcpy(t, "vv");
++    if(rubygem)
++       t = stpcpy(t, "m");
++    t = stpcpy(t, "f");
++
+ #ifdef AUTOFETCH_NOT	/* XXX don't expect this code to be enabled */
+     /* XXX
+      * XXX If nosource file doesn't exist, try to fetch from url.
+@@ -218,10 +230,20 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ 	zipper = rpmGetPath(t, NULL);
+ 	if (needtar) {
+ 	    rasprintf(&buf, "%s '%s' | %s %s - \n"
+-		"STATUS=$?\n"
+-		"if [ $STATUS -ne 0 ]; then\n"
+-		"  exit $STATUS\n"
+-		"fi", zipper, fn, tar, taropts);
++                   "STATUS=$?\n"
++                   "if [ $STATUS -ne 0 ]; then\n"
++                   "  exit $STATUS\n"
++                   "fi", zipper, fn, tar, taropts);
++           if(rubygem) {
++               t = stpcpy(t,
++                       "\n"
++                       "if [ -f data.tar.gz ]; then\n"
++                       "  tar ");
++               t = stpcpy(t, taropts);
++               t = stpcpy(t,
++                       " data.tar.gz\n"
++                       "fi");
++           }
+ 	} else {
+ 	    rasprintf(&buf, "%s '%s'\n"
+ 		"STATUS=$?\n"
+@@ -332,6 +354,20 @@ static int doSetupMacro(rpmSpec spec, const char *line)
+ 	free(buf);
+     }
+ 
++    /* check if source is a ruby gem */
++    {   struct Source *sp;
++       for (sp = spec->sources; sp != NULL; sp = sp->next) {
++           if ((sp->flags & RPMBUILD_ISSOURCE) && (sp->num == 0)) {
++               break;
++           }
++       }
++       if (sp != NULL) {
++           char *t = rindex(sp->source, '.');
++           if(t && !strcasecmp(t, ".gem"))
++               createDir = 1;
++       }
++    }
++
+     /* if necessary, create and cd into the proper dir */
+     if (createDir) {
+ 	buf = rpmExpand("%{__mkdir_p} ", spec->buildSubdir, "\n",

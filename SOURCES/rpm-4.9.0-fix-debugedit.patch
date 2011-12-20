@@ -1,0 +1,26 @@
+commit 944471000841076f262997650d9a3bfe57f3366a
+Author: dmorgan <dmorgan@localhost.(none)>
+Date:   Sun Jun 26 23:35:37 2011 +0200
+
+    (from Turbolinux)
+    
+    the length check is wrong:
+    - dest_dir is /usr/src/debug by default
+    - base_dir is $RPM_BUILD_DIR, which can be /RPM/BUILD
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index 57e3872..ba6c4e9 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -1505,11 +1505,6 @@ main (int argc, char *argv[])
+ 	  fprintf (stderr, "You must specify a base dir if you specify a dest dir\n");
+ 	  exit (1);
+ 	}
+-      if (strlen (dest_dir) > strlen (base_dir))
+-	{
+-	  fprintf (stderr, "Dest dir longer than base dir is not supported\n");
+-	  exit (1);
+-	}
+     }
+ 
+   /* Make sure there are trailing slashes in dirs */

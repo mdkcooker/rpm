@@ -1,7 +1,4 @@
-# Do not change this spec directly but in the svn
-# $Id: rpm.spec 134789 2007-03-27 15:13:43Z nanardon $
-
-%define lib64arches	x86_64 ppc64 sparc64
+%define lib64arches	x86_64 
 
 %ifarch %lib64arches
     %define _lib lib64
@@ -50,16 +47,18 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.8.1
-%define srcver		%rpmversion
-%define libver		4.8
-%define libmajor	1
-%define release		%mkrel 15
-%define librpmname   %mklibname rpm  %{libmajor}
+%define rpmversion	4.9.1.2
+%define srcver          %{rpmversion}%{?snapver:-%{snapver}}
+%define libver		4.9
+%define libmajor	2
+%define libmajorsign    0
+%define release		%mkrel %{?snapver:0.%{snapver}.}8
+%define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
+%define librpmsign      %mklibname rpmsign %{libmajor}
+%define librpmbuild     %mklibname rpmbuild %{libmajor}
 
 %define buildpython 1
-
 %define rpmsetup_version 1.34
 
 %define builddebug 0
@@ -68,55 +67,57 @@
 %{?_with_python:%define buildpython 1}
 %{?_without_python:%define buildpython 0}
 
+%define buildplugins 0
+%{?_with_plugins:%define buildplugins 1}
+
 Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
-Version:	%{rpmversion}
+Version:        %{rpmversion}
 Release:	%{release}
 Group:		System/Configuration/Packaging
-
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
+# Add some undocumented feature to gendiff
+# Send upstream ? drop ?
+Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 
 # if %post of foo-2 fails,
 # or if %preun of foo-1 fails,
 # or if %postun of foo-1 fails,
 # => foo-1 is not removed, so we end up with both packages in rpmdb
 # this patch makes rpm ignore the error in those cases
-# failing %pre must still make the rpm install fail (#23677)
+# failing %pre must still make the rpm install fail (mdv #23677)
 #
 # (nb: the exit code for pretrans/posttrans & trigger/triggerun/triggerpostun
 #       scripts is ignored with or without this patch)
-Patch22:        rpm-4.6.0-rc1-non-pre-scripts-dont-fail.patch
+Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
 
 # (fredl) add loging facilities through syslog
-# Patch sent to upstream for inclusion
-# http://lists.rpm.org/pipermail/rpm-maint/2011-March/002994.htm
-Patch31:	rpm-4.8.1-syslog.patch
+Patch31:	rpm-4.9.0-syslog.patch
 
 # part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
 # (is it still needed?)
-Patch49:	rpm-4.6.0-rc1-provides-obsoleted.patch
+Patch49:	rpm-4.9.0-provides-obsoleted.patch
 
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
 # - read /usr/lib/rpm/mageia/rpmpopt (not only /usr/lib/rpm/rpmpopt)
-# Patch mageia Specific => Not merge candidate
-Patch64:    rpm-4.6.1-mageia-rpmrc-rpmpopt.patch
+# if we deprecated the use of rpm -ba , ...,  we can get rid of this patch
+Patch64:    rpm-4.9.1.1-mageia-rpmrc-rpmpopt.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
-# http://qa.mandriva.com/show_bug.cgi?id=15896Z
-# (A different implementation has landed in rpm-4.9)
-Patch70:	rpm-4.6.0-rc1-bb-shortcircuit.patch
+# http://qa.mandriva.com/show_bug.cgi?id=15896
+Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
 # http://www.redhat.com/archives/rpm-list/2005-April/msg00131.html
 # http://www.redhat.com/archives/rpm-list/2005-April/msg00132.html
 # is this useful? "at least erasure ordering is just as non-existent as it was in 4.4.x" says Panu
 #with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
-#Patch71:    rpm-4.6.0-ordererase.patch#with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
+#Patch71:    rpm-4.6.0-ordererase.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
-Patch83: rpm-4.6.0-no-doc-conflicts.patch
+Patch83: rpm-4.9.0-no-doc-conflicts.patch
 
 # Fix http://qa.mandriva.com/show_bug.cgi?id=19392
 # (is this working??)
@@ -126,10 +127,7 @@ Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
-Patch114: rpm-4.6.0-rc1-read-macros_d-dot-macros.patch
-
-# remove unused skipDir functionality that conflicts with patch124 below
-#Patch1124: rpm-4.6.0-rc1-revert-unused-skipDir-functionality.patch
+Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 
 # [pixel] without this patch, "rpm -e" or "rpm -U" will need to stat(2) every dirnames of
 # files from the package (eg COPYING) in the db. This is quite costly when not in cache 
@@ -139,58 +137,48 @@ Patch114: rpm-4.6.0-rc1-read-macros_d-dot-macros.patch
 #Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
-Patch133: rpm-4.6.0-rc1-weakdeps.patch
+Patch133: rpm-4.9.1.1-weakdeps.patch
 
 # (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
-Patch135: rpm-4.4.2.3-rc1-fix-debugedit.patch
+Patch135: rpm-4.9.0-fix-debugedit.patch
 
 # convert data in the header to a specific encoding which used in the selected locale.
-Patch137: rpm-4.6.0-rc1-headerIconv.patch
-
-# Mandriva does not need the (broken) ldconfig hack since it uses filetriggers
-#Patch141: rpm-4.6.0-rc1-drop-skipping-ldconfig-hack.patch
+Patch137: rpm-4.9.1.1-headerIconv.patch
 
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
+# Bug still valid => Send upstream for review.
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
-Patch146: rpm-4.6.0-rc1-filetriggers.patch
+# Will be allowed to be dropped when "Collection" won't be experimental anymore.
+Patch146: rpm-4.9.1.1-filetriggers.patch
 
 # add two fatal errors (during package build)
-Patch147: rpm-rpmbuild-check-useless-tags-in-non-existant-binary-packages.patch
+# Useful ? to drop ?
+#Patch147: rpm-rpmbuild-check-useless-tags-in-non-existant-binary-packages.patch
 
 # (nb: see the patch for more info about this issue)
-Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
+#Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
 Patch152: rpm-4.6.0-rc1-fix-nss-detection.patch
 
-Patch157: introduce-_after_setup-which-is-called-after-setup.patch
-Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
+#Patch157: introduce-_after_setup-which-is-called-after-setup.patch
+#Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
-
-#Patch1001: rpm-4.6.0-rc1-new-liblzma.patch
-
-# default behaviour in rpm-jbj >= 4.4.6
-Patch1005: rpm-allow-conflicting-ghost-files.patch
 
 Patch1007: rpm-4.6.0-rc3-xz-support.patch
 
 # Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
 # as this breaks stuff that installs files to $DOCDIR during %%install
-Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
+#Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 
 # Exposes packagecolor tag and adds new tags from rpm5 as it otherwise will
 # break when these unknown tags might be found in the rpmdb. Notice that this
 # will only make rpm recognize these, not implement actual support for them..
-Patch1009: rpm-4.6.0-rpm5-tags.patch
-
-# Automatically handle ruby gem extraction in %setup
-Patch1018: rpm-4.8.1-setup-rubygems.patch
+Patch1009: rpm-4.9.1.2-rpm5-tags.patch
 
 # Turbolinux patches
-# add writeHeaderListTofile function into rpm-python (needed by "buildman" build system) (Toshihiro, 2003)
-#Patch2002: rpm-4.6.0-rc1-python-writeHdlist.patch
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
@@ -200,30 +188,30 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 # The post-scripts launched by rpm-build works in LANG environment. If LANG is
 # other locale except C, then some commands launched by post-scripts will not
 # display characters which you expected.
-Patch2005: rpm-4.6.0-rc1-buildlang.patch
+Patch2005: rpm-4.9.0-buildlang.patch
 
-Patch2000: rpm-4.6.0-rc1-serial-tag.patch
-# re-enable "copyright" tag (Kiichiro, 2005)
-Patch2001: rpm-4.6.0-rc1-copyright-tag.patch
+Patch2006: rpm-4.8.1-setup-rubygems.patch
 
 Patch3000: mips_macros.patch
 Patch3001: fix_stack_protector_check.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
-Patch3004: rpm_add_armv5tl.patch
-# This patch allow to fix build of rpm on other arch like ARM
-Patch3005: rpm_fix_platformdir.patch
+#Patch3004: rpm_add_armv5tl.patch
 
-License:	GPL
-BuildRequires:	autoconf >= 2.57
+# Fedora patches
+#conditionally applied patch for arm hardware floating point
+Patch5000: rpm-4.9.0-armhfp.patch
+
+License:	GPLv2+
+BuildRequires:	autoconf
 BuildRequires:	zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:	liblzma-devel >= 4.999.6-0.alpha.5
-BuildRequires:	automake >= 1.8
+BuildRequires:	automake
 BuildRequires:	elfutils-devel
-BuildRequires:	sed >= 4.0.3
 BuildRequires:	libbeecrypt-devel
-BuildRequires:	ed, gettext-devel
+BuildRequires:	ed
+BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
 BuildRequires:  db4.8-devel
 BuildRequires:  neon-devel
@@ -233,15 +221,15 @@ BuildRequires:	magic-devel
 BuildRequires:  rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
-BuildRequires:  openssl-devel >= 0.9.8
+BuildRequires:  openssl-devel
 BuildRequires:  lua-devel
-# Need for doc
+BuildRequires:  libcap-devel
+# Needed for doc
 #BuildRequires:	graphviz
-BuildRequires:	texlive
+BuildRequires:	tetex
 %if %buildpython
 BuildRequires:	python-devel
 %endif
-BuildRequires: libcap-devel
 
 Requires:	bzip2 >= 0.9.0c-2
 Requires:	lzma
@@ -253,20 +241,13 @@ Requires:	setup >= 2.2.0-8
 Requires:	rpm-%{_real_vendor}-setup >= 1.85
 Requires:	update-alternatives
 Requires:	%librpmname = %epoch:%version-%release
-Conflicts:	patch < 2.5
-Conflicts:	menu < 2.1.5-29
-Conflicts:	locales < 2.3.1.1
-Conflicts:	man-pages-fr < 0.9.7-16
-Conflicts:	man-pages-pl < 0.4-9
-Conflicts:	perl-URPM < 1.63-3
-# rpm 4.6.0 dropped support for --repackage, so urpmi-recover can not work anymore:
-Conflicts:	urpmi-recover
 URL:            http://rpm.org/
 %define         git_url        http://rpm.org/git/rpm.git
-Requires(pre):		rpm-helper >= 0.8
+Requires(pre):		rpm-helper
 Requires(pre):		coreutils
-Requires(postun):	rpm-helper >= 0.8
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+Requires(postun):	rpm-helper
+
+Conflicts: perl-URPM < 3.38.4-1.1.mga2
 
 %description
 RPM is a powerful command line driven package management system capable of
@@ -290,9 +271,6 @@ Group:		Development/C
 Requires:	rpm = %epoch:%{version}-%{release}
 Provides:	librpm-devel = %version-%release
 Provides:   	rpm-devel = %version-%release
-Obsoletes:  	rpm-devel < 4.4.1
-Obsoletes:      %{_lib}rpm4.4-devel
-Obsoletes:      %{_lib}rpm4.2-devel
 
 %description -n %librpmnamedevel
 This package contains the RPM C library and header files.  These
@@ -304,6 +282,24 @@ that need an intimate knowledge of RPM packages in order to function.
 This package should be installed if you want to develop programs that
 will manipulate RPM packages and databases.
 
+%package   -n %librpmbuild
+Summary:   Libraries for building and signing RPM packages
+Group:     System/Libraries
+Obsoletes: rpm-build-libs%{_isa} < %{version}-%{release}
+Provides: rpm-build-libs%{_isa} = %{version}-%{release}
+
+%description -n %librpmbuild
+This package contains the RPM shared libraries for building and signing
+packages.
+
+%package  -n %librpmsign
+Summary:  Libraries for building and signing RPM packages
+Group:    System/Libraries
+
+%description -n %librpmsign
+This package contains the RPM shared libraries for building and signing
+packages.
+
 %package build
 Summary:	Scripts and executable programs used to build packages
 Group:		System/Configuration/Packaging
@@ -312,15 +308,15 @@ Requires:	automake
 Requires:	file
 Requires:	gcc-c++
 # We need cputoolize & amd64-* alias to x86_64-* in config.sub
-Requires:	libtool-base >= 1.4.3-5
-Requires:	patch >= 2.5.9-7
+Requires:	libtool-base
+Requires:	patch
 Requires:	make
 Requires:	tar
 Requires:	unzip
 Requires:	elfutils
 Requires:	perl(CPAN::Meta) >= 2.112.150
 Requires:	perl(ExtUtils::MakeMaker) >= 6.570_700
-Requires:	perl(YAML::Tiny)
+Requires:       perl(YAML::Tiny)
 Requires:	rpm = %epoch:%{version}-%{release}
 Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 
@@ -328,14 +324,18 @@ Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_vers
 This package contains scripts and executable programs that are used to
 build packages using RPM.
 
+%package sign
+Summary: Package signing support
+Group:   System/Base
+
+%description sign
+This package contains support for digitally signing RPM packages.
+
 %if %buildpython
 %package -n python-rpm
 Summary:	Python bindings for apps which will manipulate RPM packages
 Group:		Development/Python
-Requires:	python >= %{pyver}
 Requires:	rpm = %epoch:%{version}-%{release}
-Obsoletes:  	rpm-python < %epoch:%version-%release
-Provides:   	rpm-python = %version-%release
 
 %description -n python-rpm
 The rpm-python package contains a module which permits applications
@@ -348,9 +348,41 @@ programs that will manipulate RPM packages and databases.
 
 %prep
 %setup -q -n %name-%srcver
-%apply_patches
+%patch17 -p1
+%patch22 -p1
+%patch31 -p1
+%patch49 -p1
+%patch64 -p1
+%patch70 -p1
+%patch83 -p1
+%patch84 -p1
+%patch111 -p1
+%patch114 -p1
+%patch133 -p1
+%patch135 -p1
+%patch137 -p1
+%patch145 -p1
+%patch146 -p1
+%patch152 -p1
+%patch159 -p1
+%patch1007 -p1
+%patch1009 -p1
+%patch2003 -p1
+%patch2005 -p1
+%patch2006 -p1
+%patch3000 -p1
+%patch3001 -p1
+%patch3002 -p1
+%patch3003 -p1
+# this patch cant be applied on softfp builds
+%ifnarch armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv7l
+%patch5000 -p1 -b .armhfp
+%endif
 
 %build
+
+# Remove me when we will upload rpm
+#exit 1
 
 autoreconf
 
@@ -366,28 +398,28 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %if %builddebug
         --enable-debug \
 %endif
-	--with-external-db \
+        --with-external-db \
 %if %buildpython
         --with-python=%{pyver} \
 %else
         --without-python \
 %endif
+%if ! %buildplugins
+        --disable-plugins \
+%endif
         --with-glob \
         --without-selinux \
-        --without-apidocs  \
-	--with-cap
+        --without-apidocs \
+        --with-cap
 
 %make
 
 %install
+rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=%buildroot install
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
-
-%ifarch ppc powerpc
-ln -sf ppc-%{_real_vendor}-linux $RPM_BUILD_ROOT%{rpmdir}/powerpc-%{_real_vendor}-linux
-%endif
 
 #mv -f $RPM_BUILD_ROOT/%{rpmdir}/rpmdiff $RPM_BUILD_ROOT/%{_bindir}
 
@@ -402,7 +434,8 @@ mkdir -p $RPM_BUILD_ROOT/var/lib/rpm
 for dbi in \
 	Basenames Conflictname Dirnames Group Installtid Name Providename \
 	Provideversion Removetid Requirename Requireversion Triggername \
-	Packages __db.001 __db.002 __db.003 __db.004
+	Obsoletename Packages Sha1header Sigmd5 __db.001 __db.002 \
+	__db.003 __db.004 __db.005 __db.006 __db.007 __db.008 __db.009
 do
     touch $RPM_BUILD_ROOT/var/lib/rpm/$dbi
 done
@@ -437,20 +470,7 @@ EOF
 
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %pre
-if [ -f /var/lib/rpm/Packages -a -f /var/lib/rpm/packages.rpm ]; then
-    echo "
-You have both
-	/var/lib/rpm/packages.rpm	db1 format installed package headers
-	/var/lib/rpm/Packages		db3 format installed package headers
-Please remove (or at least rename) one of those files, and re-install.
-"
-    exit 1
-fi
-
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
 
 rm -rf /usr/lib/rpm/*-mandrake-*
@@ -466,20 +486,12 @@ then
 	sh %{rpmdir}/convertrpmrc.sh 2>&1 > /dev/null
 fi
 
-if [ -f /var/lib/rpm/packages.rpm ]; then
-    /bin/chown rpm.rpm /var/lib/rpm/*.rpm
-elif [ ! -f /var/lib/rpm/Packages ]; then
+if [ ! -f /var/lib/rpm/Packages ]; then
     /bin/rpm --initdb
 fi
 
 %postun
 /usr/share/rpm-helper/del-user rpm $1 rpm
-
-%triggerpostun -- rpm < 1:4.4.2.3-11
-if [ -f /etc/rpm/macros.cdb.rpmsave ]; then
-   echo "warning: restoring /etc/rpm/macros.cdb from macros.cdb.rpmsave, please check you really need the changes"
-   mv /etc/rpm/macros.cdb.rpmsave /etc/rpm/macros.cdb
-fi
 
 %define	rpmattr		%attr(0755, rpm, rpm)
 
@@ -490,6 +502,7 @@ fi
 %attr(0755, rpm, rpm) %{_bindir}/rpm2cpio
 %attr(0755, rpm, rpm) %{_bindir}/gendiff
 %attr(0755, rpm, rpm) %{_bindir}/rpmdb
+%attr(0755, rpm, rpm) %{_bindir}/rpmkeys
 %attr(0755, rpm, rpm) %{_bindir}/rpmgraph
 %attr(0755, rpm, rpm) %{_bindir}/rpmsign
 %attr(0755, rpm, rpm) %{_bindir}/rpmquery
@@ -509,6 +522,9 @@ fi
 %attr(0755, rpm, rpm) %{rpmdir}/rpm.*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmpopt*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmrc
+%attr(0644, rpm, rpm) %{rpmdir}/fileattrs
+%attr(0644, rpm, rpm) %{rpmdir}/elfdeps
+%attr(0644, rpm, rpm) %{rpmdir}/script.req
 
 %rpmattr	%{rpmdir}/rpm2cpio.sh
 %rpmattr	%{rpmdir}/tgpg
@@ -519,29 +535,6 @@ fi
 %attr(   -, rpm, rpm) %{rpmdir}/platform/athlon-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/pentium*-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/geode-*
-%endif
-%ifarch alpha
-%attr(   -, rpm, rpm) %{rpmdir}/platform/alpha*
-%endif
-%ifarch %{sunsparc}
-%attr(   -, rpm, rpm) %{rpmdir}/platform/sparc*
-%endif
-%ifarch ppc powerpc
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc32-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc64-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/powerpc-*
-%endif
-%ifarch ppc powerpc ppc64
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc*series-*
-%endif
-%ifarch ppc64
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc32-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ppc64-*
-%endif
-%ifarch ia64
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ia64-*
 %endif
 %ifarch x86_64
 %attr(   -, rpm, rpm) %{rpmdir}/platform/amd64-*
@@ -578,12 +571,15 @@ fi
 %rpmdbattr	/var/lib/rpm/Group
 %rpmdbattr	/var/lib/rpm/Installtid
 %rpmdbattr	/var/lib/rpm/Name
+%rpmdbattr	/var/lib/rpm/Obsoletename
 %rpmdbattr	/var/lib/rpm/Packages
 %rpmdbattr	/var/lib/rpm/Providename
 %rpmdbattr	/var/lib/rpm/Provideversion
 %rpmdbattr	/var/lib/rpm/Removetid
 %rpmdbattr	/var/lib/rpm/Requirename
 %rpmdbattr	/var/lib/rpm/Requireversion
+%rpmdbattr	/var/lib/rpm/Sha1header
+%rpmdbattr	/var/lib/rpm/Sigmd5
 %rpmdbattr	/var/lib/rpm/Triggername
 
 %files build
@@ -591,6 +587,7 @@ fi
 %doc CHANGES
 %doc doc-copy/*
 %rpmattr	%{_bindir}/rpmbuild
+%rpmattr        %{_bindir}/rpmspec
 %rpmattr	%{_prefix}/lib/rpm/brp-*
 %rpmattr	%{_prefix}/lib/rpm/check-files
 %rpmattr	%{_prefix}/lib/rpm/debugedit
@@ -619,11 +616,11 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/ocaml-find-requires.sh
 %rpmattr	%{_prefix}/lib/rpm/osgideps.pl
 %rpmattr	%{_prefix}/lib/rpm/pkgconfigdeps.sh
-%rpmattr	%{_prefix}/lib/rpm/rpmdiff
+#%rpmattr	%{_prefix}/lib/rpm/rpmdiff
 
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
 #%rpmattr	%{_prefix}/lib/rpm/trpm
-%rpmattr    %{_prefix}/lib/rpm/pythondeps.sh
+%rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
 
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
@@ -638,7 +635,20 @@ fi
 %defattr(-,root,root)
 %{_libdir}/librpm.so.%{libmajor}*
 %{_libdir}/librpmio.so.%{libmajor}*
+%if %{with plugins}
+%{_libdir}/rpm-plugins
+%endif
+
+%files -n %librpmbuild
 %{_libdir}/librpmbuild.so.%{libmajor}*
+
+%files -n %librpmsign
+%{_libdir}/librpmsign.so.%{libmajorsign}*
+
+%files sign
+%defattr(-,root,root)
+%{_bindir}/rpmsign
+%{_mandir}/man8/rpmsign.8*
 
 %files -n %librpmnamedevel
 %defattr(-,root,root)
@@ -646,4 +656,6 @@ fi
 %{_libdir}/librpm.so
 %{_libdir}/librpmio.so
 %{_libdir}/librpmbuild.so
+%{_libdir}/librpmsign.so
 %{_libdir}/pkgconfig/rpm.pc
+

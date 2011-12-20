@@ -1,0 +1,63 @@
+From e6a21a0d6f0cf0baa471caa9bfbd1a3a92031cd4 Mon Sep 17 00:00:00 2001
+From: unknown author <cooker@mandrivalinux.org>
+Date: Mon, 5 Jan 2009 13:29:57 +0000
+Subject: [PATCH 05/36] mageia rpmrc rpmpopt
+
+---
+ Makefile.am     |    1 +
+ lib/Makefile.am |    1 +
+ lib/poptALL.c   |    5 +++++
+ lib/rpmrc.c     |    2 +-
+ rpmqv.c         |    5 +++++
+ 5 files changed, 13 insertions(+), 1 deletions(-)
+
+diff -up a/lib/Makefile.am b/lib/Makefile.am
+--- a/lib/Makefile.am	2011-07-15 09:36:38.000000000 +0000
++++ b/lib/Makefile.am	2011-08-25 08:05:00.497297714 +0000
+@@ -11,6 +11,7 @@ AM_CPPFLAGS += -DSYSCONFDIR="\"$(sysconf
+ AM_CPPFLAGS += -DLOCALSTATEDIR="\"$(localstatedir)\""
+ AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"rpmpopt-${VERSION}\""
+ AM_CPPFLAGS += -DLIBRPMALIAS_EXECPATH="\"$(bindir)\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"mageia/rpmpopt\""
+ 
+ usrlibdir = $(libdir)
+ 
+diff -up a/lib/poptALL.c b/lib/poptALL.c
+--- a/lib/poptALL.c	2011-07-15 09:32:41.000000000 +0000
++++ b/lib/poptALL.c	2011-08-25 08:05:37.992340446 +0000
+@@ -278,6 +278,11 @@ rpmcliInit(int argc, char *const argv[],
+ 	(void) poptReadConfigFile(optCon, poptfile);
+ 	free(poptfile);
+     }
++    {
++	char *poptfile = rpmGenPath(rpmConfigDir(), LIBVENDORALIAS_FILENAME, NULL);
++	(void) poptReadConfigFile(optCon, poptfile);
++	free(poptfile);
++    }
+     (void) poptReadDefaultConfig(optCon, 1);
+ 
+     if ((execPath = getenv("RPM_POPTEXEC_PATH")) == NULL)
+diff -up a/lib/rpmrc.c b/lib/rpmrc.c
+--- a/lib/rpmrc.c	2011-07-15 08:17:57.000000000 +0000
++++ b/lib/rpmrc.c	2011-08-25 08:03:03.431164073 +0000
+@@ -421,7 +421,7 @@ static void setDefaults(void)
+     const char *confdir = rpmConfigDir();
+     if (!defrcfiles) {
+ 	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
+-				confdir, "/" RPMCANONVENDOR "/rpmrc", ":",
++				confdir, "/" "mageia" "/rpmrc", ":",
+ 				SYSCONFDIR "/rpmrc", ":",
+ 			  	"~/.rpmrc", NULL);
+     }
+diff -up a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2011-07-15 09:32:41.000000000 +0000
++++ b/Makefile.am	2011-08-25 08:04:44.243279177 +0000
+@@ -42,6 +42,7 @@ AM_CPPFLAGS += @WITH_POPT_INCLUDE@
+ AM_CPPFLAGS += -I$(top_srcdir)/misc
+ AM_CPPFLAGS += -DLOCALEDIR="\"$(localedir)\""
+ AM_CPPFLAGS += -DLIBRPMALIAS_FILENAME="\"rpmpopt-${VERSION}\""
++AM_CPPFLAGS += -DLIBVENDORALIAS_FILENAME="\"mageia/rpmpopt\""
+ 
+ pkginclude_HEADERS =
+ nodist_pkginclude_HEADERS =
+

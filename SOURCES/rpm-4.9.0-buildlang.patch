@@ -1,0 +1,32 @@
+commit 1e4cead33c24fe6b10e8eccf892afa6fb1f2cb3a
+Author: dmorgan <dmorgan@localhost.(none)>
+Date:   Sun Jun 26 23:40:42 2011 +0200
+
+     The following patch isn't needed for Mandriva, but Turbolinux has it
+     and it can't hurt much
+    
+     This patch fixes the problem when the post-scripts launched by
+     rpm-build.
+     The post-scripts launched by rpm-build works in LANG environment. If
+     LANG is
+     other locale except C, then some commands launched by post-scripts
+     will not
+     display characters which you expected.
+
+diff --git a/build/build.c b/build/build.c
+index 5924ec6..1f108a4 100644
+--- a/build/build.c
++++ b/build/build.c
+@@ -172,6 +172,12 @@ rpmRC doScript(rpmSpec spec, rpmBuildFlags what, const char *name,
+ 	/* NSPR messes with SIGPIPE, reset to default for the kids */
+ 	signal(SIGPIPE, SIG_DFL);
+ 	errno = 0;
++
++        setenv ("LANG", "C", 1);
++        unsetenv ("LC_ALL");
++        unsetenv ("LANGUAGE");
++        unsetenv ("LINGUAS");
++
+ 	(void) execvp(argv[0], (char *const *)argv);
+ 
+ 	rpmlog(RPMLOG_ERR, _("Exec of %s failed (%s): %s\n"),

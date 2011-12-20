@@ -1,0 +1,88 @@
+commit ac0baec92e57da7299202096cb15e7cfac089155
+Author: dmorgan <dmorgan@localhost.(none)>
+Date:   Sun Jun 26 22:35:57 2011 +0200
+
+    add loging facilities through syslog
+
+diff --git a/configure.ac b/configure.ac
+index 3cd23e3..3fee053 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -196,6 +196,12 @@ AC_SUBST(WITH_LZMA_LIB)
+ #=================
+ 
+ dnl
++dnl Checking syslog
++dnl
++
++AC_CHECK_HEADERS(syslog.h)
++
++dnl
+ dnl Check for features
+ dnl
+ 
+diff --git a/lib/psm.c b/lib/psm.c
+index 6cf4ef9..338a219 100644
+--- a/lib/psm.c
++++ b/lib/psm.c
+@@ -1009,6 +1009,15 @@ static rpmRC rpmpsmStage(rpmpsm psm, pkgStage stage)
+ 	rc = (rpmdbAdd(rpmtsGetRdb(ts), h) == 0) ? RPMRC_OK : RPMRC_FAIL;
+ 	(void) rpmswExit(rpmtsOp(ts, RPMTS_OP_DBADD), 0);
+ 
++
++#if HAVE_SYSLOG_H
++       {
++               if (rpmExpandNumeric("%{_use_syslog}")) {
++                       syslog(LOG_NOTICE, "[RPM] %s installed\n", rpmteNEVRA(psm->te));
++               }
++       }
++#endif
++
+ 	if (rc == RPMRC_OK)
+ 	    rpmteSetDBInstance(psm->te, headerGetInstance(h));
+ 	headerFree(h);
+@@ -1019,6 +1028,15 @@ static rpmRC rpmpsmStage(rpmpsm psm, pkgStage stage)
+ 	rc = (rpmdbRemove(rpmtsGetRdb(ts), rpmteDBInstance(psm->te)) == 0) ?
+ 						    RPMRC_OK : RPMRC_FAIL;
+ 	(void) rpmswExit(rpmtsOp(ts, RPMTS_OP_DBREMOVE), 0);
++
++#if HAVE_SYSLOG_H
++        {
++               if (rpmExpandNumeric("%{_use_syslog}")) {
++                       syslog(LOG_NOTICE, "[RPM] %s removed\n", rpmteNEVRA(psm->te));
++               }
++       }
++#endif
++
+ 	if (rc == RPMRC_OK)
+ 	    rpmteSetDBInstance(psm->te, 0);
+ 	break;
+diff --git a/macros.in b/macros.in
+index a279995..fff1e23 100644
+--- a/macros.in
++++ b/macros.in
+@@ -1060,6 +1060,9 @@ done \
+ %__urlhelper_proxyopts   %{?_httpproxy:--proxy %{_httpproxy}%{?_httpport::%{_httpport}}}%{!?_httpproxy:%{nil}}
+ %_urlhelper             %{__urlhelpercmd} %{?__urlhelper_localopts} %{?__urlhelper_proxyopts} %{__urlhelperopts}
+ 
++# Syslog support when installing/removing rpms
++%_use_syslog  1
++
+ #------------------------------------------------------------------------------
+ # Collection specific macros
+ %__plugindir		%{_libdir}/rpm-plugins
+diff --git a/system.h b/system.h
+index 9b23e45..53f7f05 100644
+--- a/system.h
++++ b/system.h
+@@ -9,6 +9,10 @@
+ #include "config.h"
+ #endif
+ 
++#if HAVE_SYSLOG_H
++#include <syslog.h>
++#endif
++
+ #ifdef HAVE_SYS_PARAM_H
+ #include <sys/param.h>
+ #endif

@@ -1,0 +1,64 @@
+commit ca52c9ff92a9bb1493bfb9917c8fb529c1d11a34
+Author: dmorgan <dmorgan@localhost.(none)>
+Date:   Sun Jun 26 23:11:12 2011 +0200
+
+    don't conflict for doc files
+    (to be able to install lib*-devel together with lib64*-devel even if
+    they have conflicting manpages)
+
+diff --git a/lib/transaction.c b/lib/transaction.c
+index 628e4ea..151cde7 100644
+--- a/lib/transaction.c
++++ b/lib/transaction.c
+@@ -314,6 +314,22 @@ static uint64_t countFiles(rpmts ts)
+     return fc;
+ }
+ 
++static int is_a_doc_conflict(rpmfi fi)
++{
++    const char *ignorelist[] = {
++       "/usr/share/man/",
++       "/usr/share/gtk-doc/html/",
++       "/usr/share/gnome/html/",
++       NULL
++    };
++    const char *fn = rpmfiFN(fi);
++    const char **dnp;
++    for (dnp = ignorelist; *dnp != NULL; dnp++)
++       if (strstr(fn, *dnp) == fn) return 1;
++
++    return 0;
++}
++
+ /**
+  * handleInstInstalledFiles.
+  * @param ts		transaction set
+@@ -354,6 +370,13 @@ static int handleInstInstalledFile(const rpmts ts, rpmte p, rpmfi fi,
+ 	    }
+ 	}
+ 
++       /* HACK: always install latest (arch-independent) man
++          pages and gtk/gnome html doc files. */
++       if (rConflicts && is_a_doc_conflict(fi)) {
++           rpmfsSetAction(fs, fx, FA_CREATE);
++           rConflicts = 0;
++       }
++
+ 	if (rConflicts) {
+ 	    char *altNEVR = headerGetAsString(otherHeader, RPMTAG_NEVRA);
+ 	    rpmteAddProblem(p, RPMPROB_FILE_CONFLICT, altNEVR, rpmfiFN(fi),
+@@ -525,6 +548,14 @@ assert(otherFi != NULL);
+ 		    }
+ 		    done = 1;
+ 		}
++
++               /* HACK: always install latest (arch-independent) man
++                  pages and gtk/gnome html doc files. */
++               if (rConflicts && is_a_doc_conflict(fi)) {
++                   rpmfsSetAction(fs, i, FA_CREATE);
++                   rConflicts = 0;
++               }
++		
+ 		if (rConflicts) {
+ 		    rpmteAddProblem(p, RPMPROB_NEW_FILE_CONFLICT,
+ 				    rpmteNEVRA(otherTe), fn, 0);
