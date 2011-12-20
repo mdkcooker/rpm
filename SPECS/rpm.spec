@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}9
+%define release		%mkrel %{?snapver:0.%{snapver}.}10
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -522,12 +522,14 @@ fi
 %attr(0755, rpm, rpm) %{rpmdir}/rpm.*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmpopt*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmrc
-%attr(0644, rpm, rpm) %{rpmdir}/fileattrs
 %attr(0644, rpm, rpm) %{rpmdir}/elfdeps
 %attr(0644, rpm, rpm) %{rpmdir}/script.req
 
 %rpmattr	%{rpmdir}/rpm2cpio.sh
 %rpmattr	%{rpmdir}/tgpg
+
+%dir %attr(   -, rpm, rpm) %{rpmdir}/fileattrs
+%attr(0644, rpm, rpm) %{rpmdir}/fileattrs/*.attr
 
 %dir %attr(   -, rpm, rpm) %{rpmdir}/platform/
 %ifarch %{ix86} x86_64
