@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}10
+%define release		%mkrel %{?snapver:0.%{snapver}.}11
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -255,33 +255,6 @@ installing, uninstalling, verifying, querying, and updating software packages.
 Each software package consists of an archive of files along with information
 about the package like its version, a description, etc.
 
-%package -n %librpmname
-Summary:  Library used by rpm
-Group:	  System/Libraries
-Provides: librpm = %version-%release
-
-%description -n %librpmname
-RPM is a powerful command line driven package management system capable of
-installing, uninstalling, verifying, querying, and updating software packages.
-This package contains common files to all applications based on rpm.
-
-%package -n %librpmnamedevel
-Summary:	Development files for applications which will manipulate RPM packages
-Group:		Development/C
-Requires:	rpm = %epoch:%{version}-%{release}
-Provides:	librpm-devel = %version-%release
-Provides:   	rpm-devel = %version-%release
-
-%description -n %librpmnamedevel
-This package contains the RPM C library and header files.  These
-development files will simplify the process of writing programs
-which manipulate RPM packages and databases and are intended to make
-it easier to create graphical package managers or any other tools
-that need an intimate knowledge of RPM packages in order to function.
-
-This package should be installed if you want to develop programs that
-will manipulate RPM packages and databases.
-
 %package   -n %librpmbuild
 Summary:   Libraries for building and signing RPM packages
 Group:     System/Libraries
@@ -299,6 +272,36 @@ Group:    System/Libraries
 %description -n %librpmsign
 This package contains the RPM shared libraries for building and signing
 packages.
+
+%package -n %librpmname
+Summary:  Library used by rpm
+Group:	  System/Libraries
+Provides: librpm = %version-%release
+
+%description -n %librpmname
+RPM is a powerful command line driven package management system capable of
+installing, uninstalling, verifying, querying, and updating software packages.
+This package contains common files to all applications based on rpm.
+
+%package -n %librpmnamedevel
+Summary:	Development files for applications which will manipulate RPM packages
+Group:		Development/C
+Requires:	rpm = %epoch:%{version}-%{release}
+Provides:	librpm-devel = %version-%release
+Provides:   	rpm-devel = %version-%release
+Requires:       %librpmname = %version-%release
+Requires:       %librpmbuild = %version-%release
+Requires:       %librpmsign = %version-%release
+
+%description -n %librpmnamedevel
+This package contains the RPM C library and header files.  These
+development files will simplify the process of writing programs
+which manipulate RPM packages and databases and are intended to make
+it easier to create graphical package managers or any other tools
+that need an intimate knowledge of RPM packages in order to function.
+
+This package should be installed if you want to develop programs that
+will manipulate RPM packages and databases.
 
 %package build
 Summary:	Scripts and executable programs used to build packages
