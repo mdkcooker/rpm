@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}11
+%define release		%mkrel %{?snapver:0.%{snapver}.}12
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -289,9 +289,9 @@ Group:		Development/C
 Requires:	rpm = %epoch:%{version}-%{release}
 Provides:	librpm-devel = %version-%release
 Provides:   	rpm-devel = %version-%release
-Requires:       %librpmname = %version-%release
-Requires:       %librpmbuild = %version-%release
-Requires:       %librpmsign = %version-%release
+Requires:       %librpmname = %epoch:%version-%release
+Requires:       %librpmbuild = %epoch:%version-%release
+Requires:       %librpmsign = %epoch:%version-%release
 
 %description -n %librpmnamedevel
 This package contains the RPM C library and header files.  These
