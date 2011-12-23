@@ -200,8 +200,6 @@ Patch3003: rpm_arm_mips_isa_macros.patch
 #Patch3004: rpm_add_armv5tl.patch
 
 # Fedora patches
-#conditionally applied patch for arm hardware floating point
-Patch5000: rpm-4.9.0-armhfp.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
@@ -352,36 +350,7 @@ programs that will manipulate RPM packages and databases.
 
 %prep
 %setup -q -n %name-%srcver
-%patch17 -p1
-%patch22 -p1
-%patch31 -p1
-%patch49 -p1
-%patch64 -p1
-%patch70 -p1
-%patch83 -p1
-%patch84 -p1
-%patch111 -p1
-%patch114 -p1
-%patch133 -p1
-%patch135 -p1
-%patch137 -p1
-%patch145 -p1
-%patch146 -p1
-%patch152 -p1
-%patch159 -p1
-%patch1007 -p1
-%patch1009 -p1
-%patch2003 -p1
-%patch2005 -p1
-%patch2006 -p1
-%patch3000 -p1
-%patch3001 -p1
-%patch3002 -p1
-%patch3003 -p1
-# this patch cant be applied on softfp builds
-%ifnarch armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv7l
-%patch5000 -p1 -b .armhfp
-%endif
+%apply_patches
 
 %build
 
