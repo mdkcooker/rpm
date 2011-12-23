@@ -67,6 +67,7 @@
 %{?_with_python:%define buildpython 1}
 %{?_without_python:%define buildpython 0}
 
+# disable plugins initially
 %define buildplugins 0
 %{?_with_plugins:%define buildplugins 1}
 
