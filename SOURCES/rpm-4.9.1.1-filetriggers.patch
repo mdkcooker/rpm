@@ -1,6 +1,7 @@
 unchanged:
---- /dev/null
-+++ b/doc/manual/filetriggers
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/doc/manual/filetriggers rpm-4.9.1.2/doc/manual/filetriggers
+--- rpm-4.9.1.2/doc/manual/filetriggers	1970-01-01 02:00:00.000000000 +0200
++++ rpm-4.9.1.2/doc/manual/filetriggers	2011-12-23 18:44:52.023585938 +0200
 @@ -0,0 +1,88 @@
 +== Introduction ==
 +
@@ -90,10 +91,9 @@ unchanged:
 +* what may get in rpm.org:
 +** http://www.mail-archive.com/rpm-maint@lists.rpm.org/msg00789.html
 +** http://www.mail-archive.com/rpm-maint@lists.rpm.org/msg00788.html
-unchanged:
-diff -u b/lib/filetriggers.c rpm-4.6.0/lib/filetriggers.c
---- b/lib/filetriggers.c
-+++ rpm-4.6.0/lib/filetriggers.c	2010-04-16 16:58:09.244840369 +0200
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/filetriggers.c rpm-4.9.1.2/lib/filetriggers.c
+--- rpm-4.9.1.2/lib/filetriggers.c	1970-01-01 02:00:00.000000000 +0200
++++ rpm-4.9.1.2/lib/filetriggers.c	2011-12-23 18:44:52.023585938 +0200
 @@ -0,0 +1,268 @@
 +#include "system.h"
 +#include <rpm/rpmlib.h>
@@ -363,10 +363,9 @@ diff -u b/lib/filetriggers.c rpm-4.6.0/lib/filetriggers.c
 +     unlink(file);
 +     _free(file);
 +}
-diff --git a/lib/Makefile.am b/lib/Makefile.am
-index 1bf0fde..1fa51fc 100644
---- a/lib/Makefile.am
-+++ b/lib/Makefile.am
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/Makefile.am rpm-4.9.1.2/lib/Makefile.am
+--- rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:51.943585368 +0200
++++ rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:52.023585938 +0200
 @@ -34,7 +34,7 @@ librpm_la_SOURCES = \
  	rpmlead.c rpmlead.h rpmps.c rpmprob.c rpmrc.c \
  	rpmte.c rpmte_internal.h rpmts.c rpmfs.h rpmfs.c \
@@ -376,11 +375,10 @@ index 1bf0fde..1fa51fc 100644
  	rpmscript.h rpmscript.c legacy.c merge.c \
  	rpmchroot.c rpmchroot.h \
  	rpmplugins.c rpmplugins.h rpmug.c rpmug.h
-diff --git a/lib/misc.h b/lib/misc.h
-index 958561c..89f54c2 100644
---- a/lib/misc.h
-+++ b/lib/misc.h
-@@ -39,6 +39,11 @@ headerTagFormatFunction rpmHeaderFormatFuncByName(const char *fmt);
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/misc.h rpm-4.9.1.2/lib/misc.h
+--- rpm-4.9.1.2/lib/misc.h	2011-07-15 11:59:12.000000000 +0300
++++ rpm-4.9.1.2/lib/misc.h	2011-12-23 18:44:52.023585938 +0200
+@@ -39,6 +39,11 @@ headerTagFormatFunction rpmHeaderFormatF
  RPM_GNUC_INTERNAL
  headerTagFormatFunction rpmHeaderFormatFuncByValue(rpmtdFormats fmt);
  
@@ -392,10 +390,21 @@ index 958561c..89f54c2 100644
  #ifdef __cplusplus
  }
  #endif
-diff --git a/lib/transaction.c b/lib/transaction.c
-index 2cb252c..95661b8 100644
---- a/lib/transaction.c
-+++ b/lib/transaction.c
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/rpmte.c rpm-4.9.1.2/lib/rpmte.c
+--- rpm-4.9.1.2/lib/rpmte.c	2011-07-15 12:32:41.000000000 +0300
++++ rpm-4.9.1.2/lib/rpmte.c	2011-12-23 18:44:52.023585938 +0200
+@@ -910,7 +910,7 @@ int rpmteProcess(rpmte te, pkgGoal goal)
+ 
+     if (rpmteOpen(te, reset_fi)) {
+ 	failed = rpmpsmRun(te->ts, te, goal);
+-	rpmteClose(te, reset_fi);
++	rpmteClose(te, 0);
+     }
+     
+     if (!scriptstage) {
+diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/transaction.c rpm-4.9.1.2/lib/transaction.c
+--- rpm-4.9.1.2/lib/transaction.c	2011-12-23 18:44:51.953585439 +0200
++++ rpm-4.9.1.2/lib/transaction.c	2011-12-23 18:44:52.023585938 +0200
 @@ -1409,6 +1409,7 @@ static int rpmtsProcess(rpmts ts)
      pi = rpmtsiInit(ts);
      while ((p = rpmtsiNext(pi, 0)) != NULL) {
@@ -419,7 +428,7 @@ index 2cb252c..95661b8 100644
  	}
  	(void) rpmdbSync(rpmtsGetRdb(ts));
      }
-@@ -1488,6 +1497,9 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rpmprobFilterFlags ignoreSet)
+@@ -1488,6 +1497,9 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rp
  
      /* Run post-transaction scripts unless disabled */
      if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOST))) {
