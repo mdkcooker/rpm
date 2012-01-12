@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}14
+%define release		%mkrel %{?snapver:0.%{snapver}.}15
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -197,7 +197,7 @@ Patch3000: mips_macros.patch
 Patch3001: fix_stack_protector_check.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
-#Patch3004: rpm_add_armv5tl.patch
+Patch3004: rpm_add_armv5tl.patch
 
 # Fedora patches
 
