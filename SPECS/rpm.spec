@@ -517,7 +517,7 @@ fi
 %attr(   -, rpm, rpm) %{rpmdir}/platform/ia32e-*
 %endif
 %ifarch %arm
-%attr(   -, rpm, rpm) %{rpmdir}/platform/armv*
+%attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
 %endif
 %ifarch %mips
 %attr(   -, rpm, rpm) %{rpmdir}/platform/mips*
