@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}15
+%define release		%mkrel %{?snapver:0.%{snapver}.}16
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -443,6 +443,9 @@ EOF
 )
 
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
+
+%check
+make check
 
 %pre
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
