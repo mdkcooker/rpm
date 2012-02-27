@@ -231,7 +231,7 @@ Needs extcond.diff for query operations.
  rpm	alias -R --requires
  
 +rpm    alias --suggests        --qf \
-+  "[%|SUGGESTSFLAGS:depflag_strong?{}:{%{SUGGESTSNAME} %{SUGGESTSFLAGS:depflags} %{SUGGESTSVERSION}\n}|]" \
++  [%{SUGGESTSNAME} %{SUGGESTSFLAGS:depflags} %{SUGGESTSVERSION}\n]" \
 +	--POPTdesc=$"list capabilities this package suggests"
 +
 +rpm    alias --recommends      --qf \
