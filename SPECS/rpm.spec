@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}17
+%define release		%mkrel %{?snapver:0.%{snapver}.}18
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -139,6 +139,7 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
 Patch133: rpm-4.9.1.1-weakdeps.patch
+Patch134: extcond.diff
 
 # (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
 Patch135: rpm-4.9.0-fix-debugedit.patch
