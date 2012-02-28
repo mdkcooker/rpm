@@ -369,7 +369,7 @@ autoreconf
 RPM_OPT_FLAGS=-g
 %endif
 CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
-    %configure \
+    %configure2_5x \
         --enable-nls \
         --enable-python \
         --enable-sqlite3 \
