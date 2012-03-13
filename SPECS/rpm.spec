@@ -201,12 +201,15 @@ Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 Patch3005: rpm-4.9.x-kill-libio.patch
 
+#
 # Fedora patches
+# Patches 41xx are already in upstream and are 1xx in FC
+#
 # RH bug:   https://bugzilla.redhat.com/show_bug.cgi?id=752897
 # upstream commit: http://rpm.org/gitweb?p=rpm.git;a=commitdiff;h=d8cd36058b528f56bd579204426143be1e1eac6d
 # RH patch: http://pkgs.fedoraproject.org/gitweb/?p=rpm.git;a=commitdiff;h=e8efccb3d4664335b1f14e2b5a08121fa9eed2a1
 # RH announce: http://www.mail-archive.com/package-announce@lists.fedoraproject.org/msg38883.html
-Patch4000: rpm-4.9.x-mpsize.patch
+Patch4102: rpm-4.9.x-mpsize.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
