@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}20
+%define release		%mkrel %{?snapver:0.%{snapver}.}21
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -210,6 +210,19 @@ Patch3005: rpm-4.9.x-kill-libio.patch
 # RH patch: http://pkgs.fedoraproject.org/gitweb/?p=rpm.git;a=commitdiff;h=e8efccb3d4664335b1f14e2b5a08121fa9eed2a1
 # RH announce: http://www.mail-archive.com/package-announce@lists.fedoraproject.org/msg38883.html
 Patch4102: rpm-4.9.x-mpsize.patch
+# fix memory corruption on rpmdb size estimation (#766260)
+# (might help mga#4918):
+Patch4103: rpm-4.9.x-rpmdb-dsi.patch
+# fix couple of memleaks in python bindings (RH#782147)
+Patch4104: rpm-4.9.x-python-memleaks.patch
+# fix regression in verify output formatting (RH#797964)
+Patch4105: rpm-4.9.x-verify-output.patch
+# dont process spec include in false branch of if (RH#782970)
+Patch4106: rpm-4.9.x-include-cond.patch
+# only warn on missing excluded files on build (RH#745629)
+Patch4107: rpm-4.9.x-exclude-warn.patch
+# dont free up file info sets on test transactions
+Patch4108: rpm-4.9.x-tstest-fileinfo.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
