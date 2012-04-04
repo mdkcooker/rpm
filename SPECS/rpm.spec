@@ -47,12 +47,12 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.9.1.2
+%define rpmversion	4.9.1.3
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}22
+%define release		%mkrel %{?snapver:0.%{snapver}.}1
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
