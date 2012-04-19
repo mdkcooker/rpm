@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	2
 %define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}1
+%define release		%mkrel %{?snapver:0.%{snapver}.}2
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -200,6 +200,9 @@ Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 Patch3005: rpm-4.9.x-kill-libio.patch
+
+# see: http://rpm.org/gitweb?p=rpm.git;a=commit;h=1684b696111cca7a3b96bf22f8168baab2a2c5e6
+Patch4000: rpm-4.9.1.3-fix-stabs-debuginfo-error.patch
 
 #
 # Fedora patches

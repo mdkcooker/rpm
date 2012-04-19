@@ -1,0 +1,31 @@
+From 1684b696111cca7a3b96bf22f8168baab2a2c5e6 Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Wed, 7 Mar 2012 13:47:09 +0200
+Subject: [PATCH] Warn but dont fail the build on STABS debuginfo (RhBug:725378, others)
+
+- debugedit doesn't support STABS but there are some crazy cases
+  like PPC Linux kernel which contains both STABS and DWARF debuginfo
+  sections, manually added. A better fix would be erroring out
+  if we didn't find any usable debuginfo and warning otherwise but
+  this at least folks get their kernels built.
+---
+ tools/debugedit.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index 65839f2..f48d6f7 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -1588,7 +1588,7 @@ main (int argc, char *argv[])
+ 	  if (strcmp (name, ".stab") == 0)
+ 	    {
+ 	      fprintf (stderr, "Stabs debuginfo not supported: %s\n", file);
+-	      exit (1);
++	      break;
+ 	    }
+ 	  if (strcmp (name, ".debug_info") == 0)
+ 	    edit_dwarf2 (dso);
+-- 
+1.7.4.1
+
+
