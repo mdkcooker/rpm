@@ -47,12 +47,12 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.9.1.3
+%define rpmversion	4.10.0
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.9
-%define libmajor	2
-%define libmajorsign    0
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define libmajor	3
+%define libmajorsign    1
+%define release		%mkrel %{?snapver:0.%{snapver}.}0.2
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -98,7 +98,7 @@ Patch31:	rpm-4.9.0-syslog.patch
 
 # part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
 # (is it still needed?)
-Patch49:	rpm-4.9.0-provides-obsoleted.patch
+#Patch49:	rpm-4.9.0-provides-obsoleted.patch
 
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
 # - read /usr/lib/rpm/mageia/rpmpopt (not only /usr/lib/rpm/rpmpopt)
@@ -118,14 +118,14 @@ Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
-Patch83: rpm-4.9.0-no-doc-conflicts.patch
+#BETA Patch83: rpm-4.9.0-no-doc-conflicts.patch
 
 # Fix http://qa.mandriva.com/show_bug.cgi?id=19392
 # (is this working??)
 Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 
 # Fix diff issue when buildroot contains some "//"
-Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
+#Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
@@ -138,7 +138,7 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 #Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
-Patch133: rpm-4.9.1.1-weakdeps.patch
+Patch133: rpm-4.10.0-weakdeps.patch
 Patch134: extcond.diff
 
 # (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
@@ -150,7 +150,7 @@ Patch137: rpm-4.9.1.1-headerIconv.patch
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
-Patch145: rpm-forbid-badly-commented-define-in-spec.patch
+#Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
 # Will be allowed to be dropped when "Collection" won't be experimental anymore.
@@ -167,7 +167,7 @@ Patch152: rpm-4.6.0-rc1-fix-nss-detection.patch
 
 #Patch157: introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
-Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
+#Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
 Patch1007: rpm-4.6.0-rc3-xz-support.patch
 
@@ -178,7 +178,7 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 # Exposes packagecolor tag and adds new tags from rpm5 as it otherwise will
 # break when these unknown tags might be found in the rpmdb. Notice that this
 # will only make rpm recognize these, not implement actual support for them..
-Patch1009: rpm-4.9.1.2-rpm5-tags.patch
+#Patch1009: rpm-4.9.1.2-rpm5-tags.patch
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
@@ -192,40 +192,22 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 # display characters which you expected.
 Patch2005: rpm-4.9.0-buildlang.patch
 
-Patch2006: rpm-4.8.1-setup-rubygems.patch
+#Patch2006: rpm-4.8.1-setup-rubygems.patch
+
+# (tv) fix tests on non selinux systems:
+#BETA Patch2100: rpm-4.9.90-fix-test.diff
 
 Patch3000: mips_macros.patch
 Patch3001: fix_stack_protector_check.patch
-Patch3002: mips_define_isa_macros.patch
-Patch3003: rpm_arm_mips_isa_macros.patch
-Patch3004: rpm_add_armv5tl.patch
-Patch3005: rpm-4.9.x-kill-libio.patch
-
-# see: http://rpm.org/gitweb?p=rpm.git;a=commit;h=1684b696111cca7a3b96bf22f8168baab2a2c5e6
-Patch4000: rpm-4.9.1.3-fix-stabs-debuginfo-error.patch
+#Patch3002: mips_define_isa_macros.patch
+#Patch3003: rpm_arm_mips_isa_macros.patch
+#Patch3004: rpm_add_armv5tl.patch
+#Patch3005: rpm-4.9.x-kill-libio.patch
 
 #
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
 #
-# RH bug:   https://bugzilla.redhat.com/show_bug.cgi?id=752897
-# upstream commit: http://rpm.org/gitweb?p=rpm.git;a=commitdiff;h=d8cd36058b528f56bd579204426143be1e1eac6d
-# RH patch: http://pkgs.fedoraproject.org/gitweb/?p=rpm.git;a=commitdiff;h=e8efccb3d4664335b1f14e2b5a08121fa9eed2a1
-# RH announce: http://www.mail-archive.com/package-announce@lists.fedoraproject.org/msg38883.html
-Patch4102: rpm-4.9.x-mpsize.patch
-# fix memory corruption on rpmdb size estimation (#766260)
-# (might help mga#4918):
-Patch4103: rpm-4.9.x-rpmdb-dsi.patch
-# fix couple of memleaks in python bindings (RH#782147)
-Patch4104: rpm-4.9.x-python-memleaks.patch
-# fix regression in verify output formatting (RH#797964)
-Patch4105: rpm-4.9.x-verify-output.patch
-# dont process spec include in false branch of if (RH#782970)
-Patch4106: rpm-4.9.x-include-cond.patch
-# only warn on missing excluded files on build (RH#745629)
-Patch4107: rpm-4.9.x-exclude-warn.patch
-# dont free up file info sets on test transactions
-Patch4108: rpm-4.9.x-tstest-fileinfo.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
@@ -274,7 +256,7 @@ Requires(pre):		rpm-helper
 Requires(pre):		coreutils
 Requires(postun):	rpm-helper
 
-Conflicts: perl-URPM < 3.38.4-1.1.mga2
+Conflicts: perl-URPM < 3.41-1.mga3
 
 %description
 RPM is a powerful command line driven package management system capable of
@@ -611,7 +593,7 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/check-prereqs
 %rpmattr	%{_prefix}/lib/rpm/check-rpaths
 %rpmattr	%{_prefix}/lib/rpm/check-rpaths-worker
-%rpmattr	%{_prefix}/lib/rpm/javadeps
+#rpmattr	%{_prefix}/lib/rpm/javadeps
 %rpmattr	%{_prefix}/lib/rpm/libtooldeps.sh
 %rpmattr	%{_prefix}/lib/rpm/macros.perl
 %rpmattr	%{_prefix}/lib/rpm/macros.php
@@ -627,6 +609,11 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
 #%rpmattr	%{_prefix}/lib/rpm/trpm
 %rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
+
+%{_prefix}/lib/rpm/platform/alpha*/macros
+%{_prefix}/lib/rpm/platform/arm*/macros
+%{_prefix}/lib/rpm/platform/*-linux/macros
+
 
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*

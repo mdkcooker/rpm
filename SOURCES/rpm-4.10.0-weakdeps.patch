@@ -16,7 +16,7 @@ Needs extcond.diff for query operations.
 
 --- a/build/parsePreamble.c.orig	2011-01-25 13:52:28.000000000 +0000
 +++ b/build/parsePreamble.c	2011-05-11 14:09:07.000000000 +0000
-@@ -310,6 +310,8 @@ static struct tokenBits_s const installS
+@@ -342,6 +342,8 @@ static struct tokenBits_s const installS
      { "verify",		RPMSENSE_SCRIPT_VERIFY },
      { "pretrans",	RPMSENSE_PRETRANS },
      { "posttrans",	RPMSENSE_POSTTRANS },
@@ -25,9 +25,9 @@ Needs extcond.diff for query operations.
      { NULL, 0 }
  };
  
-@@ -790,6 +792,18 @@ static int handlePreambleTag(rpmSpec spe
- 	if ((rc = parseRCPOT(spec, pkg, field, tag, 0, tagflags)))
- 	    return rc;
+@@ -816,6 +818,18 @@ static rpmRC handlePreambleTag(rpmSpec s
+ 	if (parseRCPOT(spec, pkg, field, tag, 0, tagflags))
+ 	    goto exit;
  	break;
 +    case RPMTAG_SUGGESTSFLAGS:
 +    case RPMTAG_ENHANCESFLAGS:
@@ -44,7 +44,7 @@ Needs extcond.diff for query operations.
      case RPMTAG_EXCLUDEARCH:
      case RPMTAG_EXCLUSIVEARCH:
      case RPMTAG_EXCLUDEOS:
-@@ -895,6 +909,14 @@ static struct PreambleRec_s const preamb
+@@ -924,6 +938,14 @@ static struct PreambleRec_s const preamb
      {RPMTAG_BUGURL,		0, 0, LEN_AND_STR("bugurl")},
      {RPMTAG_COLLECTIONS,	0, 0, LEN_AND_STR("collections")},
      {RPMTAG_ORDERFLAGS,		2, 0, LEN_AND_STR("orderwithrequires")},
@@ -59,6 +59,7 @@ Needs extcond.diff for query operations.
      {0, 0, 0, 0}
  };
  
+diff -p -up ./build/rpmfc.c.orig ./build/rpmfc.c
 --- a/build/parseReqs.c.orig	2010-12-13 14:01:56.000000000 +0000
 +++ b/build/parseReqs.c	2011-05-11 14:16:43.000000000 +0000
 @@ -95,6 +95,20 @@ rpmRC parseRCPOT(rpmSpec spec, Package p
@@ -82,6 +83,7 @@ Needs extcond.diff for query operations.
      }
  
      for (r = field; *r != '\0'; r = re) {
+diff -p -up ./configure.ac.orig ./configure.ac
 --- a/build/reqprov.c.orig	2010-12-13 14:01:56.000000000 +0000
 +++ b/build/reqprov.c	2011-05-11 14:15:02.000000000 +0000
 @@ -75,6 +75,16 @@ int addReqProv(Header h, rpmTagVal tagN,
@@ -116,8 +118,8 @@ Needs extcond.diff for query operations.
    { NULL,		{ NULL, NULL, NULL, NULL },	0, 0, 0, 0, 0 }
  };
  
-@@ -1160,6 +1166,14 @@ static rpmRC rpmfcGenerateDependsHelper(
- 	    failnonzero = 0;
+@@ -1166,6 +1166,14 @@ static rpmRC rpmfcGenerateDependsHelper(
+ 		continue;
  	    tagflags = RPMSENSE_FIND_REQUIRES;
  	    break;
 +	case RPMTAG_ENHANCESFLAGS:
@@ -182,8 +184,8 @@ Needs extcond.diff for query operations.
 --- a/lib/rpmtag.h.orig	2010-12-13 14:01:56.000000000 +0000
 +++ b/lib/rpmtag.h	2011-05-11 13:58:33.000000000 +0000
 @@ -217,14 +217,14 @@ typedef enum rpmTag_e {
-     RPMTAG_PRETRANSPROG		= 1153,	/* s */
-     RPMTAG_POSTTRANSPROG	= 1154,	/* s */
+     RPMTAG_PRETRANSPROG		= 1153,	/* s[] */
+     RPMTAG_POSTTRANSPROG	= 1154,	/* s[] */
      RPMTAG_DISTTAG		= 1155,	/* s */
 -    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension (unimplemented) */
 -#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] (unimplemented) */
@@ -197,13 +199,14 @@ Needs extcond.diff for query operations.
 +#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] */
 +    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension */
 +    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension */
-+    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension */
++    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension placeholder */
 +#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] */
-+    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension */
-+    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension */
++    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension placeholder */
++    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension placeholder */
      RPMTAG_PRIORITY		= 1162, /* i[] extension placeholder (unimplemented) */
      RPMTAG_CVSID		= 1163, /* s (unimplemented) */
  #define	RPMTAG_SVNID	RPMTAG_CVSID	/* s (unimplemented) */
+diff -p -up ./lib/rpmtd.h.orig ./lib/rpmtd.h
 --- a/lib/rpmtd.h.orig	2010-12-03 12:11:57.000000000 +0000
 +++ b/lib/rpmtd.h	2011-05-11 14:00:06.000000000 +0000
 @@ -220,6 +220,7 @@ typedef enum rpmtdFormats_e {
