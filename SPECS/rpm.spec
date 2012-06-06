@@ -224,7 +224,7 @@ BuildRequires:  rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetu
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  lua-devel
+BuildRequires:  lua5.1-devel
 BuildRequires:  libcap-devel
 # Needed for doc
 #BuildRequires:	graphviz
