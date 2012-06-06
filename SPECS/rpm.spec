@@ -114,14 +114,14 @@ Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
-#BETA Patch83: rpm-4.9.0-no-doc-conflicts.patch
+Patch83: rpm-4.10.0-no-doc-conflicts.patch
 
 # Fix http://qa.mandriva.com/show_bug.cgi?id=19392
 # (is this working??)
 Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 
 # Fix diff issue when buildroot contains some "//"
-#Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
+Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
@@ -146,7 +146,7 @@ Patch137: rpm-4.9.1.1-headerIconv.patch
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
-#Patch145: rpm-forbid-badly-commented-define-in-spec.patch
+Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
 # Will be allowed to be dropped when "Collection" won't be experimental anymore.
@@ -163,7 +163,7 @@ Patch152: rpm-4.6.0-rc1-fix-nss-detection.patch
 
 #Patch157: introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
-#Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
+Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
 Patch1007: rpm-4.6.0-rc3-xz-support.patch
 
@@ -174,7 +174,7 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 # Exposes packagecolor tag and adds new tags from rpm5 as it otherwise will
 # break when these unknown tags might be found in the rpmdb. Notice that this
 # will only make rpm recognize these, not implement actual support for them..
-#Patch1009: rpm-4.9.1.2-rpm5-tags.patch
+Patch1009: rpm-4.10.0-rpm5-tags.patch
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
@@ -188,7 +188,7 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 # display characters which you expected.
 Patch2005: rpm-4.9.0-buildlang.patch
 
-#Patch2006: rpm-4.8.1-setup-rubygems.patch
+Patch2006: rpm-4.10.0-setup-rubygems.patch
 
 # (tv) fix tests on non selinux systems:
 #BETA Patch2100: rpm-4.9.90-fix-test.diff
