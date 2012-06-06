@@ -43,7 +43,7 @@ index b4c79fd..b794c0d 100644
 diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
 --- ./tests/rpmgeneral.at.tv	2012-03-13 11:28:43.316662701 +0000
 +++ ./tests/rpmgeneral.at	2012-03-13 11:30:40.803813509 +0000
-@@ -79,6 +79,7 @@ C
+@@ -61,6 +61,7 @@ C
  CHANGELOGNAME
  CHANGELOGTEXT
  CHANGELOGTIME
@@ -51,7 +51,7 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  CLASSDICT
  COLLECTIONS
  CONFLICTFLAGS
-@@ -91,6 +92,7 @@ DEPENDSDICT
+@@ -74,6 +75,7 @@ DEPENDSDICT
  DESCRIPTION
  DIRINDEXES
  DIRNAMES
@@ -59,11 +59,12 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  DISTRIBUTION
  DISTTAG
  DISTURL
-@@ -121,10 +127,12 @@ FILEMD5S
+@@ -108,11 +110,13 @@ FILEMD5S
  FILEMODES
  FILEMTIMES
  FILENAMES
 +FILEPATHS
+ FILENLINKS
  FILEPROVIDE
  FILERDEVS
  FILEREQUIRE
@@ -72,7 +73,7 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  FILESTATES
  FILEUSERNAME
  FILEVERIFYFLAGS
-@@ -133,11 +141,13 @@ GIF
+@@ -121,11 +125,13 @@ GIF
  GROUP
  HDRID
  HEADERCOLOR
@@ -86,7 +87,7 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  ICON
  INSTALLCOLOR
  INSTALLTID
-@@ -170,9 +180,18 @@ ORIGBASENAMES
+@@ -160,9 +166,18 @@ ORIGBASENAMES
  ORIGDIRINDEXES
  ORIGDIRNAMES
  ORIGFILENAMES
@@ -105,8 +106,8 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  PATCH
  PATCHESFLAGS
  PATCHESNAME
-@@ -219,8 +238,13 @@ REQUIREFLAGS
- REQUIRENAME
+@@ -211,8 +226,13 @@ REQUIRENAME
+ REQUIRENEVRS
  REQUIRES
  REQUIREVERSION
 +RPMLIBTIMESTAMP
@@ -119,7 +120,7 @@ diff -p -up ./tests/rpmgeneral.at.tv ./tests/rpmgeneral.at
  SHA1HEADER
  SIGGPG
  SIGMD5
-@@ -231,6 +255,7 @@ SOURCE
+@@ -223,6 +243,7 @@ SOURCE
  SOURCEPACKAGE
  SOURCEPKGID
  SOURCERPM

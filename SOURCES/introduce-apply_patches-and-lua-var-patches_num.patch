@@ -33,42 +33,30 @@ diff --git a/build/parsePreamble.c b/build/parsePreamble.c
 index 9c5dabb..55c35df 100644
 --- a/build/parsePreamble.c
 +++ b/build/parsePreamble.c
-@@ -275,15 +275,29 @@ static int addSource(rpmSpec spec, Package pkg, const char *field, rpmTagVal tag
+@@ -307,6 +307,7 @@ static int addSource(rpmSpec spec, Packa
  	free(buf);
  #ifdef WITH_LUA
  	if (!spec->recursing) {
--	    rpmlua lua = NULL; /* global state */
--	    const char * what = (flag & RPMBUILD_ISPATCH) ? "patches" : "sources";
--	    rpmluaPushTable(lua, what);
--	    rpmluav var = rpmluavNew();
--	    rpmluavSetListMode(var, 1);
--	    rpmluavSetValue(var, RPMLUAV_STRING, body);
--	    rpmluaSetVar(lua, var);
--	    var = rpmluavFree(var);
--	    rpmluaPop(lua);
-+		{
-+			rpmlua lua = NULL; /* global state */
-+			const char * what = (flag & RPMBUILD_ISPATCH) ? "patches" : "sources";
-+			rpmluaPushTable(lua, what);
-+			rpmluav var = rpmluavNew();
-+			rpmluavSetListMode(var, 1);
-+			rpmluavSetValue(var, RPMLUAV_STRING, body);
-+			rpmluaSetVar(lua, var);
-+			var = rpmluavFree(var);
-+			rpmluaPop(lua);
-+		}
-+       	{
-+       		rpmlua lua = NULL; /* global state */
-+       		const char * what = (flag & RPMBUILD_ISPATCH) ? "patches_num" : "sources_num";
-+       		rpmluaPushTable(lua, what);
-+       		rpmluav var = rpmluavNew();
-+       		rpmluavSetKey(var, RPMLUAV_STRING, body);
-+       		rpmluavSetValueNum(var, num);
-+       		rpmluaSetVar(lua, var);
-+       		var = rpmluavFree(var);
-+       		rpmluaPop(lua);
-+       	}
-+
++	  {
+ 	    rpmlua lua = NULL; /* global state */
+ 	    const char * what = (flag & RPMBUILD_ISPATCH) ? "patches" : "sources";
+ 	    rpmluaPushTable(lua, what);
+@@ -316,6 +317,18 @@ static int addSource(rpmSpec spec, Packa
+ 	    rpmluaSetVar(lua, var);
+ 	    rpmluavFree(var);
+ 	    rpmluaPop(lua);
++	  }
++	  {
++	    rpmlua lua = NULL; /* global state */
++	    const char * what = (flag & RPMBUILD_ISPATCH) ? "patches_num" : "sources_num";
++	    rpmluaPushTable(lua, what);
++	    rpmluav var = rpmluavNew();
++	    rpmluavSetKey(var, RPMLUAV_STRING, body);
++	    rpmluavSetValueNum(var, num);
++	    rpmluaSetVar(lua, var);
++	    rpmluavFree(var);
++	    rpmluaPop(lua);
++	  }
  	}
  #endif
- 	body = _free(body);
+ 	free(body);

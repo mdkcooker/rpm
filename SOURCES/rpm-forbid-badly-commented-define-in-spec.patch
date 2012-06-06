@@ -2,7 +2,7 @@ diff --git a/build/parseSpec.c b/build/parseSpec.c
 index 01620bd..4233b15 100644
 --- a/build/parseSpec.c
 +++ b/build/parseSpec.c
-@@ -122,6 +122,24 @@ static struct OpenFileInfo * newOpenFileInfo(void)
+@@ -124,6 +124,24 @@ static struct OpenFileInfo * newOpenFile
      return ofi;
  }
  
@@ -27,14 +27,14 @@ index 01620bd..4233b15 100644
  /**
   */
  static void forceIncludeFile(rpmSpec spec, const char * fileName)
-@@ -163,6 +181,11 @@ static int copyNextLineFromOFI(rpmSpec spec, OFI_t *ofi)
- 	*to++ = '\0';
+@@ -165,6 +183,11 @@ static int copyNextLineFromOFI(rpmSpec s
+ 	*to = '\0';
  	ofi->readPtr = from;
  
-+       if (isCommentedDefine(spec->lbuf)) {
-+           rpmlog(RPMLOG_ERR, _("%s:%d: #%%define is forbidden, use #define to comment a %%define\n"), ofi->fileName, ofi->lineNum);
-+           return -1;
-+       }
++	if (isCommentedDefine(spec->lbuf)) {
++	    rpmlog(RPMLOG_ERR, _("%s:%d: #%%define is forbidden, use #define to comment a %%define\n"), ofi->fileName, ofi->lineNum);
++	    return -1;
++	}
 +
  	/* Check if we need another line before expanding the buffer. */
  	for (p = spec->lbuf; *p; p++) {

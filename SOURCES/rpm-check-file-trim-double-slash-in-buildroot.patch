@@ -11,7 +11,7 @@ diff --git a/scripts/check-files b/scripts/check-files
 index b397f1c..31e92fe 100755
 --- a/scripts/check-files
 +++ b/scripts/check-files
-@@ -13,12 +13,14 @@ if [ ! -d "$RPM_BUILD_ROOT" ] ; then
+@@ -13,12 +13,13 @@ if [ ! -d "$RPM_BUILD_ROOT" ] ; then
  	exit 1
  fi
  
@@ -20,14 +20,10 @@ index b397f1c..31e92fe 100755
  FILES_DISK=`mktemp $TMPDIR/rpmXXXXXX`
  FILES_RPM=`mktemp $TMPDIR/rpmXXXXXX`
  
--find $RPM_BUILD_ROOT -type f -o -type l | LC_ALL=C sort > $FILES_DISK
+-find "$RPM_BUILD_ROOT" -type f -o -type l | LC_ALL=C sort > $FILES_DISK
 -LC_ALL=C sort > $FILES_RPM
-+
-+find $RPM_BUILD_ROOT -type f -o -type l | sed 's://*:/:g' | LC_ALL=C sort > $FILES_DISK
++find "$RPM_BUILD_ROOT" -type f -o -type l | sed 's://*:/:g' | LC_ALL=C sort > $FILES_DISK
 +sed 's://*:/:g' | LC_ALL=C sort -u > $FILES_RPM
  
  diff -d "$FILES_DISK" "$FILES_RPM" | grep "^< " | cut -c3- | 
  while read f; do
--- 
-1.6.4.4
-
