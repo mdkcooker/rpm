@@ -448,11 +448,6 @@ rm -rf /usr/lib/rpm/*-%{_real_vendor}-*
 # nuke __db.00? when updating to this rpm
 rm -f /var/lib/rpm/__db.00?
 
-if [ ! -e /etc/rpm/macros -a -e /etc/rpmrc -a -f %{rpmdir}/convertrpmrc.sh ] 
-then
-	sh %{rpmdir}/convertrpmrc.sh 2>&1 > /dev/null
-fi
-
 if [ ! -f /var/lib/rpm/Packages ]; then
     /bin/rpm --initdb
 fi
@@ -482,7 +477,6 @@ fi
 %dir /etc/rpm/macros.d
 %attr(0755, rpm, rpm) %{rpmdir}/config.guess
 %attr(0755, rpm, rpm) %{rpmdir}/config.sub
-#%attr(0755, rpm, rpm) %{rpmdir}/convertrpmrc.sh
 %attr(0755, rpm, rpm) %{rpmdir}/rpmdb_*
 %attr(0644, rpm, rpm) %{rpmdir}/macros
 %attr(0755, rpm, rpm) %{rpmdir}/mkinstalldirs
