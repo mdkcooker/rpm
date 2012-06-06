@@ -432,17 +432,6 @@ cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 
 EOF
 
-# Get rid of unpackaged files
-(cd $RPM_BUILD_ROOT;
-  rm -rf .%{_includedir}/beecrypt/
-  rm -f  .%{_libdir}/libbeecrypt.{a,la,so*}
-  rm -f  .%{_libdir}/python*/site-packages/rpmmodule.{a,la}
-  rm -f  .%{rpmdir}/{Specfile.pm,cpanflute2,cpanflute,sql.prov,sql.req,tcl.req}
-  rm -f  .%{rpmdir}/{config.site,cross-build,rpmdiff.cgi}
-  rm -f  .%{rpmdir}/trpm
-  rm -f  .%{_bindir}/rpmdiff
-)
-
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
@@ -502,6 +491,7 @@ fi
 %attr(0644, rpm, rpm) %{rpmdir}/rpmrc
 %attr(0755, rpm, rpm) %{rpmdir}/elfdeps
 %attr(0755, rpm, rpm) %{rpmdir}/script.req
+%exclude %{rpmdir}/tcl.req
 
 %rpmattr	%{rpmdir}/rpm2cpio.sh
 %rpmattr	%{rpmdir}/tgpg
