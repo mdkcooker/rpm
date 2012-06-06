@@ -513,11 +513,22 @@ fi
 %endif
 %ifarch %arm
 %attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
+%else
+%exclude %{rpmdir}/platform/arm*/macros
 %endif
 %ifarch %mips
 %attr(   -, rpm, rpm) %{rpmdir}/platform/mips*
 %endif
 %attr(   -, rpm, rpm) %{rpmdir}/platform/noarch*
+# new in 4.10.0:
+%exclude %{rpmdir}/platform/alpha*-linux/macros
+%exclude %{rpmdir}/platform/sparc*-linux/macros
+%exclude %{rpmdir}/platform/ia64*-linux/macros
+%exclude %{rpmdir}/platform/ppc*-linux/macros
+%exclude %{rpmdir}/platform/s390*-linux/macros
+%exclude %{rpmdir}/platform/sh*-linux/macros
+
+
 
 %{_mandir}/man[18]/*.[18]*
 %lang(pl) %{_mandir}/pl/man[18]/*.[18]*
@@ -591,10 +602,6 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
 #%rpmattr	%{_prefix}/lib/rpm/trpm
 %rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
-
-%{_prefix}/lib/rpm/platform/alpha*/macros
-%{_prefix}/lib/rpm/platform/arm*/macros
-%{_prefix}/lib/rpm/platform/*-linux/macros
 
 
 %{_mandir}/man8/rpmbuild.8*
