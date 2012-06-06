@@ -1,0 +1,31 @@
+Index: rpm-4.8.0/installplatform
+===================================================================
+--- rpm-4.8.0/installplatform
++++ rpm-4.8.0/installplatform	2010-03-01 16:08:55.495440879 +0100
+@@ -89,12 +89,24 @@ for ARCH in noarch `grep ^arch_canon $RP
+ 	CANONARCH=${ARCH}
+ 	CANONCOLOR=0
+ 	;;
+-    arm*)
+-	ISANAME=`echo ${ARCH} | sed "s/^\([^-]*\)-.*/\1/"`
++    arm*b)
++	ISANAME=armeb
+ 	ISABITS=32
+ 	CANONARCH=arm
+ 	CANONCOLOR=0
+ 	;;
++    arm)
++	ISANAME=armel
++	ISABITS=32
++	CANONARCH=arm
++	CANONCOLOR=0
++	;;
++    arm*l)
++	ISANAME=armel
++ 	ISABITS=32
++	CANONARCH=arm
++	CANONCOLOR=0
++	;;
+     alpha*)
+ 	ISANAME=alpha
+ 	ISABITS=64
