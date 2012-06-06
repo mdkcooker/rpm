@@ -96,10 +96,6 @@ Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
 # (fredl) add loging facilities through syslog
 Patch31:	rpm-4.9.0-syslog.patch
 
-# part of Backport from 4.2.1 provides becoming obsoletes bug (fpons)
-# (is it still needed?)
-#Patch49:	rpm-4.9.0-provides-obsoleted.patch
-
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
 # - read /usr/lib/rpm/mageia/rpmpopt (not only /usr/lib/rpm/rpmpopt)
 # if we deprecated the use of rpm -ba , ...,  we can get rid of this patch
