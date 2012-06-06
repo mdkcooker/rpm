@@ -106,12 +106,6 @@ Patch64:    rpm-4.9.1.1-mageia-rpmrc-rpmpopt.patch
 # http://qa.mandriva.com/show_bug.cgi?id=15896
 Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
-# http://www.redhat.com/archives/rpm-list/2005-April/msg00131.html
-# http://www.redhat.com/archives/rpm-list/2005-April/msg00132.html
-# is this useful? "at least erasure ordering is just as non-existent as it was in 4.4.x" says Panu
-#with rpm 4.8.0, breaks urpmi testsuite (ordering-scriptlets)
-#Patch71:    rpm-4.6.0-ordererase.patch
-
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
 Patch83: rpm-4.10.0-no-doc-conflicts.patch
