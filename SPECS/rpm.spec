@@ -198,7 +198,6 @@ Patch3001: fix_stack_protector_check.patch
 #Patch3002: mips_define_isa_macros.patch
 #Patch3003: rpm_arm_mips_isa_macros.patch
 #Patch3004: rpm_add_armv5tl.patch
-#Patch3005: rpm-4.9.x-kill-libio.patch
 
 #
 # Fedora patches
