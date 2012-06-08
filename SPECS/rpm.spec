@@ -215,7 +215,7 @@ BuildRequires:	libbeecrypt-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
-BuildRequires:  db4.8-devel
+BuildRequires:  db5.2-devel
 BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
