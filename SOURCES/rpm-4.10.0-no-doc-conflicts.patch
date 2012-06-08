@@ -1,20 +1,11 @@
-commit ca52c9ff92a9bb1493bfb9917c8fb529c1d11a34
-Author: dmorgan <dmorgan@localhost.(none)>
-Date:   Sun Jun 26 23:11:12 2011 +0200
-
-    don't conflict for doc files
-    (to be able to install lib*-devel together with lib64*-devel even if
-    they have conflicting manpages)
-
-diff --git a/lib/transaction.c b/lib/transaction.c
-index 628e4ea..151cde7 100644
---- a/lib/transaction.c
-+++ b/lib/transaction.c
-@@ -281,6 +281,22 @@ static uint64_t countFiles(rpmts ts)
+diff -u b/lib/transaction.c b/lib/transaction.c
+--- b/lib/transaction.c
++++ b/lib/transaction.c	2012-06-08 16:25:39.367544735 +0000
+@@ -281,6 +281,21 @@
      return fc;
  }
  
-+static int is_a_doc_conflict(rpmfi fi)
++static int is_a_doc_conflict(const char *fn)
 +{
 +    const char *ignorelist[] = {
 +       "/usr/share/man/",
@@ -22,7 +13,6 @@ index 628e4ea..151cde7 100644
 +       "/usr/share/gnome/html/",
 +       NULL
 +    };
-+    const char *fn = rpmfiFN(fi);
 +    const char **dnp;
 +    for (dnp = ignorelist; *dnp != NULL; dnp++)
 +       if (strstr(fn, *dnp) == fn) return 1;
@@ -33,32 +23,43 @@ index 628e4ea..151cde7 100644
  /**
   * handleInstInstalledFiles.
   * @param ts		transaction set
-@@ -322,6 +338,13 @@ static void handleInstInstalledFile(cons
+@@ -322,9 +340,18 @@
  	    }
  	}
  
++	char *fn;
++	if (rConflicts)
++	    fn = rpmfiFNIndex(fi, fx);
 +	/* HACK: always install latest (arch-independent) man
 +	   pages and gtk/gnome html doc files. */
-+	if (rConflicts && is_a_doc_conflict(fi)) {
++	if (rConflicts && is_a_doc_conflict(fn)) {
 +	    rpmfsSetAction(fs, fx, FA_CREATE);
 +	    rConflicts = 0;
 +	}
 +
  	if (rConflicts) {
  	    char *altNEVR = headerGetAsString(otherHeader, RPMTAG_NEVRA);
- 	    char *fn = rpmfiFNIndex(fi, fx);
-@@ -494,6 +517,14 @@ assert(otherFi != NULL);
+-	    char *fn = rpmfiFNIndex(fi, fx);
+ 	    rpmteAddProblem(p, RPMPROB_FILE_CONFLICT, altNEVR, fn,
+ 			    headerGetInstance(otherHeader));
+ 	    free(fn);
+@@ -494,8 +521,18 @@
  		    }
  		    done = 1;
  		}
 +
++		char *fn;
++		if (rConflicts)
++		    fn = rpmfiFNIndex(fi, i);
 +		/* HACK: always install latest (arch-independent) man
 +		   pages and gtk/gnome html doc files. */
-+		if (rConflicts && is_a_doc_conflict(fi)) {
++		if (rConflicts && is_a_doc_conflict(fn)) {
 +		    rpmfsSetAction(fs, i, FA_CREATE);
 +		    rConflicts = 0;
 +		}
 +
  		if (rConflicts) {
- 		    char *fn = rpmfiFNIndex(fi, i);
+-		    char *fn = rpmfiFNIndex(fi, i);
  		    rpmteAddProblem(p, RPMPROB_NEW_FILE_CONFLICT,
+ 				    rpmteNEVRA(otherTe), fn, 0);
+ 		    free(fn);
