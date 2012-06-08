@@ -251,7 +251,7 @@ Requires(pre):		rpm-helper
 Requires(pre):		coreutils
 Requires(postun):	rpm-helper
 
-Conflicts: perl-URPM < 3.41-1.mga3
+Conflicts: perl-URPM < 4.0-2.mga3
 
 %description
 RPM is a powerful command line driven package management system capable of
