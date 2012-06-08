@@ -500,6 +500,11 @@ fi
 %attr(   -, rpm, rpm) %{rpmdir}/platform/pentium*-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/geode-*
 %endif
+%ifarch %{ix86} x86_64
+%exclude %{rpmdir}/platform/amd64-linux/macros
+%exclude %{rpmdir}/platform/ia32e-linux/macros
+%exclude %{rpmdir}/platform/x86_64-linux/macros
+%endif
 %ifarch x86_64
 %attr(   -, rpm, rpm) %{rpmdir}/platform/amd64-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/x86_64-*
