@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}0.2
+%define release		%mkrel %{?snapver:0.%{snapver}.}0.3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -252,6 +252,7 @@ Requires(pre):		coreutils
 Requires(postun):	rpm-helper
 
 Conflicts: perl-URPM < 4.0-2.mga3
+Conflicts: jpackage-utils < 1:1.7.5-17
 
 %description
 RPM is a powerful command line driven package management system capable of
