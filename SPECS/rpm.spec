@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}0.3
+%define release		%mkrel %{?snapver:0.%{snapver}.}0.8
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -91,6 +91,7 @@ Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 #
 # (nb: the exit code for pretrans/posttrans & trigger/triggerun/triggerpostun
 #       scripts is ignored with or without this patch)
+# Needed for urpmi testsuite:
 Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
 
 # (fredl) add loging facilities through syslog
@@ -139,10 +140,6 @@ Patch134: extcond.diff
 # might be technically possible but debugedit currently does not even try to."
 Patch135: rpm-4.9.0-fix-debugedit.patch
 
-# convert data in the header to a specific encoding which used in the selected locale.
-# Not that usefull, everything should be UTF-8
-Patch137: rpm-4.9.1.1-headerIconv.patch
-
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
@@ -159,8 +156,6 @@ Patch146: rpm-4.9.1.1-filetriggers.patch
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
-Patch152: rpm-4.6.0-rc1-fix-nss-detection.patch
-
 #Patch157: introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
@@ -171,27 +166,14 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 # as this breaks stuff that installs files to $DOCDIR during %%install
 #Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 
-# Exposes packagecolor tag and adds new tags from rpm5 as it otherwise will
-# break when these unknown tags might be found in the rpmdb. Notice that this
-# will only make rpm recognize these, not implement actual support for them..
-Patch1009: rpm-4.10.0-rpm5-tags.patch
-
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
-# The following patch isn't needed for Mandriva, but Turbolinux has it and it can't hurt much
-#
-# This patch fixes the problem when the post-scripts launched by rpm-build. 
-# The post-scripts launched by rpm-build works in LANG environment. If LANG is
-# other locale except C, then some commands launched by post-scripts will not
-# display characters which you expected.
-Patch2005: rpm-4.9.0-buildlang.patch
-
 Patch2006: rpm-4.10.0-setup-rubygems.patch
 
-# (tv) fix tests on non selinux systems:
-#BETA Patch2100: rpm-4.9.90-fix-test.diff
+# (tv) fix tests:
+Patch2100: rpm-4.10.0-fix-testsuite.diff
 
 Patch3000: mips_macros.patch
 Patch3001: fix_stack_protector_check.patch
@@ -364,6 +346,7 @@ autoreconf
 %if %builddebug
 RPM_OPT_FLAGS=-g
 %endif
+export CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
 CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     %configure2_5x \
         --enable-nls \
@@ -467,7 +450,6 @@ fi
 %attr(0755, rpm, rpm) %{_bindir}/rpmdb
 %attr(0755, rpm, rpm) %{_bindir}/rpmkeys
 %attr(0755, rpm, rpm) %{_bindir}/rpmgraph
-%attr(0755, rpm, rpm) %{_bindir}/rpmsign
 %attr(0755, rpm, rpm) %{_bindir}/rpmquery
 %attr(0755, rpm, rpm) %{_bindir}/rpmverify
 
