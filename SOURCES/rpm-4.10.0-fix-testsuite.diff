@@ -1,0 +1,24 @@
+diff -p -up ./tests/Makefile.am.tv ./tests/Makefile.am
+--- ./tests/Makefile.am.tv	2012-04-16 14:35:01.000000000 +0200
++++ ./tests/Makefile.am	2012-06-20 22:02:04.963465011 +0200
+@@ -102,7 +102,7 @@ testing$(bindir)/rpmbuild: ../rpmbuild
+ 	for cf in hosts resolv.conf passwd shadow group gshadow mtab fstab; do [ -f /etc/$${cf} ] && ln -s /etc/$${cf} testing/etc/$${cf}; done
+ 	for prog in gzip cat patch tar sh ln chmod rm mkdir uname grep sed find file mktemp cut sort diff; do p=`which $${prog}`; ln -s $${p} testing/$${p}; done
+ 	for d in /proc /sys /selinux /etc/selinux; do if [ -d $${d} ]; then ln -s $${d} testing/$${d}; fi; done
+-	(cd testing/magic && file -C)
++	cp /usr/share/misc/magic.mgc testing/magic/ || (cd testing/magic && file -C)
+ 
+ check_DATA = atconfig atlocal $(TESTSUITE)
+ check_DATA += testing$(bindir)/rpmbuild
+diff -p -up ./tests/Makefile.in.tv ./tests/Makefile.in
+--- ./tests/Makefile.in.tv	2012-05-22 12:55:36.000000000 +0200
++++ ./tests/Makefile.in	2012-06-20 22:02:12.763058601 +0200
+@@ -542,7 +542,7 @@ testing$(bindir)/rpmbuild: ../rpmbuild
+ 	for cf in hosts resolv.conf passwd shadow group gshadow mtab fstab; do [ -f /etc/$${cf} ] && ln -s /etc/$${cf} testing/etc/$${cf}; done
+ 	for prog in gzip cat patch tar sh ln chmod rm mkdir uname grep sed find file mktemp cut sort diff; do p=`which $${prog}`; ln -s $${p} testing/$${p}; done
+ 	for d in /proc /sys /selinux /etc/selinux; do if [ -d $${d} ]; then ln -s $${d} testing/$${d}; fi; done
+-	(cd testing/magic && file -C)
++	cp /usr/share/misc/magic.mgc testing/magic/ || (cd testing/magic && file -C)
+ 
+ @HAVE_FAKECHROOT_TRUE@check-local: $(check_DATA)
+ @HAVE_FAKECHROOT_TRUE@	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) ||:
