@@ -22,3 +22,12 @@ diff -p -up ./tests/Makefile.in.tv ./tests/Makefile.in
  
  @HAVE_FAKECHROOT_TRUE@check-local: $(check_DATA)
  @HAVE_FAKECHROOT_TRUE@	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) ||:
+diff -p -up ./tests/data/SPECS/hello.spec.tv ./tests/data/SPECS/hello.spec
+--- ./tests/data/SPECS/hello.spec.tv	2012-06-26 08:41:23.444615795 +0000
++++ ./tests/data/SPECS/hello.spec	2012-06-26 08:41:17.242604248 +0000
+@@ -1,3 +1,5 @@
++%define debug_package_and_restore %{nil}
++
+ Summary: hello -- hello, world rpm
+ Name: hello
+ Version: 1.0

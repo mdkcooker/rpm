@@ -52,7 +52,7 @@
 %define libver		4.9
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}0.8
+%define release		%mkrel %{?snapver:0.%{snapver}.}1
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -418,7 +418,6 @@ EOF
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
-exit 0
 make check
 
 %pre
