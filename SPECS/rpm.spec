@@ -49,7 +49,7 @@
 
 %define rpmversion	4.10.0
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
-%define libver		4.9
+%define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
 %define release		%mkrel %{?snapver:0.%{snapver}.}1
