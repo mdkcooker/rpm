@@ -135,11 +135,11 @@ diff -p -up ./configure.ac.orig ./configure.ac
  	    break;
 --- a/lib/formats.c.orig	2011-01-25 13:52:28.000000000 +0000
 +++ b/lib/formats.c	2011-05-11 14:02:09.000000000 +0000
-@@ -560,6 +560,24 @@ static char * depflagsFormat(rpmtd td, c
+@@ -560,6 +560,23 @@ static char * depflagsFormat(rpmtd td, c
      return val;
  }
  
-+static char * depflag_strongFormat(rpmtd td, char * formatPrefix)
++static char * depflag_strongFormat(rpmtd td)
 +{
 +    char * val = NULL;
 +
@@ -151,8 +151,7 @@ diff -p -up ./configure.ac.orig ./configure.ac
 +	buf[0] = '\0';
 +	if (anint & RPMSENSE_STRONG)
 +	    strcat(buf, "strong");
-+	strcat(formatPrefix, "s");
-+	rasprintf(&val, formatPrefix, buf);
++	val = xstrdup(buf);
 +    }
 +    return val;
 +}
