@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define release		%mkrel %{?snapver:0.%{snapver}.}3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -181,6 +181,9 @@ Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
+# when using fakechroot, make sure that testsuite pathes are against /
+# and not full path
+Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 #
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
@@ -481,16 +484,20 @@ fi
 %attr(   -, rpm, rpm) %{rpmdir}/platform/athlon-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/pentium*-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/geode-*
-%endif
-%ifarch %{ix86}
-%exclude %{rpmdir}/platform/amd64-linux/macros
-%exclude %{rpmdir}/platform/ia32e-linux/macros
-%exclude %{rpmdir}/platform/x86_64-linux/macros
+%else
+%exclude %{rpmdir}/platform/i*86-linux/macros
+%exclude %{rpmdir}/platform/athlon-linux/macros
+%exclude %{rpmdir}/platform/pentium*-linux/macros
+%exclude %{rpmdir}/platform/geode-linux/macros
 %endif
 %ifarch x86_64
 %attr(   -, rpm, rpm) %{rpmdir}/platform/amd64-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/x86_64-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/ia32e-*
+%else
+%exclude %{rpmdir}/platform/amd64-linux/macros
+%exclude %{rpmdir}/platform/ia32e-linux/macros
+%exclude %{rpmdir}/platform/x86_64-linux/macros
 %endif
 %ifarch %arm
 %attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
