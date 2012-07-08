@@ -1,23 +1,23 @@
-diff --git a/build/parsePrep.c b/build/parsePrep.c
-index 3dab37f..81618e6 100644
---- a/build/parsePrep.c
-+++ b/build/parsePrep.c
-@@ -138,7 +138,9 @@ static char *doUntar(rpmSpec spec, uint3
+diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
+--- rpm-4.10.0/build/parsePrep.c.2006	2012-05-22 10:53:51.000000000 +0000
++++ rpm-4.10.0/build/parsePrep.c	2012-06-15 09:17:31.945151263 +0000
+@@ -138,7 +138,10 @@ static char *doUntar(rpmSpec spec, uint3
      char *fn = NULL;
      char *buf = NULL;
      char *tar = NULL;
 -    const char *taropts = ((rpmIsVerbose() && !quietly) ? "-xvvf" : "-xf");
 +    char taropts[8];
 +    char *t;
++    char *rubygemopts = NULL;
 +    int rubygem = 0;
      struct Source *sp;
      rpmCompressedMagic compressed = COMPRESSED_NOT;
  
-@@ -158,6 +160,17 @@ static char *doUntar(rpmSpec spec, uint3
+@@ -158,6 +161,25 @@ static char *doUntar(rpmSpec spec, uint3
  
      fn = rpmGetPath("%{_sourcedir}/", sp->source, NULL);
  
-+     t = rindex(sp->source, '.');
++     t = strrchr(sp->source, '.');
 +     if(t && !strcasecmp(t, ".gem"))
 +        rubygem = 1;
 + 
@@ -27,36 +27,37 @@ index 3dab37f..81618e6 100644
 +     if(rubygem)
 +        t = stpcpy(t, "m");
 +     t = stpcpy(t, "f");
-+ 
++
++     if (rubygem) {
++	 rasprintf(&rubygemopts,
++		 "\n"
++		 "if [ -f data.tar.gz ]; then\n"
++		 "  tar %s data.tar.gz\n"
++		 "fi", taropts);
++     }
++
      /* XXX On non-build parse's, file cannot be stat'd or read */
      if (!(spec->flags & RPMSPEC_FORCE) && (rpmFileIsCompressed(fn, &compressed) || checkOwners(fn))) {
  	goto exit;
-@@ -201,10 +214,20 @@ static char *doUntar(rpmSpec spec, uint3
- 	zipper = rpmGetPath(t, NULL);
- 	if (needtar) {
- 	    rasprintf(&buf, "%s '%s' | %s %s - \n"
--		"STATUS=$?\n"
--		"if [ $STATUS -ne 0 ]; then\n"
--		"  exit $STATUS\n"
+@@ -204,7 +226,7 @@ static char *doUntar(rpmSpec spec, uint3
+ 		"STATUS=$?\n"
+ 		"if [ $STATUS -ne 0 ]; then\n"
+ 		"  exit $STATUS\n"
 -		"fi", zipper, fn, tar, taropts);
-+                   "STATUS=$?\n"
-+                   "if [ $STATUS -ne 0 ]; then\n"
-+                   "  exit $STATUS\n"
-+                   "fi", zipper, fn, tar, taropts);
-+           if(rubygem) {
-+               t = stpcpy(t,
-+                       "\n"
-+                       "if [ -f data.tar.gz ]; then\n"
-+                       "  tar ");
-+               t = stpcpy(t, taropts);
-+               t = stpcpy(t,
-+                       " data.tar.gz\n"
-+                       "fi");
-+           }
++		"fi%s", zipper, fn, tar, taropts, rubygem ? rubygemopts : "");
  	} else {
  	    rasprintf(&buf, "%s '%s'\n"
  		"STATUS=$?\n"
-@@ -316,6 +339,20 @@ static int doSetupMacro(rpmSpec spec, co
+@@ -214,7 +236,7 @@ static char *doUntar(rpmSpec spec, uint3
+ 	}
+ 	free(zipper);
+     } else {
+-	rasprintf(&buf, "%s %s %s", tar, taropts, fn);
++	rasprintf(&buf, "%s %s %s%s", tar, taropts, fn, rubygem ? rubygemopts : "");
+     }
+ 
+ exit:
+@@ -316,6 +338,20 @@ static int doSetupMacro(rpmSpec spec, co
  	free(buf);
      }
  
@@ -68,7 +69,7 @@ index 3dab37f..81618e6 100644
 +           }
 +       }
 +       if (sp != NULL) {
-+           char *t = rindex(sp->source, '.');
++           char *t = strrchr(sp->source, '.');
 +           if(t && !strcasecmp(t, ".gem"))
 +               createDir = 1;
 +       }
