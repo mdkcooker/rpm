@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}4
+%define release		%mkrel %{?snapver:0.%{snapver}.}5
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -188,6 +188,8 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
 #
+# (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
+Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
