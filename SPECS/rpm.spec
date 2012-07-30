@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}5
+%define release		%mkrel %{?snapver:0.%{snapver}.}6
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -190,19 +190,20 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 #
 # (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
 Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
+Patch3501: rpm-minidebuginfo.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
 BuildRequires:	zlib-devel
 BuildRequires:  bzip2-devel
-BuildRequires:	liblzma-devel >= 4.999.6-0.alpha.5
+BuildRequires:	liblzma-devel >= 5
 BuildRequires:	automake
 BuildRequires:	elfutils-devel
 BuildRequires:	libbeecrypt-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
-BuildRequires:  db5.2-devel
+BuildRequires:  db5.3-devel
 BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
@@ -383,8 +384,6 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%buildroot install
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
-
-#mv -f $RPM_BUILD_ROOT/%{rpmdir}/rpmdiff $RPM_BUILD_ROOT/%{_bindir}
 
 # Save list of packages through cron
 mkdir -p ${RPM_BUILD_ROOT}/etc/cron.daily
@@ -576,7 +575,6 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/check-prereqs
 %rpmattr	%{_prefix}/lib/rpm/check-rpaths
 %rpmattr	%{_prefix}/lib/rpm/check-rpaths-worker
-#rpmattr	%{_prefix}/lib/rpm/javadeps
 %rpmattr	%{_prefix}/lib/rpm/libtooldeps.sh
 %rpmattr	%{_prefix}/lib/rpm/macros.perl
 %rpmattr	%{_prefix}/lib/rpm/macros.php
@@ -587,10 +585,8 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/ocaml-find-requires.sh
 %rpmattr	%{_prefix}/lib/rpm/osgideps.pl
 %rpmattr	%{_prefix}/lib/rpm/pkgconfigdeps.sh
-#%rpmattr	%{_prefix}/lib/rpm/rpmdiff
 
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
-#%rpmattr	%{_prefix}/lib/rpm/trpm
 %rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
 
 
