@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}7
+%define release		%mkrel %{?snapver:0.%{snapver}.}8
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -194,6 +194,9 @@ Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support:
 Patch3502: rpm-4.10.0-minidebuginfo.patch
+
+# (tv) merge mga stuff from rpm-setup:
+Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 
 License:	GPLv2+
 BuildRequires:	autoconf
