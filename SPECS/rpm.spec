@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}6
+%define release		%mkrel %{?snapver:0.%{snapver}.}7
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -190,7 +190,10 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 #
 # (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
 Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
-Patch3501: rpm-minidebuginfo.patch
+# (tv) Compressed debuginfo support:
+Patch3501: rpm-4.10.0-dwz-debuginfo.patch
+# (tv) Mini debuginfo support:
+Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
