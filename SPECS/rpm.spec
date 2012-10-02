@@ -230,7 +230,7 @@ BuildRequires:	python-devel
 BuildRequires: fakechroot
 
 Requires:	bzip2 >= 0.9.0c-2
-Requires:	lzma
+Requires:	xz
 Requires:	cpio
 Requires:	gawk
 Requires:	glibc >= 2.1.92
