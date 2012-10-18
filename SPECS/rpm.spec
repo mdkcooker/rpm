@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}3
+%define release		%mkrel %{?snapver:0.%{snapver}.}4
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -199,6 +199,8 @@ Patch5303: rpm-4.10.1-skipped-hardlinks.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
+# (tv) enhance debugedit message:
+Patch4001: fix-debugedit-log.diff
 
 License:	GPLv2+
 BuildRequires:	autoconf
