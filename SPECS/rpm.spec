@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}4
+%define release		%mkrel %{?snapver:0.%{snapver}.}5
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -156,7 +156,7 @@ Patch146: rpm-4.9.1.1-filetriggers.patch
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
-#Patch157: introduce-_after_setup-which-is-called-after-setup.patch
+Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
