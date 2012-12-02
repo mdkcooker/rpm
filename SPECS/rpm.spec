@@ -195,7 +195,7 @@ Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support:
 Patch3502: rpm-4.10.0-minidebuginfo.patch
 # (tv) fix a rpm-4.10 regression:
-Patch5303: rpm-4.10.1-skipped-hardlinks.patch
+Patch3503: rpm-4.10.1-skipped-hardlinks.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
