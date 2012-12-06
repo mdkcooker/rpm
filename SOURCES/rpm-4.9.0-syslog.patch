@@ -4,6 +4,13 @@ Date:   Sun Jun 26 22:35:57 2011 +0200
 
     add loging facilities through syslog
 
+    originally written by Frederic Lepied on Tue Jan 16 2001
+    (in rpm-4.0-0.15mdk.src.rpm):
+    "log install and removal of packages through syslog"
+    
+    rediffed over the years by Pascal Rigaux and me
+
+
 diff --git a/configure.ac b/configure.ac
 index 3cd23e3..3fee053 100644
 --- a/configure.ac
