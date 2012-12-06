@@ -94,7 +94,7 @@ Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 # Needed for urpmi testsuite:
 Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
 
-# (fredl) add loging facilities through syslog
+# (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm pluging in 4.11):
 Patch31:	rpm-4.9.0-syslog.patch
 
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
@@ -119,6 +119,7 @@ Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
+# Upstream 4.11 will have /usr/lib/rpm/macros.d:
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 
 # [pixel] without this patch, "rpm -e" or "rpm -U" will need to stat(2) every dirnames of
@@ -190,16 +191,18 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 #
 # (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
 Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
-# (tv) Compressed debuginfo support:
+# (tv) Compressed debuginfo support (UPSTREAM)::
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
-# (tv) Mini debuginfo support:
+# (tv) Mini debuginfo support (UPSTREAM)::
 Patch3502: rpm-4.10.0-minidebuginfo.patch
-# (tv) fix a rpm-4.10 regression:
+# (tv) fix a rpm-4.10 regression (UPSTREAM)::
 Patch3503: rpm-4.10.1-skipped-hardlinks.patch
+# (tv) fix double-free on %caps in spec (RhBug:877512) (UPSTREAM):
+Patch3510: rpm-4.10.90-caps-free.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (tv) enhance debugedit message:
+# (tv) enhance debugedit message (UPSTREAM):
 Patch4001: fix-debugedit-log.diff
 
 License:	GPLv2+
