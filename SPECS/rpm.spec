@@ -202,9 +202,10 @@ Patch3503: rpm-4.10.1-skipped-hardlinks.patch
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (tv) enhance debugedit message (UPSTREAM):
 Patch4001: fix-debugedit-log.diff
-
 # (tv) upstream fix for RPMDBI_LABEL (UPSTREAM)::
 Patch4002: nvra-prep.diff
+# (tv) Unbreak --setperms (RhBug:881835) (regression introduced in rpm >= 4.10)
+Patch4003: unbreak--setperms.diff
 
 
 License:	GPLv2+
