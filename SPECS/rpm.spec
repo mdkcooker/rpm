@@ -52,7 +52,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}5
+%define release		%mkrel %{?snapver:0.%{snapver}.}6
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -204,6 +204,10 @@ Patch3510: rpm-4.10.90-caps-free.patch
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (tv) enhance debugedit message (UPSTREAM):
 Patch4001: fix-debugedit-log.diff
+
+# (tv) upstream fix for RPMDBI_LABEL (UPSTREAM)::
+Patch4002: nvra-prep.diff
+
 
 License:	GPLv2+
 BuildRequires:	autoconf
