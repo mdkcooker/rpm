@@ -1,0 +1,27 @@
+commit 942c4587fe2c8c12138042fb855fd9e7e0a05314
+Author: Panu Matilainen <pmatilai@redhat.com>
+Date:   Fri Nov 30 08:15:24 2012 +0200
+
+    Unbreak --setperms (RhBug:881835)
+    
+    - Fixes a regression introduced in rpm >= 4.10 caused by query format
+      simplification (loss of zero padding support), in commit
+      1f1e5e88a1f6c60cf2d11014d809000e97a63aad.
+    - 'chmod' command doesn't need zero padding, just remove the formatting.
+      In fact we shouldn't be passing the entire mode to it but just the
+      permission bits, but fortunately chmod isn't too picky here.
+    (cherry picked from commit 4c90c79e3f3c178189ad3bd89dfd87cd3a2290ab)
+
+diff --git a/rpmpopt.in b/rpmpopt.in
+index 7a92ae5..805599e 100644
+--- a/rpmpopt.in
++++ b/rpmpopt.in
+@@ -43,7 +43,7 @@ rpm	alias --scripts --qf '\
+ ' \
+ 	--POPTdesc=$"list install/erase scriptlets from package(s)"
+ 
+-rpm	alias --setperms -q --qf '[\[ -L %{FILENAMES:shescape} \] || chmod %7.7{FILEMODES:octal} %{FILENAMES:shescape}\n]' \
++rpm	alias --setperms -q --qf '[\[ -L %{FILENAMES:shescape} \] || chmod %7{FILEMODES:octal} %{FILENAMES:shescape}\n]' \
+ 		   --pipe "grep -v \(none\) | grep '^. -L ' | sed 's/chmod .../chmod /' | sh" \
+ 	--POPTdesc=$"set permissions of files in a package"
+ 
