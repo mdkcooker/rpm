@@ -191,16 +191,16 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 #
 # (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
 Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
-# (tv) Compressed debuginfo support (UPSTREAM)::
+# (tv) Compressed debuginfo support (UPSTREAM):
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
-# (tv) Mini debuginfo support (UPSTREAM)::
+# (tv) Mini debuginfo support (UPSTREAM):
 Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (tv) enhance debugedit message (UPSTREAM):
 Patch4001: fix-debugedit-log.diff
-# (tv) upstream fix for RPMDBI_LABEL (UPSTREAM)::
+# (tv) upstream fix for RPMDBI_LABEL (UPSTREAM):
 Patch4002: nvra-prep.diff
 
 
