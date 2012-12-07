@@ -47,12 +47,12 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.10.1
+%define rpmversion	4.10.2
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}6
+%define release		%mkrel %{?snapver:0.%{snapver}.}1
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -195,8 +195,6 @@ Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM)::
 Patch3502: rpm-4.10.0-minidebuginfo.patch
-# (tv) fix a rpm-4.10 regression (UPSTREAM)::
-Patch3503: rpm-4.10.1-skipped-hardlinks.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
@@ -204,8 +202,6 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 Patch4001: fix-debugedit-log.diff
 # (tv) upstream fix for RPMDBI_LABEL (UPSTREAM)::
 Patch4002: nvra-prep.diff
-# (tv) Unbreak --setperms (RhBug:881835) (regression introduced in rpm >= 4.10)
-Patch4003: unbreak--setperms.diff
 
 
 License:	GPLv2+
