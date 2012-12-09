@@ -202,6 +202,8 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 Patch4001: fix-debugedit-log.diff
 # (tv) upstream fix for RPMDBI_LABEL (UPSTREAM):
 Patch4002: nvra-prep.diff
+# (tv) fix 4.10.2 building:
+Patch4003: rpm-4.10.2-build-fix.diff
 
 
 License:	GPLv2+
