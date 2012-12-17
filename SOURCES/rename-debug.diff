@@ -1,0 +1,29 @@
+revert "Rename -debug to -debuginfo to match what everybody uses anyway
+    
+    - Practically everybody renames the debug information sub-packages
+      from -debug to -debuginfo, might as well do so upstream already.
+      Intended to do this like five years ago but kept forgetting..."
+
+diff --git a/macros.in b/macros.in
+index f55dcbe..dc4939a 100644
+--- a/macros.in
++++ b/macros.in
+@@ -187,15 +187,15 @@
+ %debug_package \
+ %ifnarch noarch\
+ %global __debug_package 1\
+-%package debuginfo\
++%package debug\
+ Summary: Debug information for package %{name}\
+ Group: Development/Debug\
+ AutoReqProv: 0\
+-%description debuginfo\
++%description debug\
+ This package provides debug information for package %{name}.\
+ Debug information is useful when developing applications that use this\
+ package or when debugging this package.\
+-%files debuginfo -f debugfiles.list\
++%files debug -f debugfiles.list\
+ %defattr(-,root,root)\
+ %endif\
+ %{nil}
