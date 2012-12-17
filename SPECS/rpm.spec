@@ -53,7 +53,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define release		%mkrel %{?snapver:0.%{snapver}.}3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -198,6 +198,8 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (tv) fix unknow macro option error message:
 Patch4004: 0001-display-the-actual-unknown-option-instead-of.patch
+# (tv) revert upstream debug -> debuginfo rename:
+Patch4005: rename-debug.diff 
 
 
 License:	GPLv2+
