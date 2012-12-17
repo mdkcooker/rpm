@@ -47,7 +47,8 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmversion	4.10.2
+%define snapver		beta1
+%define rpmversion	4.11.0
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
@@ -109,7 +110,7 @@ Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
-Patch83: rpm-4.10.0-no-doc-conflicts.patch
+Patch83: rpm-4.11.0-no-doc-conflicts.patch
 
 # Fix http://qa.mandriva.com/show_bug.cgi?id=19392
 # (is this working??)
@@ -177,7 +178,6 @@ Patch2006: rpm-4.10.0-setup-rubygems.patch
 Patch2100: rpm-4.10.0-fix-testsuite.diff
 
 Patch3000: mips_macros.patch
-Patch3001: fix_stack_protector_check.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
@@ -189,8 +189,6 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
 #
-# (cg) Fedora patch to enable a new check used in the 'filesystem' package for usrmove
-Patch3500: rpm-4.9.1.2-rpmlib-filesystem-check.patch
 # (tv) Compressed debuginfo support (UPSTREAM):
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM):
@@ -198,12 +196,8 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (tv) enhance debugedit message (UPSTREAM):
-Patch4001: fix-debugedit-log.diff
-# (tv) upstream fix for RPMDBI_LABEL (UPSTREAM):
-Patch4002: nvra-prep.diff
-# (tv) fix 4.10.2 building:
-Patch4003: rpm-4.10.2-build-fix.diff
+# (tv) fix unknow macro option error message:
+Patch4004: 0001-display-the-actual-unknown-option-instead-of.patch
 
 
 License:	GPLv2+

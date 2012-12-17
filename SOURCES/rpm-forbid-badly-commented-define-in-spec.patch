@@ -2,8 +2,8 @@ diff --git a/build/parseSpec.c b/build/parseSpec.c
 index 01620bd..4233b15 100644
 --- a/build/parseSpec.c
 +++ b/build/parseSpec.c
-@@ -124,6 +124,24 @@ static struct OpenFileInfo * newOpenFile
-     return ofi;
+@@ -140,6 +140,24 @@ static OFI_t * popOFI(rpmSpec spec)
+     return spec->fileStack;
  }
  
 +static int begins_with(const char *s, const char *prefix)
@@ -24,11 +24,11 @@ index 01620bd..4233b15 100644
 +    return 0;
 +}
 +
- /**
-  */
- static void forceIncludeFile(rpmSpec spec, const char * fileName)
-@@ -165,6 +183,11 @@ static int copyNextLineFromOFI(rpmSpec s
- 	*to = '\0';
+ static int restoreFirstChar(rpmSpec spec)
+ {
+     /* Restore 1st char in (possible) next line */
+@@ -171,6 +189,11 @@ static int copyNextLineFromOFI(rpmSpec s
+ 	spec->lbuf[spec->lbufOff] = '\0';
  	ofi->readPtr = from;
  
 +	if (isCommentedDefine(spec->lbuf)) {
@@ -37,5 +37,5 @@ index 01620bd..4233b15 100644
 +	}
 +
  	/* Check if we need another line before expanding the buffer. */
- 	for (p = spec->lbuf; *p; p++) {
+ 	for (const char *p = spec->lbuf; *p; p++) {
  	    switch (*p) {

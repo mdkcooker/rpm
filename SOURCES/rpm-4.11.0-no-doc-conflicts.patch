@@ -1,8 +1,8 @@
 diff -u b/lib/transaction.c b/lib/transaction.c
 --- b/lib/transaction.c
 +++ b/lib/transaction.c	2012-06-08 16:25:39.367544735 +0000
-@@ -281,6 +281,21 @@
-     return fc;
+@@ -366,6 +366,21 @@ static int handleColorConflict(rpmts ts,
+     return rConflicts;
  }
  
 +static int is_a_doc_conflict(const char *fn)
@@ -23,9 +23,9 @@ diff -u b/lib/transaction.c b/lib/transaction.c
  /**
   * handleInstInstalledFiles.
   * @param ts		transaction set
-@@ -322,9 +340,18 @@
- 	    }
- 	}
+@@ -419,9 +434,18 @@ static void handleInstInstalledFile(cons
+ 	if (rpmtsFilterFlags(ts) & RPMPROB_FILTER_REPLACEOLDFILES)
+ 	    rConflicts = 0;
  
 +	char *fn;
 +	if (rConflicts)
@@ -43,11 +43,10 @@ diff -u b/lib/transaction.c b/lib/transaction.c
  	    rpmteAddProblem(p, RPMPROB_FILE_CONFLICT, altNEVR, fn,
  			    headerGetInstance(otherHeader));
  	    free(fn);
-@@ -494,8 +521,18 @@
- 		    }
- 		    done = 1;
- 		}
-+
+@@ -562,8 +586,17 @@ assert(otherFi != NULL);
+ 		rConflicts = handleColorConflict(ts, fs, fi, i,
+ 						otherFs, otherFi, otherFileNum);
+ 
 +		char *fn;
 +		if (rConflicts)
 +		    fn = rpmfiFNIndex(fi, i);
@@ -58,7 +57,7 @@ diff -u b/lib/transaction.c b/lib/transaction.c
 +		    rConflicts = 0;
 +		}
 +
- 		if (rConflicts) {
+ 		if (rConflicts && reportConflicts) {
 -		    char *fn = rpmfiFNIndex(fi, i);
  		    rpmteAddProblem(p, RPMPROB_NEW_FILE_CONFLICT,
  				    rpmteNEVRA(otherTe), fn, 0);
