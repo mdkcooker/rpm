@@ -21,8 +21,7 @@ index d9b0c21..ea9d190 100644
    exit 1
  }
  
--: ${DIFF:=diff}
-+: ${DIFF:=diff -p}
+ : ${DIFF:=diff}
  : ${GENDIFF_DIFF_ARGS:=-up}
  : ${GENDIFF_DIFF_CHANGELOG_ARGS:=-U0}
  
