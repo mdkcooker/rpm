@@ -265,7 +265,7 @@ about the package like its version, a description, etc.
 %package   -n %librpmbuild
 Summary:   Libraries for building and signing RPM packages
 Group:     System/Libraries
-Obsoletes: rpm-build-libs%{_isa} < %{version}-%{fease}
+Obsoletes: rpm-build-libs%{_isa} < %{version}-%{release}
 Provides: rpm-build-libs%{_isa} = %{version}-%{release}
 
 %description -n %librpmbuild
