@@ -53,7 +53,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}4
+%define release		%mkrel %{?snapver:0.%{snapver}.}5
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -189,6 +189,8 @@ Patch3005: rpm-4.10-fix-testsuite-pathes.patch
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
 #
+# (tv) Temporary Patch to provide support for updates (FC):
+Patch3500: rpm-4.10.90-rpmlib-filesystem-check.patch
 # (tv) Compressed debuginfo support (UPSTREAM):
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM):
@@ -196,7 +198,7 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (tv) fix unknow macro option error message:
+# (tv) fix unknow macro option error message (UPSTREAM):
 Patch4004: 0001-display-the-actual-unknown-option-instead-of.patch
 # (tv) revert upstream debug -> debuginfo rename:
 Patch4005: rename-debug.diff 
@@ -263,7 +265,7 @@ about the package like its version, a description, etc.
 %package   -n %librpmbuild
 Summary:   Libraries for building and signing RPM packages
 Group:     System/Libraries
-Obsoletes: rpm-build-libs%{_isa} < %{version}-%{release}
+Obsoletes: rpm-build-libs%{_isa} < %{version}-%{fease}
 Provides: rpm-build-libs%{_isa} = %{version}-%{release}
 
 %description -n %librpmbuild
