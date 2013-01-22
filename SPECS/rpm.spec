@@ -53,7 +53,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}8
+%define release		%mkrel %{?snapver:0.%{snapver}.}9
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -77,7 +77,7 @@ Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
 Release:	%{release}
-Group:		System/Configuration/Packaging
+Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
 # Send upstream ? drop ?
@@ -310,7 +310,7 @@ will manipulate RPM packages and databases.
 
 %package build
 Summary:	Scripts and executable programs used to build packages
-Group:		System/Configuration/Packaging
+Group:		System/Packaging
 Requires:	autoconf
 Requires:	automake
 Requires:	file
