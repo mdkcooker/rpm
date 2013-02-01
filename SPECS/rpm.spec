@@ -47,8 +47,8 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define snapver		beta1
-%define rpmversion	4.11.0
+#define snapver		beta1
+%define rpmversion	4.11.0.1
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
@@ -198,8 +198,6 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (tv) fix unknow macro option error message (UPSTREAM):
-Patch4004: 0001-display-the-actual-unknown-option-instead-of.patch
 # (tv) fix aborting when ordering empty transactions:
 Patch4006: fix-order-on-empty-transactions.diff
 
