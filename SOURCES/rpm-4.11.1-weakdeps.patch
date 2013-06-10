@@ -62,7 +62,7 @@ Needs extcond.diff for query operations.
 diff -p -up ./build/rpmfc.c.orig ./build/rpmfc.c
 --- a/build/parseReqs.c.orig	2010-12-13 14:01:56.000000000 +0000
 +++ b/build/parseReqs.c	2011-05-11 14:16:43.000000000 +0000
-@@ -92,6 +92,20 @@ rpmRC parseRCPOT(rpmSpec spec, Package p
+@@ -92,6 +92,18 @@ rpmRC parseRCPOT(rpmSpec spec, Package p
      case RPMTAG_BUILDCONFLICTS:
  	nametag = RPMTAG_CONFLICTNAME;
  	break;
@@ -74,11 +74,9 @@ diff -p -up ./build/rpmfc.c.orig ./build/rpmfc.c
 +	break;
 +    case RPMTAG_BUILDSUGGESTS:
 +	nametag = RPMTAG_SUGGESTSNAME;
-+	h = spec->buildRestrictions;
 +	break;
 +    case RPMTAG_BUILDENHANCES:
 +	nametag = RPMTAG_ENHANCESNAME;
-+	h = spec->buildRestrictions;
 +	break;
      }
  
