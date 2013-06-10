@@ -101,6 +101,108 @@ diff -p -up ./configure.ac.orig ./configure.ac
      case RPMTAG_REQUIRENAME:
      default:
  	tagN = RPMTAG_REQUIRENAME;
+--- a/build/rpmfc.c.orig	2011-02-28 09:57:21.000000000 +0000
++++ b/build/rpmfc.c	2011-05-11 13:58:33.000000000 +0000
+@@ -1075,6 +1075,12 @@ static struct DepMsg_s depMsgs[] = {
+   { "Obsoletes",	{ "%{?__find_obsoletes}", NULL, NULL, NULL },
+ 	RPMTAG_OBSOLETENAME, RPMTAG_OBSOLETEVERSION, RPMTAG_OBSOLETEFLAGS,
+ 	0, -1 },
++  { "Enhances",		{ "%{?__find_enhances}", NULL, NULL, NULL },
++	RPMTAG_ENHANCESNAME, RPMTAG_ENHANCESVERSION, RPMTAG_ENHANCESFLAGS,
++	RPMSENSE_STRONG, RPMSENSE_STRONG },
++  { "Supplements",	{ "%{?__find_supplements}", NULL, NULL, NULL },
++	RPMTAG_ENHANCESNAME, RPMTAG_ENHANCESVERSION, RPMTAG_ENHANCESFLAGS,
++	RPMSENSE_STRONG, 0 },
+   { NULL,		{ NULL, NULL, NULL, NULL },	0, 0, 0, 0, 0 }
+ };
+ 
+@@ -1166,6 +1166,14 @@ static rpmRC rpmfcGenerateDependsHelper(
+ 		continue;
+ 	    tagflags = RPMSENSE_FIND_REQUIRES;
+ 	    break;
++	case RPMTAG_ENHANCESFLAGS:
++	    if (!pkg->autoProv)
++		continue;
++	    failnonzero = 0;
++	    tagflags = RPMSENSE_FIND_REQUIRES | RPMSENSE_MISSINGOK;
++	    if (strcmp(dm->msg, "Supplements") == 0)
++		tagflags |= RPMSENSE_STRONG;
++	    break;
+ 	default:
+ 	    continue;
+ 	    break;
+--- a/lib/formats.c.orig	2011-01-25 13:52:28.000000000 +0000
++++ b/lib/formats.c	2011-05-11 14:02:09.000000000 +0000
+@@ -560,6 +560,23 @@ static char * depflagsFormat(rpmtd td, c
+     return val;
+ }
+ 
++static char * depflag_strongFormat(rpmtd td)
++{
++    char * val = NULL;
++
++    if (rpmtdClass(td) != RPM_NUMERIC_CLASS) {
++	val = xstrdup(_("(not a number)"));
++    } else {
++	uint64_t anint = rpmtdGetNumber(td);
++	char buf[10];
++	buf[0] = '\0';
++	if (anint & RPMSENSE_STRONG)
++	    strcat(buf, "strong");
++	val = xstrdup(buf);
++    }
++    return val;
++}
++
+ /**
+  * Return tag container array size.
+  * @param td		tag data container
+@@ -672,6 +690,7 @@ static const struct headerFormatFunc_s r
+     { RPMTD_FORMAT_VFLAGS,	"vflags",	vflagsFormat },
+     { RPMTD_FORMAT_EXPAND,	"expand",	expandFormat },
+     { RPMTD_FORMAT_FSTATUS,	"fstatus",	fstatusFormat },
++    { RPMTD_FORMAT_DEPFLAG_STRONG,	"depflag_strong",	depflag_strongFormat },
+     { -1,			NULL, 		NULL }
+ };
+ 
+--- a/lib/rpmds.c.orig	2011-02-15 13:04:04.000000000 +0000
++++ b/lib/rpmds.c	2011-05-11 13:58:33.000000000 +0000
+@@ -69,6 +69,10 @@ static int dsType(rpmTagVal tag,
+ 	t = "Trigger";
+ 	evr = RPMTAG_TRIGGERVERSION;
+ 	f = RPMTAG_TRIGGERFLAGS;
++    } else if (tag == RPMTAG_ENHANCESNAME) {
++	t = "Enhances";
++	evr = RPMTAG_ENHANCESVERSION;
++	f = RPMTAG_ENHANCESFLAGS;
+     } else {
+ 	rc = 1;
+     } 
+--- a/lib/rpmtag.h.orig	2010-12-13 14:01:56.000000000 +0000
++++ b/lib/rpmtag.h	2011-05-11 13:58:33.000000000 +0000
+@@ -217,14 +217,14 @@ typedef enum rpmTag_e {
+     RPMTAG_PRETRANSPROG		= 1153,	/* s[] */
+     RPMTAG_POSTTRANSPROG	= 1154,	/* s[] */
+     RPMTAG_DISTTAG		= 1155,	/* s */
+-    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension (unimplemented) */
+-#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] (unimplemented) */
+-    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension (unimplemented) */
+-    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension (unimplemented) */
+-    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension placeholder (unimplemented) */
+-#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] (unimplemented) */
+-    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension placeholder (unimplemented) */
+-    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension placeholder (unimplemented) */
++    RPMTAG_SUGGESTSNAME		= 1156,	/* s[] extension */
++#define	RPMTAG_SUGGESTS RPMTAG_SUGGESTSNAME	/* s[] */
++    RPMTAG_SUGGESTSVERSION	= 1157,	/* s[] extension */
++    RPMTAG_SUGGESTSFLAGS	= 1158,	/* i[] extension */
++    RPMTAG_ENHANCESNAME		= 1159,	/* s[] extension placeholder */
++#define	RPMTAG_ENHANCES RPMTAG_ENHANCESNAME	/* s[] */
++    RPMTAG_ENHANCESVERSION	= 1160,	/* s[] extension placeholder */
++    RPMTAG_ENHANCESFLAGS	= 1161,	/* i[] extension placeholder */
+     RPMTAG_PRIORITY		= 1162, /* i[] extension placeholder (unimplemented) */
+     RPMTAG_CVSID		= 1163, /* s (unimplemented) */
+ #define	RPMTAG_SVNID	RPMTAG_CVSID	/* s (unimplemented) */
 diff -p -up ./lib/rpmtd.h.orig ./lib/rpmtd.h
 --- a/lib/rpmtd.h.orig	2010-12-03 12:11:57.000000000 +0000
 +++ b/lib/rpmtd.h	2011-05-11 14:00:06.000000000 +0000
