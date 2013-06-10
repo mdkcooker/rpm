@@ -47,8 +47,8 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-#define snapver		beta1
-%define rpmversion	4.11.0.1
+%define snapver		rc1
+%define rpmversion	4.11.1
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
@@ -131,7 +131,7 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 #Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
 # [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
-Patch133: rpm-4.10.0-weakdeps.patch
+Patch133: rpm-4.11.1-weakdeps.patch
 Patch134: extcond.diff
 
 # (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
@@ -175,7 +175,7 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 Patch2006: rpm-4.10.0-setup-rubygems.patch
 
 # (tv) fix tests:
-Patch2100: rpm-4.10.0-fix-testsuite.diff
+Patch2100: rpm-4.11.1-fix-testsuite.diff
 
 Patch3000: mips_macros.patch
 Patch3002: mips_define_isa_macros.patch
@@ -184,7 +184,7 @@ Patch3004: rpm_add_armv5tl.patch
 
 # when using fakechroot, make sure that testsuite pathes are against /
 # and not full path
-Patch3005: rpm-4.10-fix-testsuite-pathes.patch
+Patch3005: rpm-4.11.1-fix-testsuite-pathes.patch
 #
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC

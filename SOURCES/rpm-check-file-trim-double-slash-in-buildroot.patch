@@ -11,19 +11,20 @@ diff --git a/scripts/check-files b/scripts/check-files
 index b397f1c..31e92fe 100755
 --- a/scripts/check-files
 +++ b/scripts/check-files
-@@ -13,12 +13,13 @@ if [ ! -d "$RPM_BUILD_ROOT" ] ; then
+@@ -18,6 +18,7 @@ if [ ! -d "${RPM_BUILD_ROOT}" ] ; then
  	exit 1
  fi
  
 +RPM_BUILD_ROOT=`echo $RPM_BUILD_ROOT | sed 's://*:/:g'`
- [ "$TMPDIR" ] || TMPDIR=/tmp
- FILES_DISK=`mktemp $TMPDIR/rpmXXXXXX`
- FILES_RPM=`mktemp $TMPDIR/rpmXXXXXX`
+ # Create temporary file listing files in the manifest
+ [ -n "$TMPDIR" ] || TMPDIR="/tmp"
+ FILES_DISK=`mktemp "${TMPDIR}/rpmXXXXXX"`
+@@ -27,6 +28,6 @@ trap "rm -f \"${FILES_DISK}\"" 0 2 3 5 1
  
--find "$RPM_BUILD_ROOT" -type f -o -type l | LC_ALL=C sort > $FILES_DISK
--LC_ALL=C sort > $FILES_RPM
-+find "$RPM_BUILD_ROOT" -type f -o -type l | sed 's://*:/:g' | LC_ALL=C sort > $FILES_DISK
-+sed 's://*:/:g' | LC_ALL=C sort -u > $FILES_RPM
+ # Find non-directory files in the build root and compare to the manifest.
+ # TODO: regex chars in last sed(1) expression should be escaped
+-find "${RPM_BUILD_ROOT}" -type f -o -type l | LC_ALL=C sort > "${FILES_DISK}"
+-LC_ALL=C sort | diff -d "${FILES_DISK}" - | sed -n 's|^< '"${RPM_BUILD_ROOT}"'\(.*\)$|   \1|gp'
++find "$RPM_BUILD_ROOT" -type f -o -type l | sed 's://*:/:g' | LC_ALL=C sort > "${FILES_DISK}"
++sed 's://*:/:g' | LC_ALL=C sort -u | diff -d "${FILES_DISK}" - | sed -n 's|^< '"${RPM_BUILD_ROOT}"'\(.*\)$|   \1|gp'
  
- diff -d "$FILES_DISK" "$FILES_RPM" | grep "^< " | cut -c3- | 
- while read f; do
