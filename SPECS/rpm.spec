@@ -512,8 +512,10 @@ fi
 %endif
 %ifarch %arm
 %attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
+%attr(   -, rpm, rpm) %{rpmdir}/platform/aarch64*/macros
 %else
 %exclude %{rpmdir}/platform/arm*/macros
+%exclude %{rpmdir}/platform/aarch64*/macros
 %endif
 %ifarch %mips
 %attr(   -, rpm, rpm) %{rpmdir}/platform/mips*
