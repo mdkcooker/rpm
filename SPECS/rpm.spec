@@ -53,7 +53,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define release		%mkrel %{?snapver:0.%{snapver}.}3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -167,6 +167,10 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 # Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
 # as this breaks stuff that installs files to $DOCDIR during %%install
 #Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
+
+# Fedora patches
+# Fix 4.11.1~rc1 regression (UPSTREAM):
+Patch1000: rpm-4.11.1-rc1-lookup-mainpkg.patch
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
