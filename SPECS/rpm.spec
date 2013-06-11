@@ -433,6 +433,7 @@ EOF
 
 %check
 make check
+[ "$(ls -A tests/rpmtests.dir)" ] && cat tests/rpmtests.log
 
 %pre
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
