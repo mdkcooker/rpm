@@ -84,18 +84,20 @@ diff -p -up ./build/rpmfc.c.orig ./build/rpmfc.c
 diff -p -up ./configure.ac.orig ./configure.ac
 --- a/build/reqprov.c.orig	2010-12-13 14:01:56.000000000 +0000
 +++ b/build/reqprov.c	2011-05-11 14:15:02.000000000 +0000
-@@ -81,6 +81,16 @@ int addReqProv(Package pkg, rpmTagVal ta
+@@ -81,6 +81,18 @@ int addReqProv(Package pkg, rpmTagVal ta
  	extra = Flags & RPMSENSE_TRIGGER;
  	dsp = &pkg->triggers;
  	break;
 +    case RPMTAG_SUGGESTSNAME:
 +	versiontag = RPMTAG_SUGGESTSVERSION;
 +	flagtag = RPMTAG_SUGGESTSFLAGS;
++	dsp = &pkg->suggests;
 +	extra = Flags & _ALL_REQUIRES_MASK;
 +	break;
 +    case RPMTAG_ENHANCESNAME:
 +	versiontag = RPMTAG_ENHANCESVERSION;
 +	flagtag = RPMTAG_ENHANCESFLAGS;
++	dsp = &pkg->enhances;
 +	extra = Flags & _ALL_REQUIRES_MASK;
 +	break;
      case RPMTAG_REQUIRENAME:
@@ -271,6 +273,28 @@ index bf3ee2c..66bedd2 100644
      RPMSENSE_RPMLIB | \
      RPMSENSE_KEYRING | \
      RPMSENSE_PRETRANS | \
+--- a/build/rpmbuild_internal.h.tv	2013-06-11 09:09:46.203608389 +0200
++++ b/build/rpmbuild_internal.h	2013-06-11 09:10:25.772671337 +0200
+@@ -92,6 +92,8 @@ struct Package_s {
+     Header header;
+     rpmds ds;			/*!< Requires: N = EVR */
+     rpmds requires;
++    rpmds suggests;
++    rpmds enhances;
+     rpmds provides;
+     rpmds conflicts;
+     rpmds obsoletes;
+--- a/build/spec.c.tv	2013-06-11 09:09:48.137757868 +0200
++++ b/build/spec.c	2013-06-11 09:10:44.083089318 +0200
+@@ -136,6 +136,8 @@ static Package freePackage(Package pkg)
+     pkg->header = headerFree(pkg->header);
+     pkg->ds = rpmdsFree(pkg->ds);
+     pkg->requires = rpmdsFree(pkg->requires);
++    pkg->suggests = rpmdsFree(pkg->suggests);
++    pkg->enhances = rpmdsFree(pkg->enhances);
+     pkg->provides = rpmdsFree(pkg->provides);
+     pkg->conflicts = rpmdsFree(pkg->conflicts);
+     pkg->obsoletes = rpmdsFree(pkg->obsoletes);
 diff -u ./tests/rpmgeneral.at ./tests/rpmgeneral.at
 --- ./tests/rpmgeneral.at	2012-03-13 11:30:40.803813509 +0000
 +++ ./tests/rpmgeneral.at	2012-03-13 11:30:40.803813509 +0000
