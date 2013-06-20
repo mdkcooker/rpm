@@ -47,13 +47,13 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define snapver		rc1
+%define snapver		rc2
 %define rpmversion	4.11.1
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}3
+%define release		%mkrel %{?snapver:0.%{snapver}.}1
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -169,8 +169,6 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 #Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 
 # Fedora patches
-# Fix 4.11.1~rc1 regression (UPSTREAM):
-Patch1000: rpm-4.11.1-rc1-lookup-mainpkg.patch
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
