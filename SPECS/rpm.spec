@@ -359,6 +359,9 @@ programs that will manipulate RPM packages and databases.
 %apply_patches
 
 %build
+aclocal
+automake-1.14 --add-missing
+automake
 autoreconf
 
 %if %builddebug
