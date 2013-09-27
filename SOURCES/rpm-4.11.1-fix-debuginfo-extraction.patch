@@ -1,0 +1,23 @@
+From: Colin Guthrie <colin@mageia.org>
+Subject: Fix debuginfo extraction with shared %_builddir
+
+Sometimes, depending on local setup, the extraction of debuginfo can
+fail. This happens if you have a shared build dir which contains lots of
+subfolders for different packages (i.e. the default you would get if you
+rpm -i lots of srpms and build a whole bunch of them).
+
+This fix simply uses the real build dir passed in as an argument to the
+script rather than the top level %_builddir definition
+(aka $RPM_BUILD_DIR).
+
+--- rpm-4.11.1/scripts/find-debuginfo.sh.orig	2013-09-27 10:06:37.257387913 +0100
++++ rpm-4.11.1/scripts/find-debuginfo.sh	2013-09-27 10:07:49.019720041 +0100
+@@ -296,7 +296,7 @@
+   fi
+ 
+   echo "extracting debug info from $f"
+-  id=$(/usr/lib/rpm/debugedit -b "$RPM_BUILD_DIR" -d /usr/src/debug \
++  id=$(/usr/lib/rpm/debugedit -b "$BUILDDIR" -d /usr/src/debug \
+ 			      -i -l "$SOURCEFILE" "$f") || exit
+   if [ $nlinks -gt 1 ]; then
+     eval linkedid_$inum=\$id

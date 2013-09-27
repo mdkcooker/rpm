@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define release		%mkrel %{?snapver:0.%{snapver}.}3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -207,7 +207,13 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (tv) fix aborting when ordering empty transactions:
 Patch4006: fix-order-on-empty-transactions.diff
-
+# (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
+# extraction of debuginfo can fail. This happens if you have a shared build dir
+# which contains lots of subfolders for different packages (i.e. the default
+# you would get if you rpm -i lots of srpms and build a whole bunch of them)
+# This fix simply uses the real build dir passed in as an argument to the script
+# rather than the top level %_builddir definition (aka $RPM_BUILD_DIR).
+Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
