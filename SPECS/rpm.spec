@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}3
+%define release		%mkrel %{?snapver:0.%{snapver}.}4
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -213,7 +213,11 @@ Patch4006: fix-order-on-empty-transactions.diff
 # you would get if you rpm -i lots of srpms and build a whole bunch of them)
 # This fix simply uses the real build dir passed in as an argument to the script
 # rather than the top level %_builddir definition (aka $RPM_BUILD_DIR).
-Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
+# (cg) This messes up the debuginfo packages themselves due to bad paths.
+# I suspect the real problem lies in the debugedit binary which I will debug further.
+# Leaving this here so I don't forget (aka it annoys tv enough to bug me if it's
+# still here after any reasonable length of time!)
+#Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
