@@ -480,8 +480,8 @@ fi
 %attr(0755, rpm, rpm) %{_bindir}/rpmdb
 %attr(0755, rpm, rpm) %{_bindir}/rpmkeys
 %attr(0755, rpm, rpm) %{_bindir}/rpmgraph
-%attr(0755, rpm, rpm) %{_bindir}/rpmquery
-%attr(0755, rpm, rpm) %{_bindir}/rpmverify
+%{_bindir}/rpmquery
+%{_bindir}/rpmverify
 
 %dir %{_localstatedir}/spool/repackage
 %dir %{rpmdir}
