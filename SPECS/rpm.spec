@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}4
+%define release		%mkrel %{?snapver:0.%{snapver}.}5
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -218,6 +218,8 @@ Patch4006: fix-order-on-empty-transactions.diff
 # Leaving this here so I don't forget (aka it annoys tv enough to bug me if it's
 # still here after any reasonable length of time!)
 #Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
+# (lm) Don't uselessly bytecompile .py in docdir
+Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
