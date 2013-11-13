@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}6
+%define release		%mkrel %{?snapver:0.%{snapver}.}7
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -154,7 +154,7 @@ Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
 # Will be allowed to be dropped when "Collection" won't be experimental anymore.
-Patch146: rpm-4.9.1.1-filetriggers.patch
+Patch146: rpm-4.11.1-filetriggers.patch
 
 # add two fatal errors (during package build)
 # Useful ? to drop ?

@@ -390,45 +390,35 @@ diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/misc.h rpm
  #ifdef __cplusplus
  }
  #endif
-diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/rpmte.c rpm-4.9.1.2/lib/rpmte.c
---- rpm-4.9.1.2/lib/rpmte.c	2011-07-15 12:32:41.000000000 +0300
-+++ rpm-4.9.1.2/lib/rpmte.c	2011-12-23 18:44:52.023585938 +0200
-@@ -910,7 +910,7 @@ int rpmteProcess(rpmte te, pkgGoal goal)
+diff --git a/lib/rpmte.c b/lib/rpmte.c
+index 87fb391..a395d0f 100644
+--- a/lib/rpmte.c
++++ b/lib/rpmte.c
+@@ -19,6 +19,7 @@
+ #include "lib/rpmfi_internal.h"
+ #include "lib/rpmds_internal.h"
+ #include "lib/rpmts_internal.h"
++#include "lib/misc.h"
+ 
+ #include "debug.h"
+ 
+@@ -960,6 +961,11 @@ int rpmteProcess(rpmte te, pkgGoal goal)
  
      if (rpmteOpen(te, reset_fi)) {
  	failed = rpmpsmRun(te->ts, te, goal);
--	rpmteClose(te, reset_fi);
-+	rpmteClose(te, 0);
++	if (!failed && !test) {
++	    int install_or_erase = (rpmteType(te) == TR_ADDED) ? 1 : 0;
++	    mayAddToFilesAwaitingFiletriggers(rpmtsRootDir(te->ts),
++					      rpmteFI(te), install_or_erase);
++	}
+ 	rpmteClose(te, reset_fi);
      }
      
-     if (!scriptstage) {
-diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/transaction.c rpm-4.9.1.2/lib/transaction.c
---- rpm-4.9.1.2/lib/transaction.c	2011-12-23 18:44:51.953585439 +0200
-+++ rpm-4.9.1.2/lib/transaction.c	2011-12-23 18:44:52.023585938 +0200
-@@ -1409,6 +1409,7 @@ static int rpmtsProcess(rpmts ts)
-     pi = rpmtsiInit(ts);
-     while ((p = rpmtsiNext(pi, 0)) != NULL) {
- 	int failed;
-+	rpmElementType tetype = rpmteType(p);
- 
- 	rpmlog(RPMLOG_DEBUG, "========== +++ %s %s-%s 0x%x\n",
- 		rpmteNEVR(p), rpmteA(p), rpmteO(p), rpmteColor(p));
-@@ -1418,6 +1419,14 @@ static int rpmtsProcess(rpmts ts)
- 	    rpmlog(RPMLOG_ERR, "%s: %s %s\n", rpmteNEVRA(p),
- 		   rpmteTypeString(p), failed > 1 ? _("skipped") : _("failed"));
- 	    rc++;
-+           rpmteSetFI(p, NULL);
-+       } else {
-+           if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_TEST)) {
-+               int install_or_erase = (tetype == TR_ADDED)?1:0;
-+               mayAddToFilesAwaitingFiletriggers(rpmtsRootDir(ts), rpmteFI(p),
-+                                                 install_or_erase);
-+           }
-+           rpmteSetFI(p, NULL);		
- 	}
- 	(void) rpmdbSync(rpmtsGetRdb(ts));
-     }
-@@ -1488,6 +1497,9 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rp
+diff --git a/lib/transaction.c b/lib/transaction.c
+index 02badc6..a13a8fa 100644
+--- a/lib/transaction.c
++++ b/lib/transaction.c
+@@ -1503,6 +1503,9 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rpmprobFilterFlags ignoreSet)
  
      /* Run post-transaction scripts unless disabled */
      if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOST))) {
