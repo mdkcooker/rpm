@@ -205,8 +205,6 @@ Patch3502: rpm-4.10.0-minidebuginfo.patch
 
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (tv) fix aborting when ordering empty transactions:
-Patch4006: fix-order-on-empty-transactions.diff
 # (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
 # extraction of debuginfo can fail. This happens if you have a shared build dir
 # which contains lots of subfolders for different packages (i.e. the default
