@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}2
+%define release		%mkrel %{?snapver:0.%{snapver}.}3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -218,6 +218,8 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 #Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
 # (lm) Don't uselessly bytecompile .py in docdir
 Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
+
+Patch4009: rpm-4.11.2-double-separator-warning.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
