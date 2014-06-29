@@ -250,6 +250,7 @@ BuildRequires:	tetex
 BuildRequires:	python-devel
 %endif
 # for testsuite:
+BuildRequires: eatmydata
 BuildRequires: fakechroot
 
 Requires:	bzip2 >= 0.9.0c-2
@@ -454,7 +455,7 @@ EOF
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
-make check
+eatmydata make check
 [ "$(ls -A tests/rpmtests.dir)" ] && cat tests/rpmtests.log
 
 %pre
