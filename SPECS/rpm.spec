@@ -58,7 +58,7 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}4
+%define release		%mkrel %{?snapver:0.%{snapver}.}5
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -241,7 +241,7 @@ BuildRequires:  rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetu
 BuildRequires:  readline-devel
 BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  lua5.1-devel
+BuildRequires:  lua5.2-devel >= 5.2.3-3.mga5
 BuildRequires:  libcap-devel
 # Needed for doc
 #BuildRequires:	graphviz
