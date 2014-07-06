@@ -58,7 +58,6 @@
 %define libver		4.10
 %define libmajor	3
 %define libmajorsign    1
-%define release		%mkrel %{?snapver:0.%{snapver}.}6
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -81,7 +80,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%{release}
+Release:	%mkrel %{?snapver:0.%{snapver}.}6
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -414,8 +413,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-
 make DESTDIR=%buildroot install
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
@@ -481,7 +478,6 @@ fi
 %define	rpmattr		%attr(0755, rpm, rpm)
 
 %files -f %{name}.lang
-%defattr(-,root,root)
 %doc GROUPS CHANGES doc/manual/[a-z]*
 %attr(0755,rpm,rpm) /bin/rpm
 %attr(0755, rpm, rpm) %{_bindir}/rpm2cpio
@@ -591,7 +587,6 @@ fi
 %rpmdbattr	/var/lib/rpm/Triggername
 
 %files build
-%defattr(-,root,root)
 %doc CHANGES
 %doc doc-copy/*
 %rpmattr	%{_bindir}/rpmbuild
@@ -633,12 +628,10 @@ fi
 
 %if %buildpython
 %files -n python-rpm
-%defattr(-,root,root)
 %{_libdir}/python*/site-packages/rpm
 %endif
 
 %files -n %librpmname
-%defattr(-,root,root)
 %{_libdir}/librpm.so.%{libmajor}*
 %{_libdir}/librpmio.so.%{libmajor}*
 %if %{with plugins}
@@ -652,12 +645,10 @@ fi
 %{_libdir}/librpmsign.so.%{libmajorsign}*
 
 %files sign
-%defattr(-,root,root)
 %{_bindir}/rpmsign
 %{_mandir}/man8/rpmsign.8*
 
 %files -n %librpmnamedevel
-%defattr(-,root,root)
 %{_includedir}/rpm
 %{_libdir}/librpm.so
 %{_libdir}/librpmio.so
