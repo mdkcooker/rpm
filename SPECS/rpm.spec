@@ -80,7 +80,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}6
+Release:	%mkrel %{?snapver:0.%{snapver}.}7
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -154,10 +154,12 @@ Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
 # Will be allowed to be dropped when "Collection" won't be experimental anymore.
 Patch146: rpm-4.11.1-filetriggers.patch
+Patch147: rpm-4.11.1-filetriggers-priority.patch
+Patch148: rpm-4.11.1-filetriggers-warnings.patch
 
 # add two fatal errors (during package build)
 # Useful ? to drop ?
-#Patch147: rpm-rpmbuild-check-useless-tags-in-non-existant-binary-packages.patch
+#Patch149: rpm-rpmbuild-check-useless-tags-in-non-existant-binary-packages.patch
 
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
