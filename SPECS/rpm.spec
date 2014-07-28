@@ -152,7 +152,6 @@ Patch135: rpm-4.9.0-fix-debugedit.patch
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
-# Will be allowed to be dropped when "Collection" won't be experimental anymore.
 Patch146: rpm-4.11.1-filetriggers.patch
 Patch147: rpm-4.11.1-filetriggers-priority.patch
 Patch148: rpm-4.11.1-filetriggers-warnings.patch
