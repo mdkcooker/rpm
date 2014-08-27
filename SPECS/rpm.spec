@@ -99,7 +99,7 @@ Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 # Needed for urpmi testsuite:
 Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
 
-# (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm pluging in 4.11):
+# (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm plugin in 4.12):
 Patch31:	rpm-4.9.0-syslog.patch
 
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
