@@ -156,10 +156,6 @@ Patch146: rpm-4.11.1-filetriggers.patch
 Patch147: rpm-4.11.1-filetriggers-priority.patch
 Patch148: rpm-4.11.1-filetriggers-warnings.patch
 
-# add two fatal errors (during package build)
-# Useful ? to drop ?
-#Patch149: rpm-rpmbuild-check-useless-tags-in-non-existant-binary-packages.patch
-
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
