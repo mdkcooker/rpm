@@ -257,7 +257,6 @@ Requires:	bzip2 >= 0.9.0c-2
 Requires:	xz
 Requires:	cpio
 Requires:	gawk
-Requires:	glibc >= 2.1.92
 Requires:	mktemp
 Requires:	setup >= 2.2.0-8
 Requires:	rpm-%{_real_vendor}-setup >= 1.85
