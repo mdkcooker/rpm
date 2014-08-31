@@ -169,8 +169,6 @@ Patch1007: rpm-4.6.0-rc3-xz-support.patch
 # as this breaks stuff that installs files to $DOCDIR during %%install
 #Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
 
-# Fedora patches
-
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
