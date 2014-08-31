@@ -197,6 +197,8 @@ Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM):
 Patch3502: rpm-4.10.0-minidebuginfo.patch
 
+# Mageia patches that are easier to rediff on top of FC patches:
+#---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
