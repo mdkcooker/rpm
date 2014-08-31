@@ -628,7 +628,7 @@ fi
 %files -n %librpmname
 %{_libdir}/librpm.so.%{libmajor}*
 %{_libdir}/librpmio.so.%{libmajor}*
-%if %{with plugins}
+%if %buildplugins
 %{_libdir}/rpm-plugins
 %endif
 
