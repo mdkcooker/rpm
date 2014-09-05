@@ -543,6 +543,7 @@ fi
 %exclude %{rpmdir}/platform/alpha*-%{_os}/macros
 %exclude %{rpmdir}/platform/sparc*-%{_os}/macros
 %exclude %{rpmdir}/platform/ia64*-%{_os}/macros
+%exclude %{rpmdir}/platform/m68k*-%{_os}/macros
 %exclude %{rpmdir}/platform/ppc*-%{_os}/macros
 %exclude %{rpmdir}/platform/s390*-%{_os}/macros
 %exclude %{rpmdir}/platform/sh*-%{_os}/macros
@@ -590,14 +591,12 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/brp-*
 %rpmattr	%{_prefix}/lib/rpm/check-files
 %rpmattr	%{_prefix}/lib/rpm/debugedit
-%rpmattr	%{_prefix}/lib/rpm/desktop-file.prov 
+%rpmattr	%{_prefix}/lib/rpm/*.prov 
 %rpmattr	%{_prefix}/lib/rpm/find-debuginfo.sh
 %rpmattr	%{_prefix}/lib/rpm/find-lang.sh
 %rpmattr	%{_prefix}/lib/rpm/find-provides
 %rpmattr	%{_prefix}/lib/rpm/find-requires
-%rpmattr	%{_prefix}/lib/rpm/fontconfig.prov
 %rpmattr	%{_prefix}/lib/rpm/perldeps.pl
-%rpmattr	%{_prefix}/lib/rpm/perl.prov
 %rpmattr	%{_prefix}/lib/rpm/perl.req
 
 %rpmattr	%{_prefix}/lib/rpm/check-buildroot
