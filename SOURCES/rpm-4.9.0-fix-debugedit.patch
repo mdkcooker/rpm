@@ -12,7 +12,7 @@ diff --git a/tools/debugedit.c b/tools/debugedit.c
 index 57e3872..ba6c4e9 100644
 --- a/tools/debugedit.c
 +++ b/tools/debugedit.c
-@@ -1505,11 +1505,6 @@ main (int argc, char *argv[])
+@@ -1534,11 +1534,6 @@
  	  fprintf (stderr, "You must specify a base dir if you specify a dest dir\n");
  	  exit (1);
  	}
@@ -23,4 +23,4 @@ index 57e3872..ba6c4e9 100644
 -	}
      }
  
-   /* Make sure there are trailing slashes in dirs */
+   /* Ensure clean paths, users can muck with these */

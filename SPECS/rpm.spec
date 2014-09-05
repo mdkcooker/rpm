@@ -53,7 +53,7 @@
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
 #define snapver		rc2
-%define rpmversion	4.11.2
+%define rpmversion	4.11.3
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
@@ -80,7 +80,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}7
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
