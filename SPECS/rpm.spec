@@ -247,7 +247,7 @@ BuildRequires:	python-devel
 %endif
 # for testsuite:
 BuildRequires: eatmydata
-BuildRequires: fakechroot
+BuildRequires: fakeroot
 
 Requires:	bzip2 >= 0.9.0c-2
 Requires:	xz
