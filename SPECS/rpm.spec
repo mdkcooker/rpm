@@ -52,12 +52,11 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-#define snapver		rc2
-%define rpmversion	4.11.3
+%define snapver		rc1
+%define rpmversion	4.12.0
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
 %define libmajor	3
-%define libmajorsign    1
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -73,14 +72,14 @@
 %{?_without_python:%define buildpython 0}
 
 # disable plugins initially
-%define buildplugins 0
+%define buildplugins 1
 %{?_with_plugins:%define buildplugins 1}
 
 Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}2
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -97,10 +96,10 @@ Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 # (nb: the exit code for pretrans/posttrans & trigger/triggerun/triggerpostun
 #       scripts is ignored with or without this patch)
 # Needed for urpmi testsuite:
-Patch22:        rpm-4.9.0-non-pre-scripts-dont-fail.patch
+Patch22:        rpm-4.12.0-non-pre-scripts-dont-fail.patch
 
 # (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm plugin in 4.12):
-Patch31:	rpm-4.9.0-syslog.patch
+#Patch31:	rpm-4.9.0-syslog.patch
 
 # - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
 # - read /usr/lib/rpm/mageia/rpmpopt (not only /usr/lib/rpm/rpmpopt)
@@ -114,7 +113,7 @@ Patch70:	rpm-4.9.1-bb-shortcircuit.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
-Patch83: rpm-4.11.0-no-doc-conflicts.patch
+Patch83: rpm-4.12.0-no-doc-conflicts.patch
 
 # Fix http://qa.mandriva.com/show_bug.cgi?id=19392
 # (is this working??)
@@ -134,17 +133,13 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 # but this is bad design anyway
 #Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
-# [from SuSE] handle "Suggests" via RPMTAG_SUGGESTSNAME
-Patch133: rpm-4.11.1-weakdeps.patch
-Patch134: extcond.diff
-
 # (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
 # Panu said: "To my knowledge this is a true technical limitation of the
 # implementation: as long as debugedit can just overwrite data in the elf
 # sections things keep relatively easy, but if dest_dir is longer than the
 # original directory, debugedit would have to expand the whole elf file. Which
 # might be technically possible but debugedit currently does not even try to."
-Patch135: rpm-4.9.0-fix-debugedit.patch
+Patch135: rpm-4.12.0-fix-debugedit.patch
 
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
@@ -152,7 +147,7 @@ Patch135: rpm-4.9.0-fix-debugedit.patch
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
-Patch146: rpm-4.11.1-filetriggers.patch
+Patch146: rpm-4.12.0-filetriggers.patch
 Patch147: rpm-4.11.1-filetriggers-priority.patch
 Patch148: rpm-4.11.1-filetriggers-warnings.patch
 
@@ -163,37 +158,7 @@ Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
-#
-# Merge mageia's perl.prov improvements back into upstream:
-#
-# ignore .pm files for perl provides
-Patch160: ignore-non-perl-modules.diff
-# making sure automatic provides & requires for perl package are using the new
-# macro %perl_convert_version:
-Patch162: use_perl_convert_version.diff
-# skip plain, regular comments:
-Patch163: skip-plain-regular-comments.diff
-# support for _ in perl module version:
-Patch164: support-for-_-in-perl-module-version.diff
-
-#
-# Merge mageia's find-requires.sh improvements back into upstream:
-#
-# (tv) output perl-base requires instead of /usr/bin/perl with internal generator:
-Patch170: script-perl-base.diff
-# (tv) do not emit requires for /bin/sh (required by glibc) or interpreters for which
-# we have custom
-Patch172: script-filtering.diff
-# (tv) "resolve" /bin/env foo interpreter to actual path, rather than generating
-# dependencies on coreutils, should trim off ~800 dependencies more
-Patch173: script-env.diff
-# (tv) output pkgconfig requires instead of /usr/bin/pkgconfig.diff with internal generator:
-Patch174: pkgconfig.diff
-# (tv) no not emit "rtld(GNU_HASH)" requires as we've support for it since mga1:
-# (saves ~5K packages' dependency in synthesis)
-Patch175: no-rtld_GNU_HASH_req.diff
-
-Patch1007: rpm-4.6.0-rc3-xz-support.patch
+Patch1007: rpm-4.12.0-xz-support.patch
 
 # Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
 # as this breaks stuff that installs files to $DOCDIR during %%install
@@ -215,7 +180,8 @@ Patch3004: rpm_add_armv5tl.patch
 
 # when using fakechroot, make sure that testsuite pathes are against /
 # and not full path
-Patch3005: rpm-4.11.1-fix-testsuite-pathes.patch
+Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
+
 #
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
@@ -246,6 +212,9 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
 
 Patch4009: rpm-4.11.2-double-separator-warning.patch
+# (tv) make old suggests be equivalent to recommends:
+Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
+
 
 License:	GPLv2+
 BuildRequires:	autoconf
@@ -269,6 +238,7 @@ BuildRequires:	ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  lua5.2-devel >= 5.2.3-3.mga5
 BuildRequires:  libcap-devel
+BuildRequires:  pkgconfig(libarchive)
 # Needed for doc
 #BuildRequires:	graphviz
 BuildRequires:	tetex
@@ -277,7 +247,7 @@ BuildRequires:	python-devel
 %endif
 # for testsuite:
 BuildRequires: eatmydata
-BuildRequires: fakechroot
+BuildRequires: fakeroot
 
 Requires:	bzip2 >= 0.9.0c-2
 Requires:	xz
@@ -507,6 +477,7 @@ fi
 %doc GROUPS CHANGES doc/manual/[a-z]*
 %attr(0755,rpm,rpm) /bin/rpm
 %attr(0755, rpm, rpm) %{_bindir}/rpm2cpio
+%attr(0755, rpm, rpm) %{_bindir}/rpm2archive
 %attr(0755, rpm, rpm) %{_bindir}/gendiff
 %attr(0755, rpm, rpm) %{_bindir}/rpmdb
 %attr(0755, rpm, rpm) %{_bindir}/rpmkeys
@@ -538,6 +509,7 @@ fi
 %attr(0644, rpm, rpm) %{rpmdir}/fileattrs/*.attr
 
 %dir %attr(   -, rpm, rpm) %{rpmdir}/platform/
+%exclude %{rpmdir}/platform/m68k-linux/macros
 %ifarch %{ix86} x86_64
 %attr(   -, rpm, rpm) %{rpmdir}/platform/i*86-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/athlon-*
@@ -618,6 +590,7 @@ fi
 %doc doc-copy/*
 %rpmattr	%{_bindir}/rpmbuild
 %rpmattr        %{_bindir}/rpmspec
+%rpmattr	%{_prefix}/lib/rpm/appdata.prov
 %rpmattr	%{_prefix}/lib/rpm/brp-*
 %rpmattr	%{_prefix}/lib/rpm/check-files
 %rpmattr	%{_prefix}/lib/rpm/debugedit
@@ -667,7 +640,7 @@ fi
 %{_libdir}/librpmbuild.so.%{libmajor}*
 
 %files -n %librpmsign
-%{_libdir}/librpmsign.so.%{libmajorsign}*
+%{_libdir}/librpmsign.so.%{libmajor}*
 
 %files sign
 %{_bindir}/rpmsign
