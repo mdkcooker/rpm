@@ -214,6 +214,7 @@ Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
 Patch4009: rpm-4.11.2-double-separator-warning.patch
 # (tv) make old suggests be equivalent to recommends:
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
+Patch4012: rpm-mga-suggests.diff
 
 # Upstream: fix regression:
 Patch4011: rpm-4.12.0-fix-missing-rpmlib-requires.patch
