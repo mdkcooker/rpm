@@ -1,0 +1,12 @@
+diff -up ./lib/tagexts.c.tv ./lib/tagexts.c
+--- ./lib/tagexts.c.tv	2014-08-26 19:36:49.291209949 +0200
++++ ./lib/tagexts.c	2014-08-26 19:37:56.722206818 +0200
+@@ -792,7 +792,7 @@ static int requirenevrsTag(Header h, rpm
+ static int recommendnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
+ {
+     return depnevrsTag(h, td, hgflags, RPMTAG_RECOMMENDNAME) ||
+-           depnevrsTagFiltered(h, td, hgflags, RPMTAG_OLDSUGGESTSNAME, 1);
++           depnevrsTagFiltered(h, td, hgflags, RPMTAG_OLDSUGGESTSNAME, 0);
+ }
+ 
+ static int suggestnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
