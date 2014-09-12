@@ -366,21 +366,21 @@ diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/filetrigge
 diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/Makefile.am rpm-4.9.1.2/lib/Makefile.am
 --- rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:51.943585368 +0200
 +++ rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:52.023585938 +0200
-@@ -34,7 +34,7 @@ librpm_la_SOURCES = \
+@@ -35,7 +36,7 @@
  	rpmlead.c rpmlead.h rpmps.c rpmprob.c rpmrc.c \
  	rpmte.c rpmte_internal.h rpmts.c rpmfs.h rpmfs.c \
  	rpmvercmp.c signature.c signature.h transaction.c \
--	verify.c rpmlock.c rpmlock.h misc.h \
-+	filetriggers.c verify.c rpmlock.c rpmlock.h misc.h \
- 	rpmscript.h rpmscript.c legacy.c merge.c \
+-	verify.c rpmlock.c rpmlock.h misc.h relocation.c \
++	filetriggers.c verify.c rpmlock.c rpmlock.h misc.h relocation.c \
+ 	rpmscript.h rpmscript.c legacy.c \
  	rpmchroot.c rpmchroot.h \
- 	rpmplugins.c rpmplugins.h rpmug.c rpmug.h
+ 	rpmplugins.c rpmplugins.h rpmplugin.h rpmug.c rpmug.h
 diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/misc.h rpm-4.9.1.2/lib/misc.h
 --- rpm-4.9.1.2/lib/misc.h	2011-07-15 11:59:12.000000000 +0300
 +++ rpm-4.9.1.2/lib/misc.h	2011-12-23 18:44:52.023585938 +0200
-@@ -39,6 +39,11 @@ headerTagFormatFunction rpmHeaderFormatF
- RPM_GNUC_INTERNAL
- headerTagFormatFunction rpmHeaderFormatFuncByValue(rpmtdFormats fmt);
+@@ -58,6 +58,11 @@
+ void rpmRelocationBuild(Header h, rpmRelocation *rawrelocs,
+ 		int *rnrelocs, rpmRelocation **rrelocs, uint8_t **rbadrelocs);
  
 +__attribute__ ((visibility("hidden")))
 +  int mayAddToFilesAwaitingFiletriggers(const char *rootDir, rpmfi fi, int install_or_erase);
@@ -418,13 +418,13 @@ diff --git a/lib/transaction.c b/lib/transaction.c
 index 02badc6..a13a8fa 100644
 --- a/lib/transaction.c
 +++ b/lib/transaction.c
-@@ -1503,6 +1503,9 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rpmprobFilterFlags ignoreSet)
+@@ -1492,6 +1492,9 @@
  
      /* Run post-transaction scripts unless disabled */
-     if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOST))) {
-+       if ((rpmtsFlags(ts) & _noTransTriggers) != _noTransTriggers) {
+     if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOSTTRANS))) {
++	if ((rpmtsFlags(ts) & _noTransTriggers) != _noTransTriggers) {
 +           rpmRunFileTriggers(rpmtsRootDir(ts));
-+       }
++	}
  	rpmlog(RPMLOG_DEBUG, "running post-transaction scripts\n");
  	runTransScripts(ts, PKG_POSTTRANS);
      }

@@ -11,16 +11,16 @@ diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
 index 6473d55..30a797a 100644
 --- a/rpmio/rpmio.c
 +++ b/rpmio/rpmio.c
-@@ -1156,7 +1160,7 @@ typedef struct lzfile {
+@@ -723,7 +723,7 @@ typedef struct lzfile {
  
- static LZFILE *lzopen_internal(const char *path, const char *mode, int fd, int xz)
+ static LZFILE *lzopen_internal(const char *mode, int fd, int xz)
  {
 -    int level = 7;	/* Use XZ's default compression level if unspecified */
 +    int level = LZMA_PRESET_DEFAULT;
      int encoding = 0;
      FILE *fp;
      LZFILE *lzfile;
-@@ -1189,7 +1193,7 @@ static LZFILE *lzopen_internal(const char *path, const char *mode, int fd, int x
+@@ -748,7 +748,7 @@ static LZFILE *lzopen_internal(const cha
      lzfile->strm = init_strm;
      if (encoding) {
  	if (xz) {

@@ -2,16 +2,15 @@ Index: macros.in
 ===================================================================
 --- a/macros.in
 +++ b/macros.in	2012-01-12 00:58:19.343298720 +0100
-@@ -1037,8 +1037,7 @@
+@@ -1006,7 +1006,7 @@ done \
  
  #------------------------------------------------------------------------------
  # arch macro for all supported ARM processors
--%arm	armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv7l
--
-+%arm	armv3l armv4b armv4l armv4tl armv5tl armv5tel armv5tejl armv6l armv7l
+-%arm	armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv6hl armv7l armv7hl armv7hnl
++%arm	armv3l armv4b armv4l armv4tl armv5tl armv5tel armv5tejl armv6l armv6hl armv7l armv7hl armv7hnl
+ 
  #------------------------------------------------------------------------------
  # arch macro for all supported Sparc processors
- %sparc sparc sparcv8 sparcv9 sparcv9v sparc64 sparc64v
 Index: rpmrc.in
 ===================================================================
 --- a/rpmrc.in

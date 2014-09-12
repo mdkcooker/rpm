@@ -68,5 +68,5 @@ Index: rpm-4.10.0/tests/atlocal.in
 +    HOME="/"
 +    export TOPDIR RPM_CONFIGDIR HOME RPM_POPTEXEC_PATH
      (cd ${RPMTEST} && \
-      MAGIC="/magic/magic" FAKECHROOT_BASE="${RPMTEST}" fakechroot "$@" --define "_topdir /build"
+      MAGIC="/magic/magic" FAKECHROOT_BASE="${RPMTEST}" fakechroot "$@" --define "_topdir /build" --noplugins
      )

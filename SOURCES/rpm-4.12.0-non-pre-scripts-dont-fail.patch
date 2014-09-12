@@ -1,60 +1,47 @@
 --- a/lib/psm.c
 +++ b/lib/psm.c	2011-06-26 22:14:37.258432871 +0200
-@@ -793,16 +793,14 @@
+@@ -754,8 +754,7 @@
+ 	if (rc) break;
  
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERUN)) {
- 		/* Run triggers in this package other package(s) set off. */
--		rc = rpmpsmNext(psm, PSM_IMMED_TRIGGERS);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_IMMED_TRIGGERS);
- 
- 		/* Run triggers in other package(s) this package sets off. */
--		rc = rpmpsmNext(psm, PSM_TRIGGERS);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_TRIGGERS);
- 	    }
- 
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPREUN))
--		rc = rpmpsmNext(psm, PSM_SCRIPT);
-+		rpmpsmNext(psm, PSM_SCRIPT);
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOST)) {
+-	    rc = runInstScript(psm, RPMTAG_POSTIN);
+-	    if (rc) break;
++	    runInstScript(psm, RPMTAG_POSTIN);
  	}
- 	break;
-     case PSM_PROCESS:
-@@ -922,17 +920,14 @@
- 	    psm->countCorrection = 0;
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERIN)) {
+ 	    /* Run triggers in other package(s) this package sets off. */
+@@ -783,29 +782,25 @@
+     while (once--) {
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERUN)) {
+ 	    /* Run triggers in this package other package(s) set off. */
+-	    rc = runImmedTriggers(psm, RPMSENSE_TRIGGERUN);
+-	    if (rc) break;
++	    runImmedTriggers(psm, RPMSENSE_TRIGGERUN);
  
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOST)) {
--		rc = rpmpsmNext(psm, PSM_SCRIPT);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_SCRIPT);
- 	    }
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERIN)) {
- 		/* Run triggers in other package(s) this package sets off. */
--		rc = rpmpsmNext(psm, PSM_TRIGGERS);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_TRIGGERS);
+ 	    /* Run triggers in other package(s) this package sets off. */
+-	    rc = runTriggers(psm, RPMSENSE_TRIGGERUN);
+-	    if (rc) break;
++	    runTriggers(psm, RPMSENSE_TRIGGERUN);
+ 	}
  
- 		/* Run triggers in this package other package(s) set off. */
--		rc = rpmpsmNext(psm, PSM_IMMED_TRIGGERS);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_IMMED_TRIGGERS);
- 	    }
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPREUN))
+-	    rc = runInstScript(psm, RPMTAG_PREUN);
++	    runInstScript(psm, RPMTAG_PREUN);
  
- 	    rc = markReplacedFiles(psm);
-@@ -945,14 +940,12 @@
- 	    psm->countCorrection = -1;
+ 	rc = rpmpsmRemove(psm);
+ 	if (rc) break;
  
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOSTUN)) {
--		rc = rpmpsmNext(psm, PSM_SCRIPT);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_SCRIPT);
- 	    }
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOSTUN)) {
+-	    rc = runInstScript(psm, RPMTAG_POSTUN);
+-	    if (rc) break;
++	    runInstScript(psm, RPMTAG_POSTUN);
+ 	}
  
- 	    if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERPOSTUN)) {
- 		/* Run triggers in other package(s) this package sets off. */
--		rc = rpmpsmNext(psm, PSM_TRIGGERS);
--		if (rc) break;
-+		rpmpsmNext(psm, PSM_TRIGGERS);
- 	    }
+ 	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERPOSTUN)) {
+ 	    /* Run triggers in other package(s) this package sets off. */
+-	    rc = runTriggers(psm, RPMSENSE_TRIGGERPOSTUN);
+-	    if (rc) break;
++	    runTriggers(psm, RPMSENSE_TRIGGERPOSTUN);
+ 	}
  
- 	    rc = rpmpsmNext(psm, PSM_RPMDB_REMOVE);
+ 	rc = dbRemove(ts, psm->te);
