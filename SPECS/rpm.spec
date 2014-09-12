@@ -80,7 +80,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -162,6 +162,36 @@ Patch148: rpm-4.11.1-filetriggers-warnings.patch
 Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 #Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
+
+#
+# Merge mageia's perl.prov improvements back into upstream:
+#
+# ignore .pm files for perl provides
+Patch160: ignore-non-perl-modules.diff
+# making sure automatic provides & requires for perl package are using the new
+# macro %perl_convert_version:
+Patch162: use_perl_convert_version.diff
+# skip plain, regular comments:
+Patch163: skip-plain-regular-comments.diff
+# support for _ in perl module version:
+Patch164: support-for-_-in-perl-module-version.diff
+
+#
+# Merge mageia's find-requires.sh improvements back into upstream:
+#
+# (tv) output perl-base requires instead of /usr/bin/perl with internal generator:
+Patch170: script-perl-base.diff
+# (tv) do not emit requires for /bin/sh (required by glibc) or interpreters for which
+# we have custom
+Patch172: script-filtering.diff
+# (tv) "resolve" /bin/env foo interpreter to actual path, rather than generating
+# dependencies on coreutils, should trim off ~800 dependencies more
+Patch173: script-env.diff
+# (tv) output pkgconfig requires instead of /usr/bin/pkgconfig.diff with internal generator:
+Patch174: pkgconfig.diff
+# (tv) no not emit "rtld(GNU_HASH)" requires as we've support for it since mga1:
+# (saves ~5K packages' dependency in synthesis)
+Patch175: no-rtld_GNU_HASH_req.diff
 
 Patch1007: rpm-4.6.0-rc3-xz-support.patch
 
