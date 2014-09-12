@@ -1,0 +1,97 @@
+better solution for RECOMMENDS with fallback on OLDSUGGEST:
+
+add RPMTAG_RECOMMENDNAME to extended tags as using RPMTAG_RECOMMENDNEVRS makes
+URPM->suggest_nosense to return versionated suggests, which while not supported
+by urpmi, do are used by a couple packages (such as git or gnome-user-share)
+
+This breaks urpmi as suggests on "foo >= x.y" is not interpreted by urpmi which
+thinks that "foo" is a new suggests and reinstalls a previously removed
+suggests
+
+diff --git a/lib/tagexts.c b/lib/tagexts.c
+index 0d2b1d3..2d20fd5 100644
+--- a/lib/tagexts.c
++++ b/lib/tagexts.c
+@@ -735,6 +735,27 @@ static int epochnumTag(Header h, rpmtd td, headerGetFlags hgflags)
+     return 1;
+ }
+ 
++static int depnameTag(Header h, rpmtd td, headerGetFlags hgflags,
++			rpmTagVal tag)
++{
++    rpmds ds = rpmdsNew(h, tag, 0);
++    int ndeps = rpmdsCount(ds);
++
++    if (ndeps > 0) {
++	char **deps = xmalloc(sizeof(*deps) * ndeps);
++	int i;
++	while ((i = rpmdsNext(ds)) >= 0) {
++	    deps[i] = strdup(rpmdsN(ds));
++	}
++	td->data = deps;
++	td->type = RPM_STRING_ARRAY_TYPE;
++	td->count = ndeps;
++	td->flags |= (RPMTD_ALLOCED | RPMTD_PTR_ALLOCED);
++    }
++    rpmdsFree(ds);
++    return (ndeps > 0);
++}
++
+ static int depnevrsTag(Header h, rpmtd td, headerGetFlags hgflags,
+ 			rpmTagVal tag)
+ {
+@@ -758,6 +779,33 @@ static int depnevrsTag(Header h, rpmtd td, headerGetFlags hgflags,
+ 
+ #define RPMSENSE_STRONG (1 << 27)
+ 
++
++static int depnameTagFiltered(Header h, rpmtd td, headerGetFlags hgflags,
++			rpmTagVal tag, int strong)
++{
++    rpmds ds = rpmdsNew(h, tag, 0);
++    int ndeps = rpmdsCount(ds);
++
++    if (ndeps > 0) {
++	char **deps = xmalloc(sizeof(*deps) * ndeps);
++	ndeps = 0;
++	while (rpmdsNext(ds) >= 0) {
++	    if ((rpmdsFlags(ds) & RPMSENSE_STRONG) == (strong ? RPMSENSE_STRONG : 0))
++		deps[ndeps++] = strdup(rpmdsN(ds));
++	}
++	if (ndeps) {
++	    td->data = deps;
++	    td->type = RPM_STRING_ARRAY_TYPE;
++	    td->count = ndeps;
++	    td->flags |= (RPMTD_ALLOCED | RPMTD_PTR_ALLOCED);
++	} else {
++	    _free(deps);
++        }
++    }
++    rpmdsFree(ds);
++    return (ndeps > 0);
++}
++
+ static int depnevrsTagFiltered(Header h, rpmtd td, headerGetFlags hgflags,
+ 			rpmTagVal tag, int strong)
+ {
+@@ -789,6 +836,12 @@ static int requirenevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
+     return depnevrsTag(h, td, hgflags, RPMTAG_REQUIRENAME);
+ }
+ 
++static int recommendnameTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return depnameTag(h, td, hgflags, RPMTAG_RECOMMENDNAME) ||
++           depnameTagFiltered(h, td, hgflags, RPMTAG_OLDSUGGESTSNAME, 0);
++}
++
+ static int recommendnevrsTag(Header h, rpmtd td, headerGetFlags hgflags)
+ {
+     return depnevrsTag(h, td, hgflags, RPMTAG_RECOMMENDNAME) ||
+@@ -875,6 +928,7 @@ static const struct headerTagFunc_s rpmHeaderTagExtensions[] = {
+     { RPMTAG_EPOCHNUM,		epochnumTag },
+     { RPMTAG_INSTFILENAMES,	instfilenamesTag },
+     { RPMTAG_REQUIRENEVRS,	requirenevrsTag },
++    { RPMTAG_RECOMMENDNAME,	recommendnameTag},
+     { RPMTAG_RECOMMENDNEVRS,	recommendnevrsTag},
+     { RPMTAG_SUGGESTNEVRS,	suggestnevrsTag},
+     { RPMTAG_SUPPLEMENTNEVRS,	supplementnevrsTag},
