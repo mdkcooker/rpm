@@ -1,0 +1,19 @@
+commit 0f1dd7bebbea6916dc5d698099a8a4cbfb829e81
+Author: Jerome Quelin <jquelin@mageia.org>
+Date:   Sat Feb 26 12:04:53 2011 +0000
+
+    1.118 - support for _ in perl module version
+
+diff --git a/scripts/perl.prov b/scripts/perl.prov
+index a6d68bb..85b8e81 100755
+--- a/scripts/perl.prov
++++ b/scripts/perl.prov
+@@ -171,7 +171,7 @@ sub process_file {
+ 
+       if (m/\$Revision: (\d+[.0-9]+)/) {
+         $version = $1;
+-      } elsif (m/['"]?(\d+[.0-9]+)['"]?/) {
++      } elsif (m/['"]?(\d+[._0-9]+)['"]?/) {
+ 
+         # look for a static number hard coded in the script
+ 
