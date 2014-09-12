@@ -1,0 +1,18 @@
+--- ./scripts/script.req	2014-09-10 14:18:23.978949876 +0200
++++ ./scripts/script.req	2014-09-10 14:24:42.450938935 +0200
+@@ -29,7 +31,14 @@
+ 	    # - perl/python/ruby: we already have dedicated dependency generators for these
+ 	    :
+     else
+-	    echo $INTERP
++	    # "resolve" /bin/env foo interpreter to actual path, rather than generating
++	    # dependencies on coreutils, should trim off ~800 dependencies more
++	    if [[ "$INTERP" == *bin/env ]]; then
++		   arg=`head -n 1 $filename | grep '^#!' | sed -e 's/^\#\![   ]*//' | cut -d" " -f2`
++		   INTERP="`which $arg 2>/dev/null || echo $INTERP`"
++	    fi
++	    echo $INTERP|grep -Ev $BLACKLIST
++
+     fi
+     #!/usr/bin/env /foo/bar
+     sed -n -e '1s:^#![[:space:]]*[^[:space:]]*/bin/env[[:space:]]\{1,\}\(/[^[:space:]]\{1,\}\):\1:p' "$filename"
