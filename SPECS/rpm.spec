@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}16
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -248,6 +248,7 @@ Patch4012: rpm-mga-suggests.diff
 
 # Upstream: fix regression:
 Patch4011: rpm-4.12.0-fix-missing-rpmlib-requires.patch
+Patch4013: fix-self-provides.diff
 
 
 License:	GPLv2+
