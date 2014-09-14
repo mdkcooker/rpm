@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -444,7 +444,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %make
 
 %install
-make DESTDIR=%buildroot install
+%makeinstall_std
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
