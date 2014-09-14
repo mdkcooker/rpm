@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}3
+Release:	%mkrel %{?snapver:0.%{snapver}.}4
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -377,7 +377,7 @@ Requires:	perl(ExtUtils::MakeMaker) >= 6.570_700
 Requires:       perl(YAML::Tiny)
 Requires:	rpm = %epoch:%{version}-%{release}
 Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
-Requires:	%librpmbuild = %version
+Requires:	%librpmbuild = %epoch:%version
 
 %description build
 This package contains scripts and executable programs that are used to
