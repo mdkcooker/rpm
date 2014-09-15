@@ -626,7 +626,6 @@ fi
 %doc doc-copy/*
 %rpmattr	%{_bindir}/rpmbuild
 %rpmattr        %{_bindir}/rpmspec
-%rpmattr	%{_prefix}/lib/rpm/appdata.prov
 %rpmattr	%{_prefix}/lib/rpm/brp-*
 %rpmattr	%{_prefix}/lib/rpm/check-files
 %rpmattr	%{_prefix}/lib/rpm/debugedit
