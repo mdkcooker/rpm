@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}3
+Release:	%mkrel %{?snapver:0.%{snapver}.}4
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -188,7 +188,7 @@ Patch174: pkgconfig.diff
 # (saves ~5K packages' dependency in synthesis)
 Patch175: no-rtld_GNU_HASH_req.diff
 # (pt) generate ELF provides for libraries, not only for executables
-Patch176: rpm-4.12.0-library-provides.patch
+Patch176: elf_libs_req.diff 
 
 Patch1007: rpm-4.12.0-xz-support.patch
 
