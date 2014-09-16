@@ -52,7 +52,7 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define snapver		rc1
+#define snapver		rc1
 %define rpmversion	4.12.0
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
 %define libver		4.10
@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}6
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Add some undocumented feature to gendiff
@@ -247,10 +247,6 @@ Patch4009: rpm-4.11.2-double-separator-warning.patch
 # (tv) make old suggests be equivalent to recommends:
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 Patch4012: rpm-mga-suggests.diff
-
-# Upstream: fix regression:
-Patch4011: rpm-4.12.0-fix-missing-rpmlib-requires.patch
-Patch4013: fix-self-provides.diff
 
 
 License:	GPLv2+
