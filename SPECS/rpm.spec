@@ -79,9 +79,11 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
+# Temporary band-aid for rpm2cpio whining on payload size mismatch (rhbz#1142949)
+Patch5: rpm-4.12.0-rpm2cpio-hack.patch
 # Add some undocumented feature to gendiff
 # Send upstream ? drop ?
 Patch17:	rpm-4.4.2.2-gendiff-improved.patch
