@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}3
+Release:	%mkrel %{?snapver:0.%{snapver}.}4
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # Temporary band-aid for rpm2cpio whining on payload size mismatch (rhbz#1142949)
@@ -189,6 +189,8 @@ Patch174: pkgconfig.diff
 # (tv) no not emit "rtld(GNU_HASH)" requires as we've support for it since mga1:
 # (saves ~5K packages' dependency in synthesis)
 Patch175: no-rtld_GNU_HASH_req.diff
+# (tv) replace file deps by requires on packages:
+Patch176: script-no-file-deps.diff
 # (pt) generate ELF provides for libraries, not only for executables
 Patch180: elf_libs_req.diff 
 Patch181: assumeexec.diff 
