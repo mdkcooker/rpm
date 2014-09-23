@@ -1,7 +1,6 @@
 --- ./scripts/script.req	2014-09-10 14:18:23.978949876 +0200
 +++ ./scripts/script.req	2014-09-10 14:24:42.450938935 +0200
-@@ -29,7 +31,14 @@
- 	    # - perl/python/ruby: we already have dedicated dependency generators for these
+@@ -29,6 +31,13 @@
  	    :
      else
 -	    echo $INTERP
