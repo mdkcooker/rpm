@@ -4,7 +4,7 @@
  	fi
  }
  
-+BLACKLIST="bin/(bash|libsafe|:ibfakeroot|ocamlrun|perl|python|ruby|sh)" 
++BLACKLIST="bin/(bash|libsafe|libfakeroot|ocamlrun|perl|python|ruby|sh)" 
 +
  # TODO: handle "#!/usr/bin/env foo" somehow
  while read filename; do
