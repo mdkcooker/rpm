@@ -190,8 +190,8 @@ Patch174: pkgconfig.diff
 # (saves ~5K packages' dependency in synthesis)
 Patch175: no-rtld_GNU_HASH_req.diff
 # (pt) generate ELF provides for libraries, not only for executables
-Patch176: elf_libs_req.diff 
-Patch177: assumeexec.diff 
+Patch180: elf_libs_req.diff 
+Patch181: assumeexec.diff 
 
 Patch1007: rpm-4.12.0-xz-support.patch
 
