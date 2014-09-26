@@ -13,7 +13,7 @@ index a6d68bb..85b8e81 100755
        if (m/\$Revision: (\d+[.0-9]+)/) {
          $version = $1;
 -      } elsif (m/['"]?(\d+[.0-9]+)['"]?/) {
-+      } elsif (m/['"]?(\d+[._0-9]+)['"]?/) {
++      } elsif (m/=\s*['"]?(\d+[._0-9]+)['"]?/) {
  
          # look for a static number hard coded in the script
  
