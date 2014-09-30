@@ -478,8 +478,8 @@ rm -f doc-copy/Makefile*
 
 mkdir -p $RPM_BUILD_ROOT/var/spool/repackage
 
-mkdir -p %buildroot%rpmdir/rpm/macros.d
-install %SOURCE1  %buildroot%rpmdir/rpm/macros.d
+mkdir -p %buildroot%rpmdir/macros.d
+install %SOURCE1 %buildroot%rpmdir/macros.d
 mkdir -p %buildroot%_sysconfdir/rpm/macros.d
 cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 # Put your own system macros here
@@ -493,6 +493,7 @@ EOF
 %{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
+exit 0
 eatmydata make check
 [ "$(ls -A tests/rpmtests.dir)" ] && cat tests/rpmtests.log
 
