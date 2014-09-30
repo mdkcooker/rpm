@@ -478,8 +478,8 @@ rm -f doc-copy/Makefile*
 
 mkdir -p $RPM_BUILD_ROOT/var/spool/repackage
 
-mkdir -p %buildroot%_rpmdir/rpm/macros.d
-install %SOURCE1  %buildroot%_rpmdir/rpm/macros.d
+mkdir -p %buildroot%rpmdir/rpm/macros.d
+install %SOURCE1  %buildroot%rpmdir/rpm/macros.d
 mkdir -p %buildroot%_sysconfdir/rpm/macros.d
 cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 # Put your own system macros here
@@ -537,7 +537,7 @@ fi
 %attr(0755, rpm, rpm) %{rpmdir}/config.sub
 %attr(0755, rpm, rpm) %{rpmdir}/rpmdb_*
 %attr(0644, rpm, rpm) %{rpmdir}/macros
-%_rpmdir/macros.d
+%rpmdir/macros.d
 %attr(0755, rpm, rpm) %{rpmdir}/mkinstalldirs
 %attr(0755, rpm, rpm) %{rpmdir}/rpm.*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmpopt*
