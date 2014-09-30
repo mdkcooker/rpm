@@ -79,9 +79,11 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}6
+Release:	%mkrel %{?snapver:0.%{snapver}.}7
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
+# extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
+Source1:	macros.filter
 # Temporary band-aid for rpm2cpio whining on payload size mismatch (rhbz#1142949)
 Patch5: rpm-4.12.0-rpm2cpio-hack.patch
 # Add some undocumented feature to gendiff
@@ -476,6 +478,8 @@ rm -f doc-copy/Makefile*
 
 mkdir -p $RPM_BUILD_ROOT/var/spool/repackage
 
+mkdir -p %buildroot%_rpmdir/rpm/macros.d
+install %SOURCE1  %buildroot%_rpmdir/rpm/macros.d
 mkdir -p %buildroot%_sysconfdir/rpm/macros.d
 cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 # Put your own system macros here
@@ -533,6 +537,7 @@ fi
 %attr(0755, rpm, rpm) %{rpmdir}/config.sub
 %attr(0755, rpm, rpm) %{rpmdir}/rpmdb_*
 %attr(0644, rpm, rpm) %{rpmdir}/macros
+%_rpmdir/macros.d
 %attr(0755, rpm, rpm) %{rpmdir}/mkinstalldirs
 %attr(0755, rpm, rpm) %{rpmdir}/rpm.*
 %attr(0644, rpm, rpm) %{rpmdir}/rpmpopt*
