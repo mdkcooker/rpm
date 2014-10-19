@@ -1,0 +1,68 @@
+commit 96e0cdf34b1d4b40d6565d396016f74446bd4b5f
+Author: Panu Matilainen <pmatilai@redhat.com>
+Date:   Tue Feb 19 14:04:04 2013 +0200
+
+    And finally, make rpmlog thread-safe ... mostly
+    
+    - Now that all of rpmlog global state is in the context hidden behind
+      a getter function, adding the actual locking is remarkably simple.
+      Alternatively we could use a per-thread storage for this, but
+      for now we'll go with global, locked structure.
+    - Add a reminder note about rpmlogMessage() - while grabbing the message
+      from the global context is thread-safe in itself, the returned message
+      is not as it points to the global context which could get freed or
+      moved before the caller gets to see it.
+
+reverted:
+--- b/rpmio/rpmlog.c
++++ a/rpmio/rpmlog.c
+@@ -5,13 +5,11 @@
+ #include "system.h"
+ #include <stdarg.h>
+ #include <stdlib.h>
+-#include <pthread.h>
+ #include <rpm/rpmlog.h>
+ #include "debug.h"
+ 
+ typedef struct rpmlogCtx_s * rpmlogCtx;
+ struct rpmlogCtx_s {
+-    pthread_rwlock_t lock;
+     unsigned mask;
+     int nrecs;
+     rpmlogRec recs;
+@@ -29,24 +27,14 @@
+ /* Force log context acquisition through a function */
+ static rpmlogCtx rpmlogCtxAcquire(int write)
+ {
++    static struct rpmlogCtx_s _globalCtx = { RPMLOG_UPTO(RPMLOG_NOTICE),
+-    static struct rpmlogCtx_s _globalCtx = { PTHREAD_RWLOCK_INITIALIZER,
+-					     RPMLOG_UPTO(RPMLOG_NOTICE),
+ 					     0, NULL, NULL, NULL, NULL };
++    return &_globalCtx;
+-    rpmlogCtx ctx = &_globalCtx;
+-
+-    /* XXX: errors should be handled */
+-    if (write)
+-	pthread_rwlock_wrlock(&ctx->lock);
+-    else
+-	pthread_rwlock_rdlock(&ctx->lock);
+-
+-    return ctx;
+ }
+ 
+ /* Release log context */
+ static rpmlogCtx rpmlogCtxRelease(rpmlogCtx ctx)
+ {
+-    pthread_rwlock_unlock(&ctx->lock);
+     return NULL;
+ }
+ 
+@@ -70,7 +58,7 @@
+     return code;
+ }
+ 
++
+-/* XXX: This is not thread-safe, we should return a malloced copy */
+ const char * rpmlogMessage(void)
+ {
+     const char *msg = _("(no error)");
