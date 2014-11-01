@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}11
+Release:	%mkrel %{?snapver:0.%{snapver}.}12
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -233,6 +233,10 @@ Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 Patch3502: rpm-4.10.0-minidebuginfo.patch
 # (tmb) dont wait for transaction lock in scripts (UPSTREAM)
 Patch3503: rpm-4.12.0-tslock-nowait.patch
+# Skip ghosts in payload (#1156497)
+Patch3511: rpm-4.12.0-payload-ghost.patch
+# Unbreak size tag generation on big-endian systems
+Patch3512: rpm-4.12.0-archive-endian.patch
 
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
