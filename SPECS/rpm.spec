@@ -272,6 +272,7 @@ BuildRequires:	liblzma-devel >= 5
 BuildRequires:	automake
 BuildRequires:	elfutils-devel
 BuildRequires:	libbeecrypt-devel
+BuildRequires:	binutils-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
