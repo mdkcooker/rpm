@@ -672,6 +672,7 @@ fi
 
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
 %rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
+%rpmattr        %{_prefix}/lib/rpm/sepdebugcrcfix
 
 
 %{_mandir}/man8/rpmbuild.8*
