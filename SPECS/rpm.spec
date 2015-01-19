@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}14
+Release:	%mkrel %{?snapver:0.%{snapver}.}15
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -262,6 +262,8 @@ Patch4009: rpm-4.11.2-double-separator-warning.patch
 # (tv) make old suggests be equivalent to recommends:
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 Patch4012: rpm-mga-suggests.diff
+# from git:
+Patch4020: pydoc.diff
 
 # from RedHat
 Patch5000: rpm-4.12-CVE-2013-6435.patch
