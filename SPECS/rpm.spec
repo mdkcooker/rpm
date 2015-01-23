@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}15
+Release:	%mkrel %{?snapver:0.%{snapver}.}16
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -269,6 +269,9 @@ Patch4020: pydoc.diff
 Patch5000: rpm-4.12-CVE-2013-6435.patch
 Patch5001: rpm-4.12-CVE-2014-8118.patch
 
+# from Debian
+Patch6001: do-not-link-libpython.patch
+
 License:	GPLv2+
 BuildRequires:	autoconf
 BuildRequires:	zlib-devel
@@ -297,8 +300,8 @@ BuildRequires:  pkgconfig(libarchive)
 #BuildRequires:	graphviz
 BuildRequires:	tetex
 %if %buildpython
-BuildRequires:	python-devel
-BuildRequires:	python3-devel
+BuildRequires:  python-devel
+BuildRequires:  python3-devel
 %endif
 # for testsuite:
 BuildRequires: eatmydata
@@ -443,6 +446,7 @@ programs that will manipulate RPM packages and databases.
 %apply_patches
 
 %build
+%define _disable_ld_no_undefined 1
 aclocal
 automake-1.14 --add-missing
 automake
@@ -462,6 +466,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %endif
         --with-external-db \
 %if %buildpython
+        --enable-shared \
         --enable-python \
 %else
         --without-python \
@@ -475,17 +480,17 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --with-cap
 
 %make
-
-
+%if %buildpython
 pushd python
 %{__python} setup.py build
 %{__python3} setup.py build
 popd
+%endif
 
 %install
 %makeinstall_std
 
-
+%if %buildpython
 # We need to build with --enable-python for the self-test suite, but we
 # actually package the bindings built with setup.py (#531543#c26)
 rm -rf $RPM_BUILD_ROOT/%{python_sitearch}
@@ -493,7 +498,7 @@ pushd python
 %{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
 popd
-
+%endif
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
@@ -714,7 +719,7 @@ fi
 
 %if %buildpython
 %files -n python-rpm
-%{_libdir}/python*/site-packages/rpm
+%{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}-py2.7.egg-info
 
 %files -n python3-rpm

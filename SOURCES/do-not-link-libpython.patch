@@ -1,0 +1,39 @@
+From: Michal Čihař <nijel@debian.org>
+Subject: Avoid linking with libpython
+    This only introduces (useless) dependency on all supported python
+    versions, while the linking itself is not needed.
+--- a/python/Makefile.am
++++ b/python/Makefile.am
+@@ -12,8 +12,8 @@
+ _rpm_la_LDFLAGS = -module -avoid-version -shared
+ _rpm_la_LIBADD = \
+ 	$(top_builddir)/lib/librpm.la \
+-	$(top_builddir)/rpmio/librpmio.la \
+-	@WITH_PYTHON_LIB@
++	$(top_builddir)/rpmio/librpmio.la 
++
+ 
+ _rpm_la_SOURCES = rpmmodule.c rpmsystem-py.h \
+ 	header-py.c header-py.h \
+@@ -34,8 +34,8 @@
+ _rpmb_la_LIBADD = \
+ 	$(top_builddir)/build/librpmbuild.la \
+ 	$(top_builddir)/lib/librpm.la \
+-	$(top_builddir)/rpmio/librpmio.la \
+-	@WITH_PYTHON_LIB@
++	$(top_builddir)/rpmio/librpmio.la 
++
+ 
+ _rpmb_la_SOURCES = rpmbmodule.c rpmsystem-py.h \
+ 	spec-py.c spec-py.h
+@@ -44,8 +44,8 @@
+ _rpms_la_LIBADD = \
+         $(top_builddir)/sign/librpmsign.la \
+         $(top_builddir)/lib/librpm.la \
+-        $(top_builddir)/rpmio/librpmio.la \
+-        @WITH_PYTHON_LIB@
++        $(top_builddir)/rpmio/librpmio.la 
++
+ 
+ _rpms_la_SOURCES = rpmsmodule.c rpmsystem-py.h
+ 
