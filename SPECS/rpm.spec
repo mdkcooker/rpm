@@ -298,6 +298,7 @@ BuildRequires:  pkgconfig(libarchive)
 BuildRequires:	tetex
 %if %buildpython
 BuildRequires:	python-devel
+BuildRequires:	python3-devel
 %endif
 # for testsuite:
 BuildRequires: eatmydata
@@ -411,7 +412,7 @@ This package contains support for digitally signing RPM packages.
 
 %if %buildpython
 %package -n python-rpm
-Summary:	Python bindings for apps which will manipulate RPM packages
+Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
 
@@ -420,7 +421,20 @@ The rpm-python package contains a module which permits applications
 written in the Python programming language to use the interface
 supplied by RPM (RPM Package Manager) libraries.
 
-This package should be installed if you want to develop Python
+This package should be installed if you want to develop Python 2
+programs that will manipulate RPM packages and databases.
+
+%package -n python3-rpm
+Summary:	Python 3 bindings for apps which will manipulate RPM packages
+Group:		Development/Python
+Requires:	rpm = %epoch:%{version}-%{release}
+
+%description -n python3-rpm
+The rpm-python package contains a module which permits applications
+written in the Python programming language to use the interface
+supplied by RPM (RPM Package Manager) libraries.
+
+This package should be installed if you want to develop Python 3
 programs that will manipulate RPM packages and databases.
 %endif
 
@@ -441,7 +455,6 @@ export CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
 CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     %configure2_5x \
         --enable-nls \
-        --enable-python \
         --enable-sqlite3 \
         --without-javaglue \
 %if %builddebug
@@ -449,7 +462,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %endif
         --with-external-db \
 %if %buildpython
-        --with-python=%{pyver} \
+        --enable-python \
 %else
         --without-python \
 %endif
@@ -463,8 +476,24 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 
 %make
 
+
+pushd python
+%{__python} setup.py build
+%{__python3} setup.py build
+popd
+
 %install
 %makeinstall_std
+
+
+# We need to build with --enable-python for the self-test suite, but we
+# actually package the bindings built with setup.py (#531543#c26)
+rm -rf $RPM_BUILD_ROOT/%{python_sitearch}
+pushd python
+%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT
+%{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
+popd
+
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
@@ -686,6 +715,12 @@ fi
 %if %buildpython
 %files -n python-rpm
 %{_libdir}/python*/site-packages/rpm
+%{python_sitearch}/rpm_python-%{version}-py2.7.egg-info
+
+%files -n python3-rpm
+%defattr(-,root,root)
+%{python3_sitearch}/rpm
+%{python3_sitearch}/rpm_python-%{version}-py%{python3_version}.egg-info
 %endif
 
 %files -n %librpmname
