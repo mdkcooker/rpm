@@ -466,7 +466,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %endif
         --with-external-db \
 %if %buildpython
-        --enable-shared \
         --enable-python \
 %else
         --without-python \
