@@ -55,7 +55,7 @@
 #define snapver		rc1
 %define rpmversion	4.12.0.1
 %define srcver          %{rpmversion}%{?snapver:-%{snapver}}
-%define libver		4.10
+%define libver		4.12
 %define libmajor	3
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
