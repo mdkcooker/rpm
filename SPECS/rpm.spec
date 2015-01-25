@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}16
+Release:	%mkrel %{?snapver:0.%{snapver}.}17
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -271,6 +271,9 @@ Patch5001: rpm-4.12-CVE-2014-8118.patch
 
 # from Debian
 Patch6001: do-not-link-libpython.patch
+
+# ovitters: make parseSpec work under Python3
+Patch7001: rpm-4.11.2-py3-fix-import.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
