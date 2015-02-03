@@ -32,24 +32,6 @@ index 8fbc751..589007c 100644
  	  }
  	  const char *argv[2];
  	  argv[0] = cmd;
-@@ -282,13 +289,15 @@ void rpmRunFileTriggers(const char *rootDir)
- 	  if (matched_any) {
- 		  int i;
- 		  for (i = 0; i < 100; ++i) {
--			  int j;
-+			  int j, bytes;
- 			  if (!matched_priorities[i]) continue;
- 
- 			  for (j = 0; j < nb; j++)
- 			       if (list[j].matched && list[j].priority == i) {
- 				    mayStartFiletrigger(rootDir, &list[j]);
--				    write(list[j].command_pipe, list[j].matched, strlen(list[j].matched));
-+				    bytes = strlen(list[j].matched);
-+				    if (write(list[j].command_pipe, list[j].matched, bytes) != bytes)
-+				        rpmlog(RPMLOG_WARNING, "[filetriggers] could not write matches to script STDIN for trigger %s", list[j].name);
- 			       }
- 			  for (j = 0; j < nb; j++)
- 			       if (list[j].command_pipe) {
 -- 
 1.9.2
 
