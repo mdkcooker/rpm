@@ -79,7 +79,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmversion}
-Release:	%mkrel %{?snapver:0.%{snapver}.}18
+Release:	%mkrel %{?snapver:0.%{snapver}.}19
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -231,8 +231,9 @@ Patch3500: rpm-4.10.90-rpmlib-filesystem-check.patch
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM):
 Patch3502: rpm-4.10.0-minidebuginfo.patch
+# Disabled as it breaks SUID (mga#14691)
 # Fix CRC32 after dwz (#971119)
-Patch3504: rpm-4.11.1-sepdebugcrcfix.patch
+#Patch3504: rpm-4.11.1-sepdebugcrcfix.patch
 # (tmb) dont wait for transaction lock in scripts (UPSTREAM)
 Patch3503: rpm-4.12.0-tslock-nowait.patch
 # Skip ghosts in payload (#1156497)
@@ -283,7 +284,7 @@ BuildRequires:	liblzma-devel >= 5
 BuildRequires:	automake
 BuildRequires:	elfutils-devel
 BuildRequires:	libbeecrypt-devel
-BuildRequires:	binutils-devel
+#BuildRequires:	binutils-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
