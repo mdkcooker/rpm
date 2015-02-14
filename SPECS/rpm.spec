@@ -196,8 +196,6 @@ Patch176: script-no-file-deps.diff
 # (pt) generate ELF provides for libraries, not only for executables
 Patch180: elf_libs_req.diff 
 Patch181: assumeexec.diff 
-# (pt) don't fail when file reports too many notes
-Patch182: rpm-4.12.0.1-ignore-file-warnings.patch
 Patch1007: rpm-4.12.0-xz-support.patch
 
 # Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
@@ -246,6 +244,8 @@ Patch3512: rpm-4.12.0-archive-endian.patch
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
+# (pt) don't fail when file reports too many notes
+Patch4001: rpm-4.12.0.1-ignore-file-warnings.patch
 # (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
 # extraction of debuginfo can fail. This happens if you have a shared build dir
 # which contains lots of subfolders for different packages (i.e. the default

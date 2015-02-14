@@ -8,4 +8,4 @@
 +file -N -f - | sed -n -e 's/^\(.*\):[ 	]*.*ELF.*, not stripped.*/\1/p' |
  xargs --no-run-if-empty stat -c '%h %D_%i %n' |
  while read nlinks inum f; do
- #  [[ -n "$EXCLUDE_REGEXP" ]] && grep -E -q "$EXCLUDE_REGEXP" <<< "$f" && \
+   [[ -n "$EXCLUDE_REGEXP" ]] && grep -E -q "$EXCLUDE_REGEXP" <<< "$f" && \
