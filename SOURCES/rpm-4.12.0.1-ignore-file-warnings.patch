@@ -1,0 +1,11 @@
+--- a/scripts/find-debuginfo.sh	2015-02-14 00:42:18.659952181 +0000
++++ b/scripts/find-debuginfo.sh	2015-02-14 00:42:24.600104238 +0000
+@@ -266,7 +266,7 @@
+ find "$RPM_BUILD_ROOT" ! -path "${debugdir}/*.debug" -type f \
+      		     \( -perm -0100 -or -perm -0010 -or -perm -0001 \) \
+ 		     -print |
+-file -N -f - | sed -n -e 's/^\(.*\):[ 	]*.*ELF.*, not stripped/\1/p' |
++file -N -f - | sed -n -e 's/^\(.*\):[ 	]*.*ELF.*, not stripped.*/\1/p' |
+ xargs --no-run-if-empty stat -c '%h %D_%i %n' |
+ while read nlinks inum f; do
+ #  [[ -n "$EXCLUDE_REGEXP" ]] && grep -E -q "$EXCLUDE_REGEXP" <<< "$f" && \
