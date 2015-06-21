@@ -208,9 +208,6 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
 Patch2006: rpm-4.10.0-setup-rubygems.patch
 
-# (tv) fix tests:
-Patch2100: rpm-4.11.1-fix-testsuite.diff
-
 Patch3000: mips_macros.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
