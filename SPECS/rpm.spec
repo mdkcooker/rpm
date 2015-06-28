@@ -84,6 +84,32 @@ Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
+
+#
+# Fedora patches
+#
+# Patches already upstream:
+# Dont wait for transaction lock inside scriptlets (#1135596)
+Patch100: rpm-4.12.0-tslock-nowait.patch
+# Skip ghosts in payload (#1156497)
+Patch101: rpm-4.12.0-payload-ghost.patch
+# Unbreak size tag generation on big-endian systems
+Patch102: rpm-4.12.0-archive-endian.patch
+# find-debuginfo.sh fails on ELF with more than 256 notes
+# http://www.rpm.org/ticket/887
+Patch103: 0001-Fix-find-debuginfo.sh-for-ELF-with-file-warnings.patch
+# Compressed debuginfo support (#833311)
+Patch305: rpm-4.10.0-dwz-debuginfo.patch
+# Minidebuginfo support (#834073)
+Patch306: rpm-4.10.0-minidebuginfo.patch
+# Disabled as it breaks SUID (mga#14691)
+# Fix CRC32 after dwz (#971119)
+#Patch307: rpm-4.11.1-sepdebugcrcfix.patch
+# Fix race condidition where unchecked data is exposed in the file system
+Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
+# Add check against malicious CPIO file name size
+Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
+
 # Temporary band-aid for rpm2cpio whining on payload size mismatch (rhbz#1142949)
 Patch5: rpm-4.12.0-rpm2cpio-hack.patch
 # Add some undocumented feature to gendiff
@@ -217,30 +243,10 @@ Patch3004: rpm_add_armv5tl.patch
 # and not full path
 Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
 
-#
-# Fedora patches
-# Patches 41xx are already in upstream and are 1xx in FC
-#
-# (tv) Compressed debuginfo support (UPSTREAM):
-Patch3501: rpm-4.10.0-dwz-debuginfo.patch
-# (tv) Mini debuginfo support (UPSTREAM):
-Patch3502: rpm-4.10.0-minidebuginfo.patch
-# Disabled as it breaks SUID (mga#14691)
-# Fix CRC32 after dwz (#971119)
-#Patch3504: rpm-4.11.1-sepdebugcrcfix.patch
-# (tmb) dont wait for transaction lock in scripts (UPSTREAM)
-Patch3503: rpm-4.12.0-tslock-nowait.patch
-# Skip ghosts in payload (#1156497)
-Patch3511: rpm-4.12.0-payload-ghost.patch
-# Unbreak size tag generation on big-endian systems
-Patch3512: rpm-4.12.0-archive-endian.patch
-
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (pt) don't fail when file reports too many notes
-Patch4001: rpm-4.12.0.1-ignore-file-warnings.patch
 # (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
 # extraction of debuginfo can fail. This happens if you have a shared build dir
 # which contains lots of subfolders for different packages (i.e. the default
@@ -261,10 +267,6 @@ Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 Patch4012: rpm-mga-suggests.diff
 # from git:
 Patch4020: pydoc.diff
-
-# from RedHat
-Patch5000: rpm-4.12-CVE-2013-6435.patch
-Patch5001: rpm-4.12-CVE-2014-8118.patch
 
 # from Debian
 Patch6001: do-not-link-libpython.patch
