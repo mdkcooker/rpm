@@ -98,6 +98,16 @@ Patch102: rpm-4.12.0-archive-endian.patch
 # find-debuginfo.sh fails on ELF with more than 256 notes
 # http://www.rpm.org/ticket/887
 Patch103: 0001-Fix-find-debuginfo.sh-for-ELF-with-file-warnings.patch
+# Fix --excludedocs option (#1192625)
+Patch104: rpm-4.12.0-exclude-doc.patch
+# Pass _find_debuginfo_opts -g to eu-strip for executables (#1186563)
+Patch105: rpm-4.12.0-eu-strip-g-option.patch
+# Fix golang debuginfo packages
+Patch106: rpm-4.12.0-golang-debuginfo.patch
+Patch107: rpm-4.12.0-whatrecommends.patch
+Patch108: rpm-4.12.0-gpg-passphrase1.patch
+Patch109: rpm-4.12.0-gpg-passphrase2.patch
+# These are not yet upstream
 # Compressed debuginfo support (#833311)
 Patch305: rpm-4.10.0-dwz-debuginfo.patch
 # Minidebuginfo support (#834073)
