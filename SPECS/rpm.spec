@@ -110,8 +110,6 @@ Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 # Add check against malicious CPIO file name size
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
-# Temporary band-aid for rpm2cpio whining on payload size mismatch (rhbz#1142949)
-Patch5: rpm-4.12.0-rpm2cpio-hack.patch
 # Add some undocumented feature to gendiff
 # Send upstream ? drop ?
 Patch17:	rpm-4.4.2.2-gendiff-improved.patch
