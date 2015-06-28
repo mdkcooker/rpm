@@ -221,8 +221,6 @@ Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
 # Fedora patches
 # Patches 41xx are already in upstream and are 1xx in FC
 #
-# (tv) Temporary Patch to provide support for updates (FC):
-Patch3500: rpm-4.10.90-rpmlib-filesystem-check.patch
 # (tv) Compressed debuginfo support (UPSTREAM):
 Patch3501: rpm-4.10.0-dwz-debuginfo.patch
 # (tv) Mini debuginfo support (UPSTREAM):
