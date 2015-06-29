@@ -164,14 +164,6 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 # but this is bad design anyway
 #Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
 
-# (from Turbolinux) remove a wrong check in case %_topdir is /RPM (ie when it is short)
-# Panu said: "To my knowledge this is a true technical limitation of the
-# implementation: as long as debugedit can just overwrite data in the elf
-# sections things keep relatively easy, but if dest_dir is longer than the
-# original directory, debugedit would have to expand the whole elf file. Which
-# might be technically possible but debugedit currently does not even try to."
-Patch135: rpm-4.12.0-fix-debugedit.patch
-
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
