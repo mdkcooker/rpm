@@ -62,14 +62,10 @@
 %define librpmsign      %mklibname rpmsign %{libmajor}
 %define librpmbuild     %mklibname rpmbuild %{libmajor}
 
-%define buildpython 1
 %define rpmsetup_version 1.34
 
-%define builddebug 0
-%{?_with_debug:%define builddebug 1}
-
-%{?_with_python:%define buildpython 1}
-%{?_without_python:%define buildpython 0}
+%bcond_with debug
+%bcond_without python
 
 Summary:	The RPM package management system
 Name:		rpm
@@ -279,7 +275,7 @@ BuildRequires:  pkgconfig(libarchive)
 # Needed for doc
 #BuildRequires:	graphviz
 BuildRequires:	tetex
-%if %buildpython
+%if %with python
 BuildRequires:  python-devel
 BuildRequires:  python3-devel
 %endif
@@ -393,7 +389,7 @@ Group:   System/Base
 %description sign
 This package contains support for digitally signing RPM packages.
 
-%if %buildpython
+%if %with python
 %package -n python-rpm
 Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
@@ -432,7 +428,7 @@ automake-1.14 --add-missing
 automake
 autoreconf
 
-%if %builddebug
+%if %with debug
 RPM_OPT_FLAGS=-g
 %endif
 export CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
@@ -441,22 +437,16 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --enable-nls \
         --enable-sqlite3 \
         --without-javaglue \
-%if %builddebug
-        --enable-debug \
-%endif
+        %{?_with_debug} \
         --with-external-db \
-%if %buildpython
-        --enable-python \
-%else
-        --without-python \
-%endif
+        %{?_with_python} \
         --with-glob \
         --without-selinux \
         --without-apidocs \
         --with-cap
 
 %make
-%if %buildpython
+%if %with python
 pushd python
 %{__python} setup.py build
 %{__python3} setup.py build
@@ -466,7 +456,7 @@ popd
 %install
 %makeinstall_std
 
-%if %buildpython
+%if %with python
 # We need to build with --enable-python for the self-test suite, but we
 # actually package the bindings built with setup.py (#531543#c26)
 rm -rf $RPM_BUILD_ROOT/%{python_sitearch}
@@ -692,7 +682,7 @@ fi
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
 
-%if %buildpython
+%if %with python
 %files -n python-rpm
 %{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}-py2.7.egg-info
