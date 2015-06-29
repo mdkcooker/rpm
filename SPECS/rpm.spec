@@ -121,10 +121,6 @@ Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
 
-# Add some undocumented feature to gendiff
-# Send upstream ? drop ?
-Patch17:	rpm-4.4.2.2-gendiff-improved.patch
-
 # if %post of foo-2 fails,
 # or if %preun of foo-1 fails,
 # or if %postun of foo-1 fails,
