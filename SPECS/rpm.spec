@@ -120,6 +120,9 @@ Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 # Add check against malicious CPIO file name size
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
+#
+# Mageia patches
+#
 
 # if %post of foo-2 fails,
 # or if %preun of foo-1 fails,
