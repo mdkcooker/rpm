@@ -71,10 +71,6 @@
 %{?_with_python:%define buildpython 1}
 %{?_without_python:%define buildpython 0}
 
-# disable plugins initially
-%define buildplugins 1
-%{?_with_plugins:%define buildplugins 1}
-
 Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
@@ -454,9 +450,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %else
         --without-python \
 %endif
-%if ! %buildplugins
-        --disable-plugins \
-%endif
         --with-glob \
         --without-selinux \
         --without-apidocs \
@@ -713,9 +706,7 @@ fi
 %files -n %librpmname
 %{_libdir}/librpm.so.%{libmajor}*
 %{_libdir}/librpmio.so.%{libmajor}*
-%if %buildplugins
 %{_libdir}/rpm-plugins
-%endif
 
 %files -n %librpmbuild
 %{_libdir}/librpmbuild.so.%{libmajor}*
