@@ -139,11 +139,6 @@ Patch22:        rpm-4.12.0-non-pre-scripts-dont-fail.patch
 # (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm plugin in 4.12):
 #Patch31:	rpm-4.9.0-syslog.patch
 
-# - force /usr/lib/rpm/mageia/rpmrc instead of /usr/lib/rpm/<vendor>/rpmrc
-# - read /usr/lib/rpm/mageia/rpmpopt (not only /usr/lib/rpm/rpmpopt)
-# if we deprecated the use of rpm -ba , ...,  we can get rid of this patch
-Patch64:    rpm-4.9.1.1-mageia-rpmrc-rpmpopt.patch
-
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
 # http://qa.mandriva.com/show_bug.cgi?id=15896
