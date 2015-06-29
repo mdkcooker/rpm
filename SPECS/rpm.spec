@@ -120,6 +120,7 @@ Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 # Add check against malicious CPIO file name size
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
+
 # Add some undocumented feature to gendiff
 # Send upstream ? drop ?
 Patch17:	rpm-4.4.2.2-gendiff-improved.patch
@@ -135,9 +136,6 @@ Patch17:	rpm-4.4.2.2-gendiff-improved.patch
 #       scripts is ignored with or without this patch)
 # Needed for urpmi testsuite:
 Patch22:        rpm-4.12.0-non-pre-scripts-dont-fail.patch
-
-# (fredl) add loging facilities through syslog (pushed upstream, might be replaced by a rpm plugin in 4.12):
-#Patch31:	rpm-4.9.0-syslog.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
@@ -228,10 +226,6 @@ Patch180: elf_libs_req.diff
 Patch181: assumeexec.diff 
 Patch1007: rpm-4.12.0-xz-support.patch
 
-# Prevents $DOCDIR from being wiped out when using %%doc <fileinbuilddir>,
-# as this breaks stuff that installs files to $DOCDIR during %%install
-#Patch1008: rpm-4.6.0-rc3-no_rm_-rf_DOCDIR.patch
-
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
@@ -251,17 +245,6 @@ Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (cg) fix debuginfo extraction. Sometimes, depending on local setup, the
-# extraction of debuginfo can fail. This happens if you have a shared build dir
-# which contains lots of subfolders for different packages (i.e. the default
-# you would get if you rpm -i lots of srpms and build a whole bunch of them)
-# This fix simply uses the real build dir passed in as an argument to the script
-# rather than the top level %_builddir definition (aka $RPM_BUILD_DIR).
-# (cg) This messes up the debuginfo packages themselves due to bad paths.
-# I suspect the real problem lies in the debugedit binary which I will debug further.
-# Leaving this here so I don't forget (aka it annoys tv enough to bug me if it's
-# still here after any reasonable length of time!)
-#Patch4007: rpm-4.11.1-fix-debuginfo-extraction.patch
 # (lm) Don't uselessly bytecompile .py in docdir
 Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
 
