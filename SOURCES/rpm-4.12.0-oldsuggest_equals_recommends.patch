@@ -1,3 +1,13 @@
+here RECOMMENDNEVR doesn't map to OLDSUGGESTNAME as there was also a
+RPMSENSE_STRONG flags that was used to turn suggests/enhances into
+recommends/supplements (which we didn't use unlike suse).
+
+Thus for mga case, we don' care about mapping against really OLDRECOMMENDSNAME
+as we were only using suggests tags
+
+Actually this patch is obsoleted by rpm-mga-suggests.diff as using
+RPMTAGRECOMMENDNEVR break suggests in perl-URPM when they're versionnated
+
 diff -up ./lib/tagexts.c.tv ./lib/tagexts.c
 --- ./lib/tagexts.c.tv	2014-08-26 19:36:49.291209949 +0200
 +++ ./lib/tagexts.c	2014-08-26 19:37:56.722206818 +0200

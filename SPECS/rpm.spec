@@ -229,6 +229,7 @@ Patch175: no-rtld_GNU_HASH_req.diff
 Patch176: script-no-file-deps.diff
 # (pt) generate ELF provides for libraries, not only for executables
 Patch180: elf_libs_req.diff 
+# [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
 Patch1007: rpm-4.12.0-xz-support.patch
 
@@ -270,9 +271,13 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
 
 Patch4009: rpm-4.11.2-double-separator-warning.patch
-# (tv) make old suggests be equivalent to recommends:
+
+# 2 patches to drop in mga7:
+# (tv) make old suggests be equivalent to recommends (RECOMMENDNAME -> OLDSUGGEST):
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
+# (tv) uneeeded: maps RECOMMENDNEVR to OLDSUGGEST instead of OLDRECOMMEND
 Patch4012: rpm-mga-suggests.diff
+
 # from git:
 Patch4020: pydoc.diff
 
