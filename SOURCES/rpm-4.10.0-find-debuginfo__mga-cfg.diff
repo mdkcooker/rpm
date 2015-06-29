@@ -1,7 +1,7 @@
 mdv/mga's changes:
 - [2011-07-14] add a EXCLUDE_FROM_FULL_STRIP environment variable so that we
   can exclude files from being completely stripped, but for their debugging symbols
-- [2010-03-09] allow for for only stripping files without creating debug
+- [2010-03-09] allow for only stripping files without creating debug
   package contents by setting DISABLE_DEBUG environment variable
 - [2010-03-23] really check that the debug directory we want to search through
   exists, not only the parent
