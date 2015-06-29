@@ -17,14 +17,16 @@ diff --git a/macros.in b/macros.in
 index dd5207a..39bb583 100644
 --- a/macros.in
 +++ b/macros.in
-@@ -965,6 +965,11 @@ done \
+@@ -965,6 +965,13 @@ done \
  %patches %{lua: for i, p in ipairs(patches) do print(p.." ") end}
  %sources %{lua: for i, s in ipairs(sources) do print(s.." ") end}
  
 +# default patch command:
 +%_patch %__patch
 +
-+%apply_patches %{lua: keys = {}; for i, p in ipairs(patches) do print(rpm.expand("%{_patch} -s -p1 -b --suffix " .. string.format(".%04d", patches_num[p]) .. " --fuzz=%{_default_patch_fuzz} -i " .. p .. "\\n")) end }
++%apply_patches \
++  echo "warning: %%apply_patches is deprecated, try %%autopatch -p[01] instead" 1>&2\
++  %{lua: keys = {}; for i, p in ipairs(patches) do print(rpm.expand("%{_patch} -s -p1 -b --suffix " .. string.format(".%04d", patches_num[p]) .. " --fuzz=%{_default_patch_fuzz} -i " .. p .. "\\n")) end }
 +
  #------------------------------------------------------------------------------
  # Useful perl macros (from Artur Frysiak <wiget@t17.ds.pwr.wroc.pl>)
