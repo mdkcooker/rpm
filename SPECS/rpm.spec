@@ -99,6 +99,7 @@ Patch106: rpm-4.12.0-golang-debuginfo.patch
 Patch107: rpm-4.12.0-whatrecommends.patch
 Patch108: rpm-4.12.0-gpg-passphrase1.patch
 Patch109: rpm-4.12.0-gpg-passphrase2.patch
+Patch110: rpm-4.12.0-Fix-Python3-import.patch
 # These are not yet upstream
 # Compressed debuginfo support (#833311)
 Patch305: rpm-4.10.0-dwz-debuginfo.patch
@@ -244,9 +245,6 @@ Patch4020: pydoc.diff
 
 # from Debian
 Patch6001: do-not-link-libpython.patch
-
-# ovitters: make parseSpec work under Python3
-Patch7001: rpm-4.11.2-py3-fix-import.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
