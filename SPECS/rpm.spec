@@ -53,8 +53,8 @@
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
 #define snapver		rc1
-%define rpmversion	4.12.0.1
-%define srcver          %{rpmversion}%{?snapver:-%{snapver}}
+%define rpmver	4.12.0.1
+%define srcver          %{rpmver}%{?snapver:-%{snapver}}
 %define libver		4.12
 %define libmajor	3
 %define librpmname      %mklibname rpm  %{libmajor}
@@ -70,7 +70,7 @@
 Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
-Version:        %{rpmversion}
+Version:        %{rpmver}
 Release:	%mkrel %{?snapver:0.%{snapver}.}22
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
