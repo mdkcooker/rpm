@@ -52,8 +52,8 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-#define snapver		rc1
 %define rpmver	4.12.0.1
+#define snapver		rc1
 %define srcver          %{rpmver}%{?snapver:-%{snapver}}
 %define libver		4.12
 %define libmajor	3
