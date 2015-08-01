@@ -1,0 +1,20 @@
+diff -Naur rpm-4.11.1.orig/scripts/brp-python-bytecompile rpm-4.11.1/scripts/brp-python-bytecompile
+--- rpm-4.11.1.orig/scripts/brp-python-bytecompile	2013-06-10 17:55:10.000000000 +0200
++++ rpm-4.11.1/scripts/brp-python-bytecompile	2013-10-17 19:56:11.226664180 +0200
+@@ -89,14 +89,14 @@
+ # implementation:
+ 
+ # Generate normal (.pyc) byte-compiled files.
+-python_bytecompile "" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]" "$RPM_BUILD_ROOT" "$depth" "/"
++python_bytecompile "" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]|/usr/share/doc" "$RPM_BUILD_ROOT" "$depth" "/"
+ if [ $? -ne 0 -a 0$errors_terminate -ne 0 ]; then
+ 	# One or more of the files had a syntax error
+ 	exit 1
+ fi
+ 
+ # Generate optimized (.pyo) byte-compiled files.
+-python_bytecompile "-O" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]" "$RPM_BUILD_ROOT" "$depth" "/"
++python_bytecompile "-O" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]|/usr/share/doc" "$RPM_BUILD_ROOT" "$depth" "/"
+ if [ $? -ne 0 -a 0$errors_terminate -ne 0 ]; then
+ 	# One or more of the files had a syntax error
+ 	exit 1

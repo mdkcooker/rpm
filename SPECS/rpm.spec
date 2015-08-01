@@ -47,11 +47,11 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmver	4.12.0.1
+%define rpmver 4.12.90
 #define snapver		rc1
 %define srcver          %{rpmver}%{?snapver:-%{snapver}}
 %define libver		4.12
-%define libmajor	3
+%define libmajor	7
 %define librpmname      %mklibname rpm  %{libmajor}
 %define librpmnamedevel %mklibname -d rpm
 %define librpmsign      %mklibname rpmsign %{libmajor}
@@ -66,7 +66,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}23
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -76,25 +76,9 @@ Source1:	macros.filter
 # Fedora patches
 #
 # Patches already upstream:
-# Dont wait for transaction lock inside scriptlets (#1135596)
-Patch100: rpm-4.12.0-tslock-nowait.patch
-# Skip ghosts in payload (#1156497)
-Patch101: rpm-4.12.0-payload-ghost.patch
-# Unbreak size tag generation on big-endian systems
-Patch102: rpm-4.12.0-archive-endian.patch
-# find-debuginfo.sh fails on ELF with more than 256 notes
-# http://www.rpm.org/ticket/887
-Patch103: 0001-Fix-find-debuginfo.sh-for-ELF-with-file-warnings.patch
-# Fix --excludedocs option (#1192625)
-Patch104: rpm-4.12.0-exclude-doc.patch
-# Pass _find_debuginfo_opts -g to eu-strip for executables (#1186563)
-Patch105: rpm-4.12.0-eu-strip-g-option.patch
-# Fix golang debuginfo packages
-Patch106: rpm-4.12.0-golang-debuginfo.patch
-Patch107: rpm-4.12.0-whatrecommends.patch
-Patch108: rpm-4.12.0-gpg-passphrase1.patch
-Patch109: rpm-4.12.0-gpg-passphrase2.patch
-Patch110: rpm-4.12.0-Fix-Python3-import.patch
+Patch100: rpm-4.12.90-braces-expansion.patch
+Patch101: rpm-4.12.90-Fix-compressed-patches.patch
+
 # These are not yet upstream
 # Compressed debuginfo support (#833311)
 Patch305: rpm-4.10.0-dwz-debuginfo.patch
@@ -122,12 +106,12 @@ Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 # (nb: the exit code for pretrans/posttrans & trigger/triggerun/triggerpostun
 #       scripts is ignored with or without this patch)
 # Needed for urpmi testsuite:
-Patch22:        rpm-4.12.0-non-pre-scripts-dont-fail.patch
+Patch22:        rpm-4.12.90-non-pre-scripts-dont-fail.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
 # http://qa.mandriva.com/show_bug.cgi?id=15896
-Patch70:	rpm-4.9.1-bb-shortcircuit.patch
+Patch70:	rpm-4.12.90-bb-shortcircuit.patch
 
 # don't conflict for doc files
 # (to be able to install lib*-devel together with lib64*-devel even if they have conflicting manpages)
@@ -150,7 +134,7 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # cf http://wiki.mandriva.com/en/Rpm_filetriggers
-Patch146: rpm-4.12.0-filetriggers.patch
+Patch146: rpm-4.12.90-filetriggers.patch
 Patch147: rpm-4.11.1-filetriggers-priority.patch
 Patch148: rpm-4.11.1-filetriggers-warnings.patch
 
@@ -202,7 +186,7 @@ Patch1007: rpm-4.12.0-xz-support.patch
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
-Patch2006: rpm-4.10.0-setup-rubygems.patch
+Patch2006: rpm-4.12.90-setup-rubygems.patch
 
 Patch3000: mips_macros.patch
 Patch3002: mips_define_isa_macros.patch
@@ -218,18 +202,13 @@ Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 # (lm) Don't uselessly bytecompile .py in docdir
-Patch4008: rpm-4.11.1-dont-bytecompile-python-in-docdir.patch
-
-Patch4009: rpm-4.11.2-double-separator-warning.patch
+Patch4008: rpm-4.12.90-dont-bytecompile-python-in-docdir.patch
 
 # 2 patches to drop in mga7:
 # (tv) make old suggests be equivalent to recommends (RECOMMENDNAME -> OLDSUGGEST):
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 # (tv) uneeeded: maps RECOMMENDNEVR to OLDSUGGEST instead of OLDRECOMMEND
 Patch4012: rpm-mga-suggests.diff
-
-# from git:
-Patch4020: pydoc.diff
 
 # from Debian
 Patch6001: do-not-link-libpython.patch
@@ -548,7 +527,6 @@ fi
 %attr(0644, rpm, rpm) %{rpmdir}/rpmrc
 %attr(0755, rpm, rpm) %{rpmdir}/elfdeps
 %attr(0755, rpm, rpm) %{rpmdir}/script.req
-%exclude %{rpmdir}/tcl.req
 
 %rpmattr	%{rpmdir}/rpm2cpio.sh
 %rpmattr	%{rpmdir}/tgpg
@@ -594,6 +572,7 @@ fi
 %exclude %{rpmdir}/platform/sparc*-linux/macros
 %exclude %{rpmdir}/platform/ia64*-linux/macros
 %exclude %{rpmdir}/platform/m68k*-linux/macros
+%exclude %{rpmdir}/platform/mips*-linux/macros
 %exclude %{rpmdir}/platform/ppc*-linux/macros
 %exclude %{rpmdir}/platform/s390*-linux/macros
 %exclude %{rpmdir}/platform/sh*-linux/macros
@@ -646,7 +625,6 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/find-lang.sh
 %rpmattr	%{_prefix}/lib/rpm/find-provides
 %rpmattr	%{_prefix}/lib/rpm/find-requires
-%rpmattr	%{_prefix}/lib/rpm/perldeps.pl
 %rpmattr	%{_prefix}/lib/rpm/perl.req
 
 %rpmattr	%{_prefix}/lib/rpm/check-buildroot
@@ -661,7 +639,6 @@ fi
 %rpmattr	%{_prefix}/lib/rpm/mono-find-requires
 %rpmattr	%{_prefix}/lib/rpm/ocaml-find-provides.sh
 %rpmattr	%{_prefix}/lib/rpm/ocaml-find-requires.sh
-%rpmattr	%{_prefix}/lib/rpm/osgideps.pl
 %rpmattr	%{_prefix}/lib/rpm/pkgconfigdeps.sh
 
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps

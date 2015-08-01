@@ -1,11 +1,11 @@
 diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
 --- rpm-4.10.0/build/parsePrep.c.2006	2012-05-22 10:53:51.000000000 +0000
 +++ rpm-4.10.0/build/parsePrep.c	2012-06-15 09:17:31.945151263 +0000
-@@ -138,7 +138,10 @@ static char *doUntar(rpmSpec spec, uint3
+@@ -141,7 +141,10 @@
      char *fn = NULL;
      char *buf = NULL;
      char *tar = NULL;
--    const char *taropts = ((rpmIsVerbose() && !quietly) ? "-xvvf" : "-xf");
+-    const char *taropts = ((rpmIsVerbose() && !quietly) ? "-xvvof" : "-xof");
 +    char taropts[8];
 +    char *t;
 +    char *rubygemopts = NULL;
@@ -13,7 +13,7 @@ diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
      struct Source *sp;
      rpmCompressedMagic compressed = COMPRESSED_NOT;
  
-@@ -158,6 +161,25 @@ static char *doUntar(rpmSpec spec, uint3
+@@ -166,6 +169,25 @@
  
      fn = rpmGetPath("%{_sourcedir}/", sp->source, NULL);
  
@@ -26,7 +26,7 @@ diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
 +        t = stpcpy(t, "vv");
 +     if(rubygem)
 +        t = stpcpy(t, "m");
-+     t = stpcpy(t, "f");
++     t = stpcpy(t, "of");
 +
 +     if (rubygem) {
 +	 rasprintf(&rubygemopts,
@@ -39,7 +39,7 @@ diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
      /* XXX On non-build parse's, file cannot be stat'd or read */
      if (!(spec->flags & RPMSPEC_FORCE) && (rpmFileIsCompressed(fn, &compressed) || checkOwners(fn))) {
  	goto exit;
-@@ -204,7 +226,7 @@ static char *doUntar(rpmSpec spec, uint3
+@@ -212,7 +234,7 @@
  		"STATUS=$?\n"
  		"if [ $STATUS -ne 0 ]; then\n"
  		"  exit $STATUS\n"
@@ -48,7 +48,7 @@ diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
  	} else {
  	    rasprintf(&buf, "%s '%s'\n"
  		"STATUS=$?\n"
-@@ -214,7 +236,7 @@ static char *doUntar(rpmSpec spec, uint3
+@@ -222,7 +244,7 @@
  	}
  	free(zipper);
      } else {
@@ -57,7 +57,7 @@ diff -p -up rpm-4.10.0/build/parsePrep.c.2006 rpm-4.10.0/build/parsePrep.c
      }
  
  exit:
-@@ -316,6 +338,20 @@ static int doSetupMacro(rpmSpec spec, co
+@@ -343,6 +365,20 @@
  	free(buf);
      }
  

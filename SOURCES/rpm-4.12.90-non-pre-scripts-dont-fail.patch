@@ -1,6 +1,6 @@
 --- a/lib/psm.c
 +++ b/lib/psm.c	2011-06-26 22:14:37.258432871 +0200
-@@ -754,8 +754,7 @@
+@@ -694,8 +694,7 @@
  	if (rc) break;
  
  	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOST)) {
@@ -10,8 +10,8 @@
  	}
  	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERIN)) {
  	    /* Run triggers in other package(s) this package sets off. */
-@@ -783,29 +782,25 @@
-     while (once--) {
+@@ -746,16 +745,14 @@
+ 
  	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOTRIGGERUN)) {
  	    /* Run triggers in this package other package(s) set off. */
 -	    rc = runImmedTriggers(psm, RPMSENSE_TRIGGERUN);
@@ -28,8 +28,10 @@
 -	    rc = runInstScript(psm, RPMTAG_PREUN);
 +	    runInstScript(psm, RPMTAG_PREUN);
  
- 	rc = rpmpsmRemove(psm);
- 	if (rc) break;
+ 	/* Run file triggers in this package other package(s) set off. */
+ 	rc = runImmedFileTriggers(psm->ts, psm->te, RPMSENSE_TRIGGERUN,
+@@ -775,14 +772,12 @@
+ 			    RPMSCRIPT_FILETRIGGER, 1);
  
  	if (!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOPOSTUN)) {
 -	    rc = runInstScript(psm, RPMTAG_POSTUN);
@@ -44,4 +46,4 @@
 +	    runTriggers(psm, RPMSENSE_TRIGGERPOSTUN);
  	}
  
- 	rc = dbRemove(ts, psm->te);
+ 	/* Run file triggers in other package(s) this package sets off. */

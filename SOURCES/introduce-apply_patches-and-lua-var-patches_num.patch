@@ -2,8 +2,8 @@ diff --git a/build/spec.c b/build/spec.c
 index d0bf9ff..fe0c6d0 100644
 --- a/build/spec.c
 +++ b/build/spec.c
-@@ -208,6 +208,10 @@ rpmSpec newSpec(void)
-     rpmlua lua = NULL; /* global state */
+@@ -243,6 +243,10 @@
+     rpmluaDelVar(lua, "sources");
      rpmluaPushTable(lua, "patches");
      rpmluaPushTable(lua, "sources");
 +    rpmluaPushTable(lua, "patches_num");
@@ -35,15 +35,15 @@ diff --git a/build/parsePreamble.c b/build/parsePreamble.c
 index 9c5dabb..55c35df 100644
 --- a/build/parsePreamble.c
 +++ b/build/parsePreamble.c
-@@ -307,6 +307,7 @@ static int addSource(rpmSpec spec, Packa
+@@ -309,6 +309,7 @@
  	free(buf);
  #ifdef WITH_LUA
- 	if (!spec->recursing) {
+ 	{
 +	  {
  	    rpmlua lua = NULL; /* global state */
  	    const char * what = (flag & RPMBUILD_ISPATCH) ? "patches" : "sources";
  	    rpmluaPushTable(lua, what);
-@@ -316,6 +317,18 @@ static int addSource(rpmSpec spec, Packa
+@@ -318,6 +319,18 @@
  	    rpmluaSetVar(lua, var);
  	    rpmluavFree(var);
  	    rpmluaPop(lua);

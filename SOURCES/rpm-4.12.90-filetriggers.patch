@@ -366,7 +366,7 @@ diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/filetrigge
 diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/Makefile.am rpm-4.9.1.2/lib/Makefile.am
 --- rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:51.943585368 +0200
 +++ rpm-4.9.1.2/lib/Makefile.am	2011-12-23 18:44:52.023585938 +0200
-@@ -35,7 +36,7 @@
+@@ -35,7 +35,7 @@
  	rpmlead.c rpmlead.h rpmps.c rpmprob.c rpmrc.c \
  	rpmte.c rpmte_internal.h rpmts.c rpmfs.h rpmfs.c \
  	rpmvercmp.c signature.c signature.h transaction.c \
@@ -374,7 +374,7 @@ diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/Makefile.a
 +	filetriggers.c verify.c rpmlock.c rpmlock.h misc.h relocation.c \
  	rpmscript.h rpmscript.c legacy.c \
  	rpmchroot.c rpmchroot.h \
- 	rpmplugins.c rpmplugins.h rpmplugin.h rpmug.c rpmug.h
+ 	rpmplugins.c rpmplugins.h rpmplugin.h rpmug.c rpmug.h \
 diff -Nurpa -x '*~' -x '*.orig' -x '*.rej' -x '*.swp' rpm-4.9.1.2/lib/misc.h rpm-4.9.1.2/lib/misc.h
 --- rpm-4.9.1.2/lib/misc.h	2011-07-15 11:59:12.000000000 +0300
 +++ rpm-4.9.1.2/lib/misc.h	2011-12-23 18:44:52.023585938 +0200
