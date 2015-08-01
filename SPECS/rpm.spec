@@ -149,13 +149,6 @@ Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 # Upstream 4.11 will have /usr/lib/rpm/macros.d:
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 
-# [pixel] without this patch, "rpm -e" or "rpm -U" will need to stat(2) every dirnames of
-# files from the package (eg COPYING) in the db. This is quite costly when not in cache 
-# (eg on a test here: >300 stats, and so 3 seconds after a "echo 3 > /proc/sys/vm/drop_caches")
-# this breaks urpmi test case test_rpm_i_fail('gd') in superuser--file-conflicts.t,
-# but this is bad design anyway
-#Patch124: rpm-4.6.0-rc1-speedup-by-not-checking-same-files-with-different-paths-through-symlink.patch
-
 # without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
 # with this patch, "#%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
