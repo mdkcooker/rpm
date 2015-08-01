@@ -1,12 +1,7 @@
 %define lib64arches	x86_64 
-%define lib64oses	linux
 
 %ifarch %lib64arches
-%ifos %lib64oses
     %define _lib lib64
-%else
-    %define _lib lib
-%endif
 %else
     %define _lib lib
 %endif
@@ -566,19 +561,19 @@ fi
 %attr(   -, rpm, rpm) %{rpmdir}/platform/pentium*-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/geode-*
 %else
-%exclude %{rpmdir}/platform/i*86-%{_os}/macros
-%exclude %{rpmdir}/platform/athlon-%{_os}/macros
-%exclude %{rpmdir}/platform/pentium*-%{_os}/macros
-%exclude %{rpmdir}/platform/geode-%{_os}/macros
+%exclude %{rpmdir}/platform/i*86-linux/macros
+%exclude %{rpmdir}/platform/athlon-linux/macros
+%exclude %{rpmdir}/platform/pentium*-linux/macros
+%exclude %{rpmdir}/platform/geode-linux/macros
 %endif
 %ifarch x86_64
 %attr(   -, rpm, rpm) %{rpmdir}/platform/amd64-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/x86_64-*
 %attr(   -, rpm, rpm) %{rpmdir}/platform/ia32e-*
 %else
-%exclude %{rpmdir}/platform/amd64-%{_os}/macros
-%exclude %{rpmdir}/platform/ia32e-%{_os}/macros
-%exclude %{rpmdir}/platform/x86_64-%{_os}/macros
+%exclude %{rpmdir}/platform/amd64-linux/macros
+%exclude %{rpmdir}/platform/ia32e-linux/macros
+%exclude %{rpmdir}/platform/x86_64-linux/macros
 %endif
 %ifarch %arm
 %attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
@@ -592,13 +587,13 @@ fi
 %endif
 %attr(   -, rpm, rpm) %{rpmdir}/platform/noarch*
 # new in 4.10.0:
-%exclude %{rpmdir}/platform/alpha*-%{_os}/macros
-%exclude %{rpmdir}/platform/sparc*-%{_os}/macros
-%exclude %{rpmdir}/platform/ia64*-%{_os}/macros
-%exclude %{rpmdir}/platform/m68k*-%{_os}/macros
-%exclude %{rpmdir}/platform/ppc*-%{_os}/macros
-%exclude %{rpmdir}/platform/s390*-%{_os}/macros
-%exclude %{rpmdir}/platform/sh*-%{_os}/macros
+%exclude %{rpmdir}/platform/alpha*-linux/macros
+%exclude %{rpmdir}/platform/sparc*-linux/macros
+%exclude %{rpmdir}/platform/ia64*-linux/macros
+%exclude %{rpmdir}/platform/m68k*-linux/macros
+%exclude %{rpmdir}/platform/ppc*-linux/macros
+%exclude %{rpmdir}/platform/s390*-linux/macros
+%exclude %{rpmdir}/platform/sh*-linux/macros
 
 
 
