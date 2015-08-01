@@ -15,10 +15,6 @@
 %define _localstatedir /var
 %define _infodir %_datadir/info
 
-%if %{?apply_patches:0}%{?!apply_patches:1}
-%define apply_patches %(for p in `grep '^Patch.*:' "%{_specdir}/rpm.spec" | cut -d':' -f2-`; do echo "patch -p1 -F0 -i %{_sourcedir}/$p"; done )
-%endif
-
 # Define directory which holds rpm config files, and some binaries actually
 # NOTE: it remains */lib even on lib64 platforms as only one version
 #       of rpm is supported anyway, per architecture
@@ -386,7 +382,7 @@ programs that will manipulate RPM packages and databases.
 
 %prep
 %setup -q -n %name-%srcver
-%apply_patches
+%autopatch -p1
 
 %build
 %define _disable_ld_no_undefined 1
