@@ -129,11 +129,6 @@ Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 # Bug still valid => Send upstream for review.
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
-# cf http://wiki.mandriva.com/en/Rpm_filetriggers
-Patch146: rpm-4.12.90-filetriggers.patch
-Patch147: rpm-4.11.1-filetriggers-priority.patch
-Patch148: rpm-4.11.1-filetriggers-warnings.patch
-
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
