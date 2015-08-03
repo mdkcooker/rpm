@@ -133,7 +133,6 @@ Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
 Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
-#Patch158: introduce-_patch-and-allow-easy-override-when-the-p.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
 #
