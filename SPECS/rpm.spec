@@ -183,10 +183,6 @@ Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
-# when using fakechroot, make sure that testsuite pathes are against /
-# and not full path
-Patch3005: rpm-4.12.0-fix-testsuite-pathes.patch
-
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
