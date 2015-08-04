@@ -80,7 +80,7 @@ Patch101: rpm-4.12.90-Fix-compressed-patches.patch
 Patch305: rpm-4.10.0-dwz-debuginfo.patch
 # Minidebuginfo support (#834073)
 Patch306: rpm-4.10.0-minidebuginfo.patch
-# Disabled as it breaks SUID (mga#14691)
+# (tv) Disabled as it breaks SUID (mga#14691):
 # Fix CRC32 after dwz (#971119)
 #Patch307: rpm-4.11.1-sepdebugcrcfix.patch
 # Fix race condidition where unchecked data is exposed in the file system
@@ -132,6 +132,7 @@ Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
+# Introduce (deprecated) %apply_patches:
 Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
@@ -170,14 +171,18 @@ Patch176: script-no-file-deps.diff
 Patch180: elf_libs_req.diff 
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
+
+# XZ changes:
 Patch1007: rpm-4.12.0-xz-support.patch
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
 Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
+# Automatically handle ruby gem extraction in %%setup:
 Patch2006: rpm-4.12.90-setup-rubygems.patch
 
+# Various arch enabling:
 Patch3000: mips_macros.patch
 Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
@@ -196,7 +201,7 @@ Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 # (tv) uneeeded: maps RECOMMENDNEVR to OLDSUGGEST instead of OLDRECOMMEND
 Patch4012: rpm-mga-suggests.diff
 
-# from Debian
+# (Debian): avoid useless) linking (&dependency) on all supported python versions:
 Patch6001: do-not-link-libpython.patch
 
 License:	GPLv2+
