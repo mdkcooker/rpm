@@ -124,15 +124,15 @@ Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
 # Upstream 4.11 will have /usr/lib/rpm/macros.d:
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
 
-# without this patch, "#%define foo bar" is surprisingly equivalent to "%define foo bar"
-# with this patch, "#%define foo bar" is a fatal error
+# without this patch, "#%%define foo bar" is surprisingly equivalent to "%%define foo bar"
+# with this patch, "#%%define foo bar" is a fatal error
 # Bug still valid => Send upstream for review.
 Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 
 # (nb: see the patch for more info about this issue)
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
-# Introduce (deprecated) %apply_patches:
+# Introduce (deprecated) %%apply_patches:
 Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
@@ -142,7 +142,7 @@ Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 # ignore .pm files for perl provides
 Patch160: ignore-non-perl-modules.diff
 # making sure automatic provides & requires for perl package are using the new
-# macro %perl_convert_version:
+# macro %%perl_convert_version:
 Patch162: use_perl_convert_version.diff
 # skip plain, regular comments:
 Patch163: skip-plain-regular-comments.diff
