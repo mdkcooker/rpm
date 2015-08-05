@@ -74,6 +74,9 @@ Source1:	macros.filter
 # Patches already upstream:
 Patch100: rpm-4.12.90-braces-expansion.patch
 Patch101: rpm-4.12.90-Fix-compressed-patches.patch
+Patch102: rpm-4.12.90-fix-macro-warning.patch
+Patch103: rpm-4.12.90-modify-rpmisglob.patch
+Patch104: rpm-4.12.90-try-unglobbed.patch
 
 # These are not yet upstream
 # Compressed debuginfo support (#833311)
