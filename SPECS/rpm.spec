@@ -62,7 +62,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -94,18 +94,6 @@ Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 #
 # Mageia patches
 #
-
-# if %post of foo-2 fails,
-# or if %preun of foo-1 fails,
-# or if %postun of foo-1 fails,
-# => foo-1 is not removed, so we end up with both packages in rpmdb
-# this patch makes rpm ignore the error in those cases
-# failing %pre must still make the rpm install fail (mdv #23677)
-#
-# (nb: the exit code for pretrans/posttrans & trigger/triggerun/triggerpostun
-#       scripts is ignored with or without this patch)
-# Needed for urpmi testsuite:
-Patch22:        rpm-4.12.90-non-pre-scripts-dont-fail.patch
 
 # In original rpm, -bb --short-circuit does not work and run all stage
 # From popular request, we allow to do this
