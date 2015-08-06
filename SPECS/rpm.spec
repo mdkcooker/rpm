@@ -62,7 +62,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}2
+Release:	%mkrel %{?snapver:0.%{snapver}.}3
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -77,6 +77,7 @@ Patch101: rpm-4.12.90-Fix-compressed-patches.patch
 Patch102: rpm-4.12.90-fix-macro-warning.patch
 Patch103: rpm-4.12.90-modify-rpmisglob.patch
 Patch104: rpm-4.12.90-try-unglobbed.patch
+Patch105: rpm-4.12.90-show-filetriggers.patch
 
 # These are not yet upstream
 # Compressed debuginfo support (#833311)
