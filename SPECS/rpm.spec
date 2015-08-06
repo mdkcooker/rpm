@@ -62,7 +62,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}3
+Release:	%mkrel %{?snapver:0.%{snapver}.}4
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -80,6 +80,9 @@ Patch104: rpm-4.12.90-try-unglobbed.patch
 Patch105: rpm-4.12.90-show-filetriggers.patch
 
 # These are not yet upstream
+Patch302: rpm-4.7.1-geode-i686.patch
+# Probably to be upstreamed in slightly different form
+Patch304: rpm-4.9.1.1-ld-flags.patch
 # Compressed debuginfo support (#833311)
 Patch305: rpm-4.10.0-dwz-debuginfo.patch
 # Minidebuginfo support (#834073)
