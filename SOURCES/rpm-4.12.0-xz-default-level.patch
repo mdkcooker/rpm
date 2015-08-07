@@ -20,15 +20,6 @@ index 6473d55..30a797a 100644
      int encoding = 0;
      FILE *fp;
      LZFILE *lzfile;
-@@ -748,7 +748,7 @@ static LZFILE *lzopen_internal(const cha
-     lzfile->strm = init_strm;
-     if (encoding) {
- 	if (xz) {
--	    ret = lzma_easy_encoder(&lzfile->strm, level, LZMA_CHECK_SHA256);
-+	    ret = lzma_easy_encoder(&lzfile->strm, level, LZMA_CHECK_CRC32);
- 	} else {
- 	    lzma_options_lzma options;
- 	    lzma_lzma_preset(&options, level);
 -- 
 1.6.4.4
 

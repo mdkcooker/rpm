@@ -167,8 +167,11 @@ Patch180: elf_libs_req.diff
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
 
-# XZ changes:
-Patch1007: rpm-4.12.0-xz-support.patch
+# really use XZ default level:
+Patch1007: rpm-4.12.0-xz-default-level.patch
+# faster but less secure XZ encoding:
+Patch1008: rpm-4.12.0-xz-faster.patch
+
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
