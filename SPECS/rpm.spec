@@ -108,9 +108,6 @@ Patch83: rpm-4.12.0-no-doc-conflicts.patch
 # (is this working??)
 Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 
-# Fix diff issue when buildroot contains some "//"
-Patch111: rpm-check-file-trim-double-slash-in-buildroot.patch
-
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
 # Upstream 4.11 will have /usr/lib/rpm/macros.d:
 Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
