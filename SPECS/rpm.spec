@@ -148,7 +148,7 @@ Patch172: script-filtering.diff
 # (tv) "resolve" /bin/env foo interpreter to actual path, rather than generating
 # dependencies on coreutils, should trim off ~800 dependencies more
 Patch173: script-env.diff
-# (tv) output pkgconfig requires instead of /usr/bin/pkgconfig.diff with internal generator:
+# (tv) output pkgconfig requires instead of /usr/bin/pkgconfig with internal generator:
 Patch174: pkgconfig.diff
 # (tv) no not emit "rtld(GNU_HASH)" requires as we've support for it since mga1:
 # (saves ~5K packages' dependency in synthesis)
