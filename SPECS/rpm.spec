@@ -32,10 +32,6 @@
 %define mkrel(c:) %{-c: 0.%{-c*}.}%{1}%{?distsuffix:%distsuffix}%{?!distsuffix:.mga}%{?mageia_release:%mageia_release}%{?subrel:.%subrel}
 %endif
 
-%if %{?mips:0}%{?!mips:1}
-%define mips		mips mipsel mips32 mips32el mips64 mips64el
-%endif
-
 %if %{?pyver:0}%{?!pyver:1}
 %define pyver %(python -V 2>&1 | cut -f2 -d" " | cut -f1,2 -d".")
 %endif
@@ -181,8 +177,6 @@ Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 Patch2006: rpm-4.12.90-setup-rubygems.patch
 
 # Various arch enabling:
-Patch3000: mips_macros.patch
-Patch3002: mips_define_isa_macros.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
@@ -556,9 +550,6 @@ fi
 %else
 %exclude %{rpmdir}/platform/arm*/macros
 %exclude %{rpmdir}/platform/aarch64*/macros
-%endif
-%ifarch %mips
-%attr(   -, rpm, rpm) %{rpmdir}/platform/mips*
 %endif
 %attr(   -, rpm, rpm) %{rpmdir}/platform/noarch*
 # new in 4.10.0:
