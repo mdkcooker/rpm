@@ -180,6 +180,9 @@ Patch2006: rpm-4.12.90-setup-rubygems.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
+# (tv) fix python3 (upstreamed):
+Patch3010: 0001-Fix-last-occurence-of-PyString.patch
+
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
