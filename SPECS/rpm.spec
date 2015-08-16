@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}5
+Release:	%mkrel %{?snapver:0.%{snapver}.}6
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -250,11 +250,6 @@ Conflicts: perl-URPM < 4.0-2.mga3
 Conflicts: jpackage-utils < 1:1.7.5-17
 # fix for plugins conflict:
 Conflicts: %{_lib}rpm3 < 1:4.12.0.1-20.3
-# "Fix" for mga5 update:
-Obsoletes: %{_lib}rpm3 <= 1:4.12.0.1-22.mga6
-# Obsolete others too as they need it:
-Obsoletes: %{_lib}rpmbuild3 <= 1:4.12.0.1-22.mga6
-Obsoletes: %{_lib}rpmsign3 <= 1:4.12.0.1-22.mga6
 
 %description
 RPM is a powerful command line driven package management system capable of
