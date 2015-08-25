@@ -1,0 +1,19 @@
+diff -up ./lib/rpmtriggers.c.tv ./lib/rpmtriggers.c
+--- ./lib/rpmtriggers.c.tv	2015-07-23 08:41:00.651210888 -0400
++++ ./lib/rpmtriggers.c	2015-08-25 09:41:58.339200191 -0400
+@@ -124,7 +124,6 @@ void rpmtriggersPrepPostUnTransFileTrigs
+     }
+     rpmdbIndexIteratorFree(ii);
+ 
+-    rpmdbUniqIterator(mi);
+     if (rpmdbGetIteratorCount(mi)) {
+ 	/* Filter triggers and save only trans postun triggers into ts */
+ 	while((trigH = rpmdbNextIterator(mi)) != NULL) {
+@@ -317,7 +316,6 @@ static const char *matchFilesNext(matchF
+ 						RPMDBI_DIRNAMES, mfi->pfx, 0);
+ 
+ 	    rpmdbFilterIterator(mfi->pi, mfi->tranPkgs, 0);
+-	    rpmdbUniqIterator(mfi->pi);
+ 
+ 	} while (fx >= 0);
+ 

@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}6
+Release:	%mkrel %{?snapver:0.%{snapver}.}7
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -164,7 +164,8 @@ Patch181: assumeexec.diff
 Patch1007: rpm-4.12.0-xz-default-level.patch
 # faster but less secure XZ encoding:
 Patch1008: rpm-4.12.0-xz-faster.patch
-
+# allow having "identical" several trans file triggers:
+Patch7002: rpm-multile-ft.diff
 
 # Turbolinux patches
 # Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
