@@ -148,8 +148,10 @@ Patch174: pkgconfig.diff
 # (tv) no not emit "rtld(GNU_HASH)" requires as we've support for it since mga1:
 # (saves ~5K packages' dependency in synthesis)
 Patch175: no-rtld_GNU_HASH_req.diff
-# (tv) replace file deps by requires on packages:
+# (tv) replace file deps by requires on packages (when interp is installed):
 Patch176: script-no-file-deps.diff
+# (tv) replace file deps by requires on packages (common cases for !BRed interp):
+Patch177: script-no-file-deps2.diff
 # (pt) generate ELF provides for libraries, not only for executables
 Patch180: elf_libs_req.diff 
 # [Suse]add --assumeexec option for previous patch:
