@@ -58,22 +58,22 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}7
+Release:	%mkrel %{?snapver:0.%{snapver}.}8
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
 
 #
+# git diff rpm-4.13.0-alpha
+#
+
+Patch0: git.diff
+
+#
 # Fedora patches
 #
 # Patches already upstream:
-Patch100: rpm-4.12.90-braces-expansion.patch
-Patch101: rpm-4.12.90-Fix-compressed-patches.patch
-Patch102: rpm-4.12.90-fix-macro-warning.patch
-Patch103: rpm-4.12.90-modify-rpmisglob.patch
-Patch104: rpm-4.12.90-try-unglobbed.patch
-Patch105: rpm-4.12.90-show-filetriggers.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -127,15 +127,9 @@ Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 #
 # Merge mageia's perl.prov improvements back into upstream:
 #
-# ignore .pm files for perl provides
-Patch160: ignore-non-perl-modules.diff
 # making sure automatic provides & requires for perl package are using the new
 # macro %%perl_convert_version:
 Patch162: use_perl_convert_version.diff
-# skip plain, regular comments:
-Patch163: skip-plain-regular-comments.diff
-# support for _ in perl module version:
-Patch164: support-for-_-in-perl-module-version.diff
 
 #
 # Merge mageia's find-requires.sh improvements back into upstream:
@@ -160,16 +154,8 @@ Patch180: elf_libs_req.diff
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
 
-# really use XZ default level:
-Patch1007: rpm-4.12.0-xz-default-level.patch
 # faster but less secure XZ encoding:
 Patch1008: rpm-4.12.0-xz-faster.patch
-# allow having "identical" several trans file triggers:
-Patch7002: rpm-multile-ft.diff
-
-# Turbolinux patches
-# Crusoe CPUs say that their CPU family is "5" but they have enough features for i686.
-Patch2003: rpm-4.4.2.3-rc1-transmeta-crusoe-is-686.patch
 
 # Automatically handle ruby gem extraction in %%setup:
 Patch2006: rpm-4.12.90-setup-rubygems.patch
@@ -178,15 +164,11 @@ Patch2006: rpm-4.12.90-setup-rubygems.patch
 Patch3003: rpm_arm_mips_isa_macros.patch
 Patch3004: rpm_add_armv5tl.patch
 
-# (tv) fix python3 (upstreamed):
-Patch3010: 0001-Fix-last-occurence-of-PyString.patch
 
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
-# (lm) Don't uselessly bytecompile .py in docdir
-Patch4008: rpm-4.12.90-dont-bytecompile-python-in-docdir.patch
 
 # 2 patches to drop in mga7:
 # (tv) make old suggests be equivalent to recommends (RECOMMENDNAME -> OLDSUGGEST):

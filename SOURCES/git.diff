@@ -1,0 +1,2049 @@
+diff --git a/build/files.c b/build/files.c
+index d16bb17..ea595b9 100644
+--- a/build/files.c
++++ b/build/files.c
+@@ -1584,16 +1584,13 @@ static rpmRC processBinaryFile(Package pkg, FileList fl, const char * fileName)
+ 	    }
+ 	    argvFree(argv);
+ 	} else {
+-	    int lvl = RPMLOG_WARNING;
+ 	    const char *msg = (fl->cur.isDir) ?
+-				_("Directory not found by glob: %s\n") :
+-				_("File not found by glob: %s\n");
+-	    if (!(fl->cur.attrFlags & RPMFILE_EXCLUDE)) {
+-		lvl = RPMLOG_ERR;
+-		rc = RPMRC_FAIL;
+-	    }
+-	    rpmlog(lvl, msg, diskPath);
+-	    goto exit;
++				_("Directory not found by glob: %s. "
++				"Trying without globbing.\n") :
++				_("File not found by glob: %s. "
++				"Trying without globbing.\n");
++	    rpmlog(RPMLOG_DEBUG, msg, diskPath);
++	    rc = addFile(fl, diskPath, NULL);
+ 	}
+     } else {
+ 	rc = addFile(fl, diskPath, NULL);
+diff --git a/build/pack.c b/build/pack.c
+index 864a0f3..83224e8 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -296,92 +296,6 @@ static rpm_loff_t estimateCpioSize(Package pkg)
+     return size;
+ }
+ 
+-static rpmRC generateSignature(char *SHA1, uint8_t *MD5, rpm_loff_t size,
+-				rpm_loff_t payloadSize, FD_t fd)
+-{
+-    Header sig = NULL;
+-    struct rpmtd_s td;
+-    rpmRC rc = RPMRC_OK;
+-    char *reservedSpace;
+-    int spaceSize = 0;
+-
+-    /* Prepare signature */
+-    sig = rpmNewSignature();
+-
+-    rpmtdReset(&td);
+-    td.tag = RPMSIGTAG_SHA1;
+-    td.count = 1;
+-    td.type = RPM_STRING_TYPE;
+-    td.data = SHA1;
+-    headerPut(sig, &td, HEADERPUT_DEFAULT);
+-
+-    rpmtdReset(&td);
+-    td.tag = RPMSIGTAG_MD5;
+-    td.count = 16;
+-    td.type = RPM_BIN_TYPE;
+-    td.data = MD5;
+-    headerPut(sig, &td, HEADERPUT_DEFAULT);
+-
+-    rpmtdReset(&td);
+-    td.count = 1;
+-    if (payloadSize < UINT32_MAX) {
+-	rpm_off_t p = payloadSize;
+-	rpm_off_t s = size;
+-	td.type = RPM_INT32_TYPE;
+-
+-	td.tag = RPMSIGTAG_PAYLOADSIZE;
+-	td.data = &p;
+-	headerPut(sig, &td, HEADERPUT_DEFAULT);
+-
+-	td.tag = RPMSIGTAG_SIZE;
+-	td.data = &s;
+-	headerPut(sig, &td, HEADERPUT_DEFAULT);
+-    } else {
+-	rpm_loff_t p = payloadSize;
+-	rpm_loff_t s = size;
+-	td.type = RPM_INT64_TYPE;
+-
+-	td.tag = RPMSIGTAG_LONGARCHIVESIZE;
+-	td.data = &p;
+-	headerPut(sig, &td, HEADERPUT_DEFAULT);
+-
+-	td.tag = RPMSIGTAG_LONGSIZE;
+-	td.data = &s;
+-	headerPut(sig, &td, HEADERPUT_DEFAULT);
+-    }
+-
+-    spaceSize = rpmExpandNumeric("%{__gpg_reserved_space}");
+-    if(spaceSize > 0) {
+-	reservedSpace = xcalloc(spaceSize, sizeof(char));
+-	rpmtdReset(&td);
+-	td.tag = RPMSIGTAG_RESERVEDSPACE;
+-	td.count = spaceSize;
+-	td.type = RPM_BIN_TYPE;
+-	td.data = reservedSpace;
+-	headerPut(sig, &td, HEADERPUT_DEFAULT);
+-	free(reservedSpace);
+-    }
+-
+-    /* Reallocate the signature into one contiguous region. */
+-    sig = headerReload(sig, RPMTAG_HEADERSIGNATURES);
+-    if (sig == NULL) { /* XXX can't happen */
+-	rpmlog(RPMLOG_ERR, _("Unable to reload signature header.\n"));
+-	rc = RPMRC_FAIL;
+-	goto exit;
+-    }
+-
+-    /* Write the signature section into the package. */
+-    if (rpmWriteSignature(fd, sig)) {
+-	rc = RPMRC_FAIL;
+-	goto exit;
+-    }
+-
+-exit:
+-    rpmFreeSignature(sig);
+-    return rc;
+-}
+-
+-
+ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+ 		      const char *fileName, char **cookie)
+ {
+@@ -520,7 +434,7 @@ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+     sigStart = Ftell(fd);
+ 
+     /* Generate and write a placeholder signature header */
+-    rc = generateSignature(zerosS, zeros, 0, estimatedCpioSize, fd);
++    rc = rpmGenerateSignature(zerosS, zeros, 0, estimatedCpioSize, fd);
+     if (rc != RPMRC_OK) {
+ 	rc = RPMRC_FAIL;
+ 	goto exit;
+@@ -576,7 +490,7 @@ static rpmRC writeRPM(Package pkg, unsigned char ** pkgidp,
+     }
+ 
+     /* Generate the signature. Now with right values */
+-    rc = generateSignature(SHA1, MD5, sigTargetSize, pkg->cpioArchiveSize, fd);
++    rc = rpmGenerateSignature(SHA1, MD5, sigTargetSize, pkg->cpioArchiveSize, fd);
+     if (rc != RPMRC_OK) {
+ 	rc = RPMRC_FAIL;
+ 	goto exit;
+diff --git a/build/parsePrep.c b/build/parsePrep.c
+index 5ba5aee..b94aad2 100644
+--- a/build/parsePrep.c
++++ b/build/parsePrep.c
+@@ -101,7 +101,7 @@ static char *doPatch(rpmSpec spec, uint32_t c, int strip, const char *db,
+ 
+     /* Avoid the extra cost of fork and pipe for uncompressed patches */
+     if (compressed != COMPRESSED_NOT) {
+-	patchcmd = rpmExpand("%{uncompress: ", fn, "} || echo patch_fail | "
++	patchcmd = rpmExpand("{ %{uncompress: ", fn, "} || echo patch_fail ; } | "
+                              "%{__patch} ", args, NULL);
+     } else {
+ 	patchcmd = rpmExpand("%{__patch} ", args, " < ", fn, NULL);
+diff --git a/build/parseSpec.c b/build/parseSpec.c
+index 706579d..edc3d00 100644
+--- a/build/parseSpec.c
++++ b/build/parseSpec.c
+@@ -189,12 +189,25 @@ static int expandMacrosInSpecBuf(rpmSpec spec, int strip)
+ 	goto exit;
+     }
+ 
+-    if (strip & STRIP_COMMENTS &&
+-	isComment && !rstreq(spec->lbuf, lbuf)) {
++    if (strip & STRIP_COMMENTS && isComment) {
++	char *bufA = lbuf;
++	char *bufB = spec->lbuf;
+ 
+-	rpmlog(RPMLOG_WARNING,
+-	    _("Macro expanded in comment on line %d: %s\n"),
+-	    spec->lineNum, lbuf);
++	while (*bufA != '\0' && *bufB != '\0') {
++	    if (*bufA == '%' && *(bufA + 1) == '%')
++		bufA++;
++
++	    if (*bufA != *bufB)
++		break;
++
++	    bufA++;
++	    bufB++;
++	}
++
++	if (*bufA != '\0' || *bufB != '\0')
++	    rpmlog(RPMLOG_WARNING,
++		_("Macro expanded in comment on line %d: %s\n"),
++		spec->lineNum, lbuf);
+     }
+ 
+ exit:
+diff --git a/configure.ac b/configure.ac
+index aa43eea..e1baeb6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -674,6 +674,15 @@ AC_SUBST(WITH_SELINUX_LIB)
+ AC_SUBST(WITH_SEMANAGE_LIB)
+ AM_CONDITIONAL(SELINUX,[test "$with_selinux" = yes])
+ 
++# libimaevm
++with_iamevm=no
++AC_ARG_WITH(imaevm, [AS_HELP_STRING([--with-imaevm],[build with imaevm support])])
++if test "$with_imaevm" = yes ; then
++  AC_DEFINE(WITH_IMAEVM, 1, [Build with imaevm support?])
++  LIBS="$LIBS -limaevm"
++fi
++AM_CONDITIONAL(WITH_IMAEVM,[test "$with_imaevm" = yes])
++
+ # libcap
+ WITH_CAP_LIB=
+ AC_ARG_WITH(cap, [AS_HELP_STRING([--with-cap],[build with capability support])],
+diff --git a/doc/rpmsign.8 b/doc/rpmsign.8
+index 53f2d70..80ffb6a 100644
+--- a/doc/rpmsign.8
++++ b/doc/rpmsign.8
+@@ -2,11 +2,17 @@
+ .SH NAME
+ rpmsign \- RPM Package Signing
+ .SH SYNOPSIS
++.SS "SIGNING PACKAGES:"
++.PP
+ 
+-\fBrpm\fR \fB--addsign|--resign\fR \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
++\fBrpm\fR \fB--addsign|--resign\fR [\fBrpmsign-options\fR] \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
+ 
+ \fBrpm\fR \fB--delsign\fR \fB\fIPACKAGE_FILE\fB\fR\fI ...\fR
+ 
++.SS "rpmsign-options"
++.PP
++[\fb--fskpath \fIKEY\fb\fR] [\fB--signfiles\fR]
++
+ .SH DESCRIPTION
+ .PP
+ Both of the \fB--addsign\fR and \fB--resign\fR
+@@ -20,6 +26,19 @@ there is no difference in behavior currently.
+ .PP
+ Delete all signatures from each package \fIPACKAGE_FILE\fR given.
+ 
++.SS "SIGN OPTIONS"
++.PP
++.TP
++\fB--fskpath \fIKEY\fB\fR
++Used with \fB--signfiles\fR, use file signing key \fIKey\fR.
++.TP
++\fB--signfiles\fR
++Sign package files. The macro \fB%_binary_filedigest_algorithm\fR must
++be set to a supported algorithm before building the package. The
++supported algorithms are SHA1, SHA256, SHA384, and SHA512, which are
++represented as 2, 8, 9, and 10 respectively.  The file signing key (RSA
++private key) must be set before signing the package, it can be configured on the command line with \fB--fskpath\fR or the macro %_file_signing_key.
++
+ .SS "USING GPG TO SIGN PACKAGES"
+ .PP
+ In order to sign packages using GPG, \fBrpm\fR
+@@ -52,7 +71,7 @@ using the executable \fI/usr/bin/gpg\fR you would include
+ in a macro configuration file. Use \fI/etc/rpm/macros\fR
+ for per-system configuration and \fI~/.rpmmacros\fR
+ for per-user configuration. Typically it's sufficient to set just %_gpg_name.
+-
++.PP
+ .SH "SEE ALSO"
+ .nf
+ \fBpopt\fR(3),
+@@ -78,4 +97,5 @@ Marc Ewing <marc@redhat.com>
+ Jeff Johnson <jbj@redhat.com>
+ Erik Troan <ewt@redhat.com>
+ Panu Matilainen <pmatilai@redhat.com>
++Fionnuala Gunter <fin@linux.vnet.ibm.com>
+ .fi
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 53a05d4..6b9df12 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -50,6 +50,10 @@ librpm_la_LIBADD = \
+ 	@WITH_ACL_LIB@ \
+ 	@LIBINTL@
+ 
++if WITH_IMAEVM
++librpm_la_SOURCES += rpmsignfiles.c rpmsignfiles.h
++endif
++
+ if WITH_LUA
+ AM_CPPFLAGS += @LUA_CFLAGS@
+ librpm_la_LIBADD += @LUA_LIBS@
+@@ -66,8 +70,11 @@ if NDB
+ librpm_la_SOURCES += \
+ 	backend/ndb/glue.c \
+ 	backend/ndb/rpmpkg.c \
++	backend/ndb/rpmpkg.h \
+ 	backend/ndb/rpmidx.c \
+-	backend/ndb/rpmxdb.c
++	backend/ndb/rpmidx.h \
++	backend/ndb/rpmxdb.c \
++	backend/ndb/rpmxdb.h
+ endif
+ 
+ tagtbl.C: Makefile.am $(srcdir)/rpmtag.h gentagtbl.sh
+diff --git a/lib/depends.c b/lib/depends.c
+index 7e65f6e..e2429e5 100644
+--- a/lib/depends.c
++++ b/lib/depends.c
+@@ -643,32 +643,28 @@ retry:
+ 	    _free(emsg);
+ 	    goto exit;
+ 	}
+-	if (op == RPMRICHOP_IF)
+-	    rc = !unsatisfiedDepend(ts, dcache, ds2);
+-	if (op != RPMRICHOP_IF || rc)
+-	    rc = unsatisfiedDepend(ts, dcache, ds1);
+-	if (op == RPMRICHOP_THEN) {
++	if (op == RPMRICHOP_IF) {
+ 	    if (rpmdsFlags(ds2) & RPMSENSE_RICH) {
+-		/* check if this is a THEN...ELSE combination */
++		/* check if this is a IF...ELSE combination */
+ 		rpmds ds21 = NULL, ds22 = NULL;
+ 		rpmrichOp op2;
+ 		if (rpmdsParseRichDep(ds2, &ds21, &ds22, &op2, NULL) == RPMRC_OK && op2 == RPMRICHOP_ELSE) {
+-		    rpmdsFree(ds2);
++		    rc = unsatisfiedDepend(ts, dcache, ds21);
+ 		    if (rc) {
+-			ds2 = ds22;
++			rpmdsFree(ds1);
++			ds1 = ds22;
+ 			ds22 = NULL;
+-		    } else {
+-			ds2 = ds21;
+-			ds21 = NULL;
+ 		    }
+-		    rc = 0;
++		    rc = 1;
+ 		}
+ 		rpmdsFree(ds21);
+ 		rpmdsFree(ds22);
+ 	    }
+-	    rc = !rc;		/* A THEN B is the same as (NOT A) OR B */
+-	    op = RPMRICHOP_OR;
++	    if (!rc)
++		rc = !unsatisfiedDepend(ts, dcache, ds2);
+ 	}
++	if (op != RPMRICHOP_IF || rc)
++	    rc = unsatisfiedDepend(ts, dcache, ds1);
+ 	if ((rc && op == RPMRICHOP_OR) || (!rc && op == RPMRICHOP_AND))
+ 	    rc = unsatisfiedDepend(ts, dcache, ds2);
+ 	ds1 = rpmdsFree(ds1);
+diff --git a/lib/order.c b/lib/order.c
+index d3c7dcf..ec18646 100644
+--- a/lib/order.c
++++ b/lib/order.c
+@@ -157,9 +157,18 @@ static inline int addRelation(rpmts ts,
+ 	rpmds ds1, ds2;
+ 	rpmrichOp op;
+ 	if (rpmdsParseRichDep(requires, &ds1, &ds2, &op, NULL) == RPMRC_OK) {
+-	    if (op != RPMRICHOP_THEN)
++	    if (op != RPMRICHOP_ELSE)
+ 		addRelation(ts, al, p, ds1);
+-	    if (op == RPMRICHOP_AND || op == RPMRICHOP_OR || op == RPMRICHOP_THEN || op == RPMRICHOP_ELSE)
++	    if (op == RPMRICHOP_IF) {
++	      rpmds ds21, ds22;
++	      rpmrichOp op2;
++	      if (rpmdsParseRichDep(requires, &ds21, &ds22, &op2, NULL) == RPMRC_OK && op2 == RPMRICHOP_ELSE) {
++		addRelation(ts, al, p, ds22);
++	      }
++	      ds21 = rpmdsFree(ds21);
++	      ds22 = rpmdsFree(ds22);
++	    }
++	    if (op == RPMRICHOP_AND || op == RPMRICHOP_OR)
+ 		addRelation(ts, al, p, ds2);
+ 	    ds1 = rpmdsFree(ds1);
+ 	    ds2 = rpmdsFree(ds2);
+diff --git a/lib/rpmcallback.h b/lib/rpmcallback.h
+index b3b05c6..f0d6ba6 100644
+--- a/lib/rpmcallback.h
++++ b/lib/rpmcallback.h
+@@ -33,7 +33,19 @@ typedef enum rpmCallbackType_e {
+     RPMCALLBACK_INST_STOP	= (1 << 18),
+ } rpmCallbackType;
+ 
+-/**
++/** \ingroup rpmts
++ * Function pointer type for rpmtsSetNotifyCallback() triggered by
++ * rpmtsNotify()
++ *
++ * @param h		related header or NULL
++ * @param what  	kind of notification (See RPMCALLBACK_ constants above)
++ * @param amount	number of bytes/packages already processed or
++ *			tag of the scriptlet involved
++ *			or 0 or some other number
++ * @param total		total number of bytes/packages to be processed or
++ * 			return code of the scriptlet or 0
++ * @param key		result of rpmteKey() of related rpmte or 0
++ * @param data		user data as passed to rpmtsSetNotifyCallback()
+  */
+ typedef void * (*rpmCallbackFunction)
+ 		(const void * h, 
+diff --git a/lib/rpmdb.c b/lib/rpmdb.c
+index e3cd4cf..6499efc 100644
+--- a/lib/rpmdb.c
++++ b/lib/rpmdb.c
+@@ -2177,8 +2177,6 @@ int rpmdbRemove(rpmdb db, unsigned int hdrNum)
+ struct updateRichDepData {
+     ARGV_t argv;
+     int nargv;
+-    int *nargvs;
+-    int level;
+     int neg;
+ };
+ 
+@@ -2186,16 +2184,6 @@ static rpmRC updateRichDepCB(void *cbdata, rpmrichParseType type,
+ 		const char *n, int nl, const char *e, int el, rpmsenseFlags sense,
+ 		rpmrichOp op, char **emsg) {
+     struct updateRichDepData *data = cbdata;
+-    int i;
+-    if (type == RPMRICH_PARSE_ENTER) {
+-	data->level++;
+-	data->nargvs = xrealloc(data->nargvs, data->level * (2 * sizeof(int)));
+-	data->nargvs[2 * data->level - 2] = data->nargv;
+-	data->nargvs[2 * data->level - 1] = data->nargv;
+-    }
+-    if (type == RPMRICH_PARSE_LEAVE) {
+-	data->level--;
+-    }
+     if (type == RPMRICH_PARSE_SIMPLE && nl && !(nl > 7 && !strncmp(n, "rpmlib(", 7))) {
+ 	char *name = xmalloc(nl + 2);
+ 	*name = data->neg ? '!' : ' ';
+@@ -2204,24 +2192,9 @@ static rpmRC updateRichDepCB(void *cbdata, rpmrichParseType type,
+ 	argvAdd(&data->argv, name);
+ 	data->nargv++;
+ 	_free(name);
+-    } else if ((type == RPMRICH_PARSE_OP || RPMRICH_PARSE_LEAVE) && op == RPMRICHOP_IF) {
++    } else if ((type == RPMRICH_PARSE_OP || RPMRICH_PARSE_LEAVE) && (op == RPMRICHOP_IF || op == RPMRICHOP_ELSE)) {
+ 	data->neg ^= 1;
+     }
+-    if (type == RPMRICH_PARSE_OP && op == RPMRICHOP_THEN) {
+-	/* need to invert last pushes... */
+-	for (i = data->nargvs[2 * data->level - 2]; i < data->nargv; i++)
+-	    data->argv[i][0] ^= ' ' ^ '!';
+-	data->nargvs[2 * data->level - 1] = data->nargv;
+-    }
+-    if (type == RPMRICH_PARSE_OP && op == RPMRICHOP_ELSE) {
+-	/* copy and invert THEN block */
+-	for (i = data->nargvs[2 * data->level - 2]; i < data->nargvs[2 * data->level - 1]; i++) {
+-	    char *name = data->argv[i];
+-	    argvAdd(&data->argv, name);
+-	    data->nargv++;
+-	    *name ^= ' ' ^ '!';
+-	}
+-    }
+     return RPMRC_OK;
+ }
+ 
+@@ -2235,8 +2208,6 @@ static rpmRC updateRichDep(dbiIndex dbi, dbiCursor dbc, const char *str,
+     data.argv = argvNew();
+     data.neg = 0;
+     data.nargv = 0;
+-    data.nargvs = xcalloc(2, sizeof(int));
+-    data.level = 0;
+     if (rpmrichParse(&str, NULL, updateRichDepCB, &data) == RPMRC_OK) {
+ 	n = argvCount(data.argv);
+ 	if (n) {
+@@ -2251,7 +2222,6 @@ static rpmRC updateRichDep(dbiIndex dbi, dbiCursor dbc, const char *str,
+ 	    }
+ 	}
+     }
+-    _free(data.nargvs);
+     argvFree(data.argv);
+     return rc;
+ }
+diff --git a/lib/rpmds.c b/lib/rpmds.c
+index 724ab4a..9217862 100644
+--- a/lib/rpmds.c
++++ b/lib/rpmds.c
+@@ -1361,9 +1361,6 @@ static struct RichOpComp {
+     { "||",	RPMRICHOP_OR},
+     { "OR",	RPMRICHOP_OR},
+     { "IF",	RPMRICHOP_IF},
+-    { "?",	RPMRICHOP_THEN},
+-    { "THEN",	RPMRICHOP_THEN},
+-    { ":",	RPMRICHOP_ELSE},
+     { "ELSE",	RPMRICHOP_ELSE},
+     { NULL, 0 },
+ };
+@@ -1396,10 +1393,8 @@ const char *rpmrichOpStr(rpmrichOp op)
+ 	return "|";
+     if (op == RPMRICHOP_IF)
+ 	return "IF";
+-    if (op == RPMRICHOP_THEN)
+-	return "?";
+     if (op == RPMRICHOP_ELSE)
+-	return ":";
++	return "ELSE";
+     return NULL;
+ }
+ 
+@@ -1488,7 +1483,7 @@ rpmRC rpmrichParse(const char **dstrp, char **emsg, rpmrichParseFunction cb, voi
+         pe = p;
+         if (parseRichDepOp(&pe, &op, emsg) != RPMRC_OK)
+             return RPMRC_FAIL;
+-	if (op == RPMRICHOP_ELSE && chainop == RPMRICHOP_THEN)
++	if (op == RPMRICHOP_ELSE && chainop == RPMRICHOP_IF)
+ 	    chainop = 0;
+         if (chainop && op != chainop) {
+             if (emsg)
+diff --git a/lib/rpmds.h b/lib/rpmds.h
+index 2826703..cbaed25 100644
+--- a/lib/rpmds.h
++++ b/lib/rpmds.h
+@@ -469,8 +469,7 @@ typedef enum rpmrichOp_e {
+     RPMRICHOP_AND    = 2,
+     RPMRICHOP_OR     = 3,
+     RPMRICHOP_IF     = 4,
+-    RPMRICHOP_THEN   = 5,
+-    RPMRICHOP_ELSE   = 6
++    RPMRICHOP_ELSE   = 5
+ } rpmrichOp;
+ 
+ typedef enum rpmrichParseType_e {
+diff --git a/lib/rpmfi.c b/lib/rpmfi.c
+index 86666f7..924ff4b 100644
+--- a/lib/rpmfi.c
++++ b/lib/rpmfi.c
+@@ -114,7 +114,9 @@ struct rpmfiles_s {
+     struct fingerPrint_s * fps;	/*!< File fingerprint(s). */
+ 
+     int digestalgo;		/*!< File digest algorithm */
++    int signaturelength;	/*!< File signature length */
+     unsigned char * digests;	/*!< File digests in binary. */
++    unsigned char * signatures; /*!< File signatures in binary. */
+ 
+     struct nlinkHash_s * nlinks;/*!< Files connected by hardlinks */
+     rpm_off_t * replacedSizes;	/*!< (TR_ADDED) */
+@@ -569,6 +571,19 @@ char * rpmfiFDigestHex(rpmfi fi, int *algo)
+     return fdigest;
+ }
+ 
++const unsigned char * rpmfilesFSignature(rpmfiles fi, int ix, size_t *len)
++{
++	const unsigned char *signature = NULL;
++
++	if (fi != NULL && ix >= 0 && ix < rpmfilesFC(fi)) {
++	     if (fi->signatures != NULL)
++		signature = fi->signatures + (fi->signaturelength * ix);
++	     if (len)
++		*len = fi->signaturelength;
++	}
++	return signature;
++}
++
+ const char * rpmfilesFLink(rpmfiles fi, int ix)
+ {
+     const char * flink = NULL;
+@@ -1165,6 +1180,7 @@ rpmfiles rpmfilesFree(rpmfiles fi)
+ 	fi->flinks = _free(fi->flinks);
+ 	fi->flangs = _free(fi->flangs);
+ 	fi->digests = _free(fi->digests);
++	fi->signatures = _free(fi->signatures);
+ 	fi->fcaps = _free(fi->fcaps);
+ 
+ 	fi->cdict = _free(fi->cdict);
+@@ -1379,7 +1395,7 @@ static int rpmfilesPopulate(rpmfiles fi, Header h, rpmfiFlags flags)
+     headerGetFlags scareFlags = (flags & RPMFI_KEEPHEADER) ? 
+ 				HEADERGET_MINMEM : HEADERGET_ALLOC;
+     headerGetFlags defFlags = HEADERGET_ALLOC;
+-    struct rpmtd_s fdigests, digalgo, td;
++    struct rpmtd_s fdigests, fsignatures, digalgo, td;
+     unsigned char * t;
+ 
+     /* XXX TODO: all these should be sanity checked, ugh... */
+@@ -1430,6 +1446,8 @@ static int rpmfilesPopulate(rpmfiles fi, Header h, rpmfiFlags flags)
+ 	}
+     }
+ 
++    fi->signaturelength = headerGetNumber(h, RPMTAG_FILESIGNATURELENGTH);
++
+     fi->digests = NULL;
+     /* grab hex digests from header and store in binary format */
+     if (!(flags & RPMFI_NOFILEDIGESTS) &&
+@@ -1450,6 +1468,25 @@ static int rpmfilesPopulate(rpmfiles fi, Header h, rpmfiFlags flags)
+ 	rpmtdFreeData(&fdigests);
+     }
+ 
++    fi->signatures = NULL;
++    /* grab hex signatures from header and store in binary format */
++    if (! (flags & RPMFI_NOFILESIGNATURES) &&
++	headerGet(h, RPMTAG_FILESIGNATURES, &fsignatures, HEADERGET_MINMEM)) {
++	const char *fsignature;
++	fi->signatures = t = xmalloc(rpmtdCount(&fsignatures) * fi->signaturelength);
++
++	while ((fsignature = rpmtdNextString(&fsignatures))) {
++	    if (*fsignature == '\0') {
++		memset(t, 0, fi->signaturelength);
++		t += fi->signaturelength;
++		continue;
++	    }
++	    for (int j = 0; j < fi->signaturelength; j++, t++, fsignature += 2)
++		*t = (rnibble(fsignature[0]) << 4) | rnibble(fsignature[1]);
++	}
++	rpmtdFreeData(&fsignatures);
++    }
++
+     /* XXX TR_REMOVED doesn;t need fmtimes, frdevs, finodes */
+     if (!(flags & RPMFI_NOFILEMTIMES))
+ 	_hgfi(h, RPMTAG_FILEMTIMES, &td, scareFlags, fi->fmtimes);
+@@ -1728,6 +1765,11 @@ const unsigned char * rpmfiFDigest(rpmfi fi, int *algo, size_t *len)
+     return rpmfilesFDigest(fi->files, fi ? fi->i : -1, algo, len);
+ }
+ 
++const unsigned char * rpmfiFSignature(rpmfi fi, size_t *len)
++{
++    return rpmfilesFSignature(fi->files, fi ? fi->i : -1, len);
++}
++
+ uint32_t rpmfiFDepends(rpmfi fi, const uint32_t ** fddictp)
+ {
+     return rpmfilesFDepends(fi->files,  fi ? fi->i : -1, fddictp);
+diff --git a/lib/rpmfi.h b/lib/rpmfi.h
+index 1752b71..6a00a14 100644
+--- a/lib/rpmfi.h
++++ b/lib/rpmfi.h
+@@ -183,6 +183,14 @@ const unsigned char * rpmfiFDigest(rpmfi fi, int *algo, size_t *diglen);
+ char * rpmfiFDigestHex(rpmfi fi, int *algo);
+ 
+ /** \ingroup rpmfi
++ * Return current file (binary) signature of file info set iterator.
++ * @param fi		file info set iterator
++ * @retval siglen	signature length (pass NULL to ignore)
++ * @return		current file signature, NULL on invalid
++ */
++const unsigned char * rpmfiFSignature(rpmfi fi, size_t *siglen);
++
++/** \ingroup rpmfi
+  * Return current file (binary) md5 digest from file info set iterator.
+  * @deprecated		Use rpmfiFDigest() instead
+  * @param fi		file info set iterator
+diff --git a/lib/rpmfiles.h b/lib/rpmfiles.h
+index 8a9de31..27fe493 100644
+--- a/lib/rpmfiles.h
++++ b/lib/rpmfiles.h
+@@ -116,6 +116,7 @@ enum rpmfiFlags_e {
+     RPMFI_NOFILECOLORS		= (1 << 15),
+     RPMFI_NOFILEVERIFYFLAGS	= (1 << 16),
+     RPMFI_NOFILEFLAGS		= (1 << 17),
++    RPMFI_NOFILESIGNATURES	= (1 << 18),
+ };
+ 
+ typedef rpmFlags rpmfiFlags;
+@@ -428,6 +429,15 @@ rpm_mode_t rpmfilesFMode(rpmfiles fi, int ix);
+ const unsigned char * rpmfilesFDigest(rpmfiles fi, int ix, int *algo, size_t *len);
+ 
+ /** \ingroup rpmfiles
++ * Return file (binary) digest of file info set.
++ * @param fi            file info set
++ * @param ix            file index
++ * @retval siglen       signature length (pass NULL to ignore)
++ * @return              file signature, NULL on invalid
++ */
++const unsigned char * rpmfilesFSignature(rpmfiles fi, int ix, size_t *len);
++
++/** \ingroup rpmfiles
+  * Return file rdev from file info set.
+  * @param fi		file info set
+  * @param ix		file index
+diff --git a/lib/rpmrc.c b/lib/rpmrc.c
+index 5ae651c..302b3ea 100644
+--- a/lib/rpmrc.c
++++ b/lib/rpmrc.c
+@@ -817,6 +817,11 @@ static inline int RPMClass(void)
+ 	
+ 	sigaction(SIGILL, &oldsa, NULL);
+ 
++#define USER686 ((1<<4) | (1<<8) | (1<<15))
++	/* Transmeta Crusoe CPUs say that their CPU family is "5" but they have enough features for i686. */
++	if(cpu == 5 && (cap & USER686) == USER686)
++		return 6;
++
+ 	if (cpu < 6)
+ 		return cpu;
+ 		
+diff --git a/lib/rpmsignfiles.c b/lib/rpmsignfiles.c
+new file mode 100644
+index 0000000..61ea33e
+--- /dev/null
++++ b/lib/rpmsignfiles.c
+@@ -0,0 +1,164 @@
++/**
++ * Copyright (C) 2014 IBM Corporation
++ *
++ * Author: Fionnuala Gunter <fin@linux.vnet.ibm.com>
++ */
++
++#include "system.h"
++#include "imaevm.h"
++
++#include <termios.h>
++
++#include <rpm/rpmlog.h>		/* rpmlog */
++#include <rpm/rpmstring.h>	/* rnibble */
++#include <rpm/rpmpgp.h>		/* rpmDigestLength */
++#include "lib/header.h"		/* HEADERGET_MINMEM */
++#include "lib/rpmtypes.h"	/* rpmRC */
++
++#include "lib/rpmsignfiles.h"
++
++#define MAX_SIGNATURE_LENGTH 1024
++
++static const char *hash_algo_name[] = {
++    [PGPHASHALGO_MD5]          = "md5",
++    [PGPHASHALGO_SHA1]         = "sha1",
++    [PGPHASHALGO_RIPEMD160]    = "rmd160",
++    [PGPHASHALGO_MD2]          = "md2",
++    [PGPHASHALGO_TIGER192]     = "tgr192",
++    [PGPHASHALGO_HAVAL_5_160]  = "haval5160",
++    [PGPHASHALGO_SHA256]       = "sha256",
++    [PGPHASHALGO_SHA384]       = "sha384",
++    [PGPHASHALGO_SHA512]       = "sha512",
++    [PGPHASHALGO_SHA224]       = "sha224",
++};
++
++char *get_fskpass(void)
++{
++    struct termios flags, tmp_flags;
++    char *password, *pwd;
++    int passlen = 64;
++
++    password = malloc(passlen);
++    if (!password) {
++	perror("malloc");
++	return NULL;
++    }
++
++    tcgetattr(fileno(stdin), &flags);
++    tmp_flags = flags;
++    tmp_flags.c_lflag &= ~ECHO;
++    tmp_flags.c_lflag |= ECHONL;
++
++    if (tcsetattr(fileno(stdin), TCSANOW, &tmp_flags) != 0) {
++	perror("tcsetattr");
++	return NULL;
++    }
++
++    printf("PEM password: ");
++    pwd = fgets(password, passlen, stdin);
++    pwd[strlen(pwd) - 1] = '\0';  /* remove newline */
++
++    if (tcsetattr(fileno(stdin), TCSANOW, &flags) != 0) {
++	perror("tcsetattr");
++	return NULL;
++    }
++    return pwd;
++}
++
++static char *signFile(const char *algo, const char *fdigest, int diglen,
++const char *key, char *keypass)
++{
++    char *fsignature;
++    unsigned char digest[diglen];
++    unsigned char signature[MAX_SIGNATURE_LENGTH];
++    int siglen;
++
++#ifndef WITH_IMAEVM
++    rpmlog(RPMLOG_ERR, _("missing libimaevm\n"));
++    return NULL;
++#endif
++
++    /* convert file digest hex to binary */
++    memset(digest, 0, diglen);
++    for (int i = 0; i < diglen; ++i, fdigest += 2)
++	digest[i] = (rnibble(fdigest[0]) << 4) | rnibble(fdigest[1]);
++
++    /* prepare file signature */
++    memset(signature, 0, MAX_SIGNATURE_LENGTH);
++    signature[0] = '\x03';
++
++    /* calculate file signature */
++    siglen = sign_hash(algo, digest, diglen, key, keypass, signature+1);
++    if (siglen < 0) {
++	rpmlog(RPMLOG_ERR, _("sign_hash failed\n"));
++	return NULL;
++    }
++
++    /* convert file signature binary to hex */
++    fsignature = pgpHexStr(signature, siglen+1);
++    return fsignature;
++}
++
++static uint32_t signatureLength(const char *algo, int diglen, const char *key,
++char *keypass)
++{
++    unsigned char digest[diglen];
++    unsigned char signature[MAX_SIGNATURE_LENGTH];
++
++    memset(digest, 0, diglen);
++    memset(signature, 0, MAX_SIGNATURE_LENGTH);
++    signature[0] = '\x03';
++
++    uint32_t siglen = sign_hash(algo, digest, diglen, key, keypass,
++				signature+1);
++    return siglen + 1;
++}
++
++rpmRC rpmSignFiles(Header h, const char *key, char *keypass)
++{
++    struct rpmtd_s digests;
++    int algo;
++    int diglen;
++    uint32_t siglen;
++    const char *algoname;
++    const char *digest;
++    char *signature;
++    rpmRC rc = RPMRC_OK;
++
++    algo = headerGetNumber(h, RPMTAG_FILEDIGESTALGO);
++    if (!algo) {
++	rpmlog(RPMLOG_ERR, _("missing RPMTAG_FILEDIGESTALGO\n"));
++	return RPMRC_FAIL;
++    }
++
++    diglen = rpmDigestLength(algo);
++    algoname = hash_algo_name[algo];
++    if (!algoname) {
++	rpmlog(RPMLOG_ERR, _("hash_algo_name failed\n"));
++	return RPMRC_FAIL;
++    }
++
++	headerDel(h, RPMTAG_FILESIGNATURELENGTH);
++	headerDel(h, RPMTAG_FILESIGNATURES);
++	siglen = signatureLength(algoname, diglen, key, keypass);
++	headerPutUint32(h, RPMTAG_FILESIGNATURELENGTH, &siglen, 1);
++
++	headerGet(h, RPMTAG_FILEDIGESTS, &digests, HEADERGET_MINMEM);
++	while ((digest = rpmtdNextString(&digests))) {
++	signature = signFile(algoname, digest, diglen, key, keypass);
++	if (!signature) {
++	    rpmlog(RPMLOG_ERR, _("signFile failed\n"));
++	    rc = RPMRC_FAIL;
++	    goto exit;
++	}
++	if (!headerPutString(h, RPMTAG_FILESIGNATURES, signature)) {
++	    rpmlog(RPMLOG_ERR, _("headerPutString failed\n"));
++	    rc = RPMRC_FAIL;
++	    goto exit;
++	}
++    }
++
++exit:
++    rpmtdFreeData(&digests);
++    return rc;
++}
+diff --git a/lib/rpmsignfiles.h b/lib/rpmsignfiles.h
+new file mode 100644
+index 0000000..52e2482
+--- /dev/null
++++ b/lib/rpmsignfiles.h
+@@ -0,0 +1,23 @@
++#ifndef H_RPMSIGNFILES
++#define H_RPMSIGNFILES
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * Sign file digests in header and store the signatures in header
++ * @param h		package header
++ * @param key		signing key
++ * @param keypass	signing key password
++ * @return		RPMRC_OK on success
++ */
++rpmRC rpmSignFiles(Header h, const char *key, char *keypass);
++
++char *get_fskpass(void); /* get file signing key password */
++
++#ifdef _cplusplus
++}
++#endif
++
++#endif /* H_RPMSIGNFILES */
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index ac6ee64..dc62de2 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
+@@ -352,6 +352,12 @@ typedef enum rpmTag_e {
+     RPMTAG_REMOVEPATHPOSTFIXES  = 5083, /* s internal */
+     RPMTAG_FILETRIGGERPRIORITIES	= 5084, /* i[] */
+     RPMTAG_TRANSFILETRIGGERPRIORITIES	= 5085, /* i[] */
++    RPMTAG_FILETRIGGERCONDS		= 5086, /* s[] extension */
++    RPMTAG_FILETRIGGERTYPE		= 5087, /* s[] extension */
++    RPMTAG_TRANSFILETRIGGERCONDS	= 5088, /* s[] extension */
++    RPMTAG_TRANSFILETRIGGERTYPE		= 5089, /* s[] extension */
++    RPMTAG_FILESIGNATURES	= 5090, /* s[] */
++    RPMTAG_FILESIGNATURELENGTH  = 5091, /* i */
+ 
+     RPMTAG_FIRSTFREE_TAG	/*!< internal */
+ } rpmTag;
+diff --git a/lib/rpmtriggers.c b/lib/rpmtriggers.c
+index 3d7b962..211e62f 100644
+--- a/lib/rpmtriggers.c
++++ b/lib/rpmtriggers.c
+@@ -124,7 +124,6 @@ void rpmtriggersPrepPostUnTransFileTrigs(rpmts ts, rpmte te)
+     }
+     rpmdbIndexIteratorFree(ii);
+ 
+-    rpmdbUniqIterator(mi);
+     if (rpmdbGetIteratorCount(mi)) {
+ 	/* Filter triggers and save only trans postun triggers into ts */
+ 	while((trigH = rpmdbNextIterator(mi)) != NULL) {
+@@ -317,7 +316,6 @@ static const char *matchFilesNext(matchFilesIter mfi)
+ 						RPMDBI_DIRNAMES, mfi->pfx, 0);
+ 
+ 	    rpmdbFilterIterator(mfi->pi, mfi->tranPkgs, 0);
+-	    rpmdbUniqIterator(mfi->pi);
+ 
+ 	} while (fx >= 0);
+ 
+diff --git a/lib/signature.c b/lib/signature.c
+index 0defc81..9784c7b 100644
+--- a/lib/signature.c
++++ b/lib/signature.c
+@@ -12,6 +12,7 @@
+ #include <rpm/rpmfileutil.h>
+ #include <rpm/rpmlog.h>
+ #include <rpm/rpmkeyring.h>
++#include <rpm/rpmmacro.h>
+ 
+ #include "lib/rpmlead.h"
+ #include "lib/signature.h"
+@@ -296,6 +297,92 @@ Header rpmFreeSignature(Header sigh)
+     return headerFree(sigh);
+ }
+ 
++rpmRC rpmGenerateSignature(char *SHA1, uint8_t *MD5, rpm_loff_t size,
++				rpm_loff_t payloadSize, FD_t fd)
++{
++    Header sig = NULL;
++    struct rpmtd_s td;
++    rpmRC rc = RPMRC_OK;
++    char *reservedSpace;
++    int spaceSize = 0;
++
++    /* Prepare signature */
++    sig = rpmNewSignature();
++
++    rpmtdReset(&td);
++    td.tag = RPMSIGTAG_SHA1;
++    td.count = 1;
++    td.type = RPM_STRING_TYPE;
++    td.data = SHA1;
++    headerPut(sig, &td, HEADERPUT_DEFAULT);
++
++    rpmtdReset(&td);
++    td.tag = RPMSIGTAG_MD5;
++    td.count = 16;
++    td.type = RPM_BIN_TYPE;
++    td.data = MD5;
++    headerPut(sig, &td, HEADERPUT_DEFAULT);
++
++    rpmtdReset(&td);
++    td.count = 1;
++    if (payloadSize < UINT32_MAX) {
++	rpm_off_t p = payloadSize;
++	rpm_off_t s = size;
++	td.type = RPM_INT32_TYPE;
++
++	td.tag = RPMSIGTAG_PAYLOADSIZE;
++	td.data = &p;
++	headerPut(sig, &td, HEADERPUT_DEFAULT);
++
++	td.tag = RPMSIGTAG_SIZE;
++	td.data = &s;
++	headerPut(sig, &td, HEADERPUT_DEFAULT);
++    } else {
++	rpm_loff_t p = payloadSize;
++	rpm_loff_t s = size;
++	td.type = RPM_INT64_TYPE;
++
++	td.tag = RPMSIGTAG_LONGARCHIVESIZE;
++	td.data = &p;
++	headerPut(sig, &td, HEADERPUT_DEFAULT);
++
++	td.tag = RPMSIGTAG_LONGSIZE;
++	td.data = &s;
++	headerPut(sig, &td, HEADERPUT_DEFAULT);
++    }
++
++    spaceSize = rpmExpandNumeric("%{__gpg_reserved_space}");
++    if(spaceSize > 0) {
++	reservedSpace = xcalloc(spaceSize, sizeof(char));
++	rpmtdReset(&td);
++	td.tag = RPMSIGTAG_RESERVEDSPACE;
++	td.count = spaceSize;
++	td.type = RPM_BIN_TYPE;
++	td.data = reservedSpace;
++	headerPut(sig, &td, HEADERPUT_DEFAULT);
++	free(reservedSpace);
++    }
++
++    /* Reallocate the signature into one contiguous region. */
++    sig = headerReload(sig, RPMTAG_HEADERSIGNATURES);
++    if (sig == NULL) { /* XXX can't happen */
++	rpmlog(RPMLOG_ERR, _("Unable to reload signature header.\n"));
++	rc = RPMRC_FAIL;
++	goto exit;
++    }
++
++    /* Write the signature section into the package. */
++    if (rpmWriteSignature(fd, sig)) {
++	rc = RPMRC_FAIL;
++	goto exit;
++    }
++
++exit:
++    rpmFreeSignature(sig);
++    return rc;
++}
++
++
+ static const char * rpmSigString(rpmRC res)
+ {
+     const char * str;
+diff --git a/lib/signature.h b/lib/signature.h
+index b2c61ca..7866e7b 100644
+--- a/lib/signature.h
++++ b/lib/signature.h
+@@ -78,6 +78,17 @@ rpmRC rpmVerifySignature(rpmKeyring keyring, rpmtd sigtd, pgpDigParams sig,
+  */
+ Header rpmFreeSignature(Header h);
+ 
++/** \ingroup signature
++ * Generate signature and write to file
++ * @param SHA1		SHA1 digest
++ * @param MD5		MD5 digest
++ * @param size		size of header
++ * @param payloadSize	size of archive
++ * @param fd		output file
++ */
++rpmRC rpmGenerateSignature(char *SHA1, uint8_t *MD5, rpm_loff_t size,
++				rpm_loff_t payloadSize, FD_t fd);
++
+ RPM_GNUC_INTERNAL
+ rpmRC rpmSigInfoParse(rpmtd td, const char *origin,
+                      struct sigtInfo_s *sigt, pgpDigParams *sigp, char **msg);
+diff --git a/lib/tagexts.c b/lib/tagexts.c
+index fa3fe72..69f3c24 100644
+--- a/lib/tagexts.c
++++ b/lib/tagexts.c
+@@ -191,6 +191,12 @@ exit:
+     return rc;
+ }
+ 
++typedef enum tMode_e {
++    NORMALTRIGGER     = 0,
++    FILETRIGGER       = 1,
++    TRANSFILETRIGGER  = 2,
++} tMode;
++
+ /**
+  * Retrieve trigger info.
+  * @param h		header
+@@ -198,22 +204,49 @@ exit:
+  * @param hgflags	header get flags
+  * @return		1 on success
+  */
+-static int triggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
++static int triggercondsTagFor(tMode mode, Header h, rpmtd td,
++				headerGetFlags hgflags)
+ {
+     uint32_t * indices;
+     int i, j;
+     char ** conds;
+     struct rpmtd_s nametd, indextd, flagtd, versiontd, scripttd;
+     int hgeflags = HEADERGET_MINMEM;
++    rpmTagVal triggername, triggerindex, triggerflags;
++    rpmTagVal triggerversion, triggerscripts;
++
++    switch (mode) {
++	case NORMALTRIGGER:
++	    triggername = RPMTAG_TRIGGERNAME;
++	    triggerindex = RPMTAG_TRIGGERINDEX;
++	    triggerflags = RPMTAG_TRIGGERFLAGS;
++	    triggerversion = RPMTAG_TRIGGERVERSION;
++	    triggerscripts = RPMTAG_TRIGGERSCRIPTS;
++	    break;
++	case FILETRIGGER:
++	    triggername = RPMTAG_FILETRIGGERNAME;
++	    triggerindex = RPMTAG_FILETRIGGERINDEX;
++	    triggerflags = RPMTAG_FILETRIGGERFLAGS;
++	    triggerversion = RPMTAG_FILETRIGGERVERSION;
++	    triggerscripts = RPMTAG_FILETRIGGERSCRIPTS;
++	    break;
++	case TRANSFILETRIGGER:
++	    triggername = RPMTAG_TRANSFILETRIGGERNAME;
++	    triggerindex = RPMTAG_TRANSFILETRIGGERINDEX;
++	    triggerflags = RPMTAG_TRANSFILETRIGGERFLAGS;
++	    triggerversion = RPMTAG_TRANSFILETRIGGERVERSION;
++	    triggerscripts = RPMTAG_TRANSFILETRIGGERSCRIPTS;
++	    break;
++    }
+ 
+-    if (!headerGet(h, RPMTAG_TRIGGERNAME, &nametd, hgeflags)) {
++    if (!headerGet(h, triggername, &nametd, hgeflags)) {
+ 	return 0;
+     }
+ 
+-    headerGet(h, RPMTAG_TRIGGERINDEX, &indextd, hgeflags);
+-    headerGet(h, RPMTAG_TRIGGERFLAGS, &flagtd, hgeflags);
+-    headerGet(h, RPMTAG_TRIGGERVERSION, &versiontd, hgeflags);
+-    headerGet(h, RPMTAG_TRIGGERSCRIPTS, &scripttd, hgeflags);
++    headerGet(h, triggerindex, &indextd, hgeflags);
++    headerGet(h, triggerflags, &flagtd, hgeflags);
++    headerGet(h, triggerversion, &versiontd, hgeflags);
++    headerGet(h, triggerscripts, &scripttd, hgeflags);
+ 
+     td->type = RPM_STRING_ARRAY_TYPE;
+     td->flags = RPMTD_ALLOCED | RPMTD_PTR_ALLOCED;
+@@ -262,6 +295,21 @@ static int triggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
+     return 1;
+ }
+ 
++static int triggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggercondsTagFor(NORMALTRIGGER, h, td, hgflags);
++}
++
++static int filetriggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggercondsTagFor(FILETRIGGER, h, td, hgflags);
++}
++
++static int transfiletriggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggercondsTagFor(TRANSFILETRIGGER, h, td, hgflags);
++}
++
+ /**
+  * Retrieve trigger type info.
+  * @param h		header
+@@ -269,18 +317,38 @@ static int triggercondsTag(Header h, rpmtd td, headerGetFlags hgflags)
+  * @param hgflags	header get flags
+  * @return		1 on success
+  */
+-static int triggertypeTag(Header h, rpmtd td, headerGetFlags hgflags)
++static int triggertypeTagFor(tMode mode, Header h, rpmtd td,
++				headerGetFlags hgflags)
+ {
+     int i;
+     char ** conds;
+     struct rpmtd_s indices, flags, scripts;
++    rpmTagVal triggerindex, triggerflags, triggerscripts;
++
++    switch (mode) {
++	case NORMALTRIGGER:
++	    triggerindex = RPMTAG_TRIGGERINDEX;
++	    triggerflags = RPMTAG_TRIGGERFLAGS;
++	    triggerscripts = RPMTAG_TRIGGERSCRIPTS;
++	    break;
++	case FILETRIGGER:
++	    triggerindex = RPMTAG_FILETRIGGERINDEX;
++	    triggerflags = RPMTAG_FILETRIGGERFLAGS;
++	    triggerscripts = RPMTAG_FILETRIGGERSCRIPTS;
++	    break;
++	case TRANSFILETRIGGER:
++	    triggerindex = RPMTAG_TRANSFILETRIGGERINDEX;
++	    triggerflags = RPMTAG_TRANSFILETRIGGERFLAGS;
++	    triggerscripts = RPMTAG_TRANSFILETRIGGERSCRIPTS;
++	    break;
++    }
+ 
+-    if (!headerGet(h, RPMTAG_TRIGGERINDEX, &indices, HEADERGET_MINMEM)) {
++    if (!headerGet(h, triggerindex, &indices, HEADERGET_MINMEM)) {
+ 	return 0;
+     }
+ 
+-    headerGet(h, RPMTAG_TRIGGERFLAGS, &flags, HEADERGET_MINMEM);
+-    headerGet(h, RPMTAG_TRIGGERSCRIPTS, &scripts, HEADERGET_MINMEM);
++    headerGet(h, triggerflags, &flags, HEADERGET_MINMEM);
++    headerGet(h, triggerscripts, &scripts, HEADERGET_MINMEM);
+ 
+     td->flags = RPMTD_ALLOCED | RPMTD_PTR_ALLOCED;
+     td->count = rpmtdCount(&scripts);
+@@ -316,6 +384,21 @@ static int triggertypeTag(Header h, rpmtd td, headerGetFlags hgflags)
+     return 1;
+ }
+ 
++static int triggertypeTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggertypeTagFor(NORMALTRIGGER, h, td, hgflags);
++}
++
++static int filetriggertypeTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggertypeTagFor(FILETRIGGER, h, td, hgflags);
++}
++
++static int transfiletriggertypeTag(Header h, rpmtd td, headerGetFlags hgflags)
++{
++    return triggertypeTagFor(TRANSFILETRIGGER, h, td, hgflags);
++}
++
+ /**
+  * Retrieve installed file paths.
+  * @param h		header
+@@ -873,7 +956,11 @@ static const struct headerTagFunc_s rpmHeaderTagExtensions[] = {
+     { RPMTAG_FILEPROVIDE,	fileprovideTag },
+     { RPMTAG_FILEREQUIRE,	filerequireTag },
+     { RPMTAG_TRIGGERCONDS,	triggercondsTag },
++    { RPMTAG_FILETRIGGERCONDS,	filetriggercondsTag },
++    { RPMTAG_TRANSFILETRIGGERCONDS,	transfiletriggercondsTag },
+     { RPMTAG_TRIGGERTYPE,	triggertypeTag },
++    { RPMTAG_FILETRIGGERTYPE,	filetriggertypeTag },
++    { RPMTAG_TRANSFILETRIGGERTYPE,	transfiletriggertypeTag },
+     { RPMTAG_LONGFILESIZES,	longfilesizesTag },
+     { RPMTAG_LONGARCHIVESIZE,	longarchivesizeTag },
+     { RPMTAG_LONGSIZE,		longsizeTag },
+diff --git a/macros.in b/macros.in
+index e3cf5fa..5dddede 100644
+--- a/macros.in
++++ b/macros.in
+@@ -1053,6 +1053,7 @@ done \
+ %__transaction_systemd_inhibit	%{__plugindir}/systemd_inhibit.so
+ %__transaction_selinux		%{__plugindir}/selinux.so
+ %__transaction_syslog		%{__plugindir}/syslog.so
++%__transaction_ima		%{__plugindir}/ima.so
+ 
+ #------------------------------------------------------------------------------
+ # Macros for further automated spec %setup and patch application
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 53b2450..5ddc174 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -31,3 +31,7 @@ endif
+ syslog_la_SOURCES = syslog.c
+ syslog_la_LIBADD = $(top_builddir)/lib/librpm.la $(top_builddir)/rpmio/librpmio.la
+ plugins_LTLIBRARIES += syslog.la
++
++ima_la_sources = ima.c
++ima_la_LIBADD = $(top_builddir)/lib/librpm.la $(top_builddir)/rpmio/librpmio.la
++plugins_LTLIBRARIES += ima.la
+diff --git a/plugins/ima.c b/plugins/ima.c
+new file mode 100644
+index 0000000..ccd59a4
+--- /dev/null
++++ b/plugins/ima.c
+@@ -0,0 +1,51 @@
++#include <sys/xattr.h>
++
++#include <rpm/rpmfi.h>
++#include <rpm/rpmte.h>
++#include <rpm/rpmfiles.h>
++#include <rpm/rpmtypes.h>
++#include <rpmio/rpmstring.h>
++
++#include "lib/rpmfs.h"
++#include "lib/rpmplugin.h"
++#include "lib/rpmte_internal.h"
++
++#define XATTR_NAME_IMA "security.ima"
++
++static rpmRC ima_psm_post(rpmPlugin plugin, rpmte te, int res)
++{
++	rpmfi fi = rpmteFI(te);
++	const char *fpath;
++	const unsigned char * fsig = NULL;
++	size_t len;
++	int rc = 0;
++
++	if (fi == NULL) {
++	    rc = RPMERR_BAD_MAGIC;
++	    goto exit;
++	}
++
++	while (!rc) {
++	    rc = rpmfiNext(fi);
++	    if (rc < 0) {
++		if (rc == RPMERR_ITER_END)
++		    rc = 0;
++		break;
++	    }
++
++	    /* Don't install signatures for (mutable) config files */
++	    if (!(rpmfiFFlags(fi) & RPMFILE_CONFIG)) {
++		fpath = rpmfiFN(fi);
++		fsig = rpmfiFSignature(fi, &len);
++		if (fsig) {
++		    lsetxattr(fpath, XATTR_NAME_IMA, fsig, len, 0);
++		}
++	    }
++	}
++exit:
++	return rc;
++}
++
++struct rpmPluginHooks_s ima_hooks = {
++	.psm_post = ima_psm_post,
++};
+diff --git a/python/spec-py.c b/python/spec-py.c
+index 728b63c..f710f5c 100644
+--- a/python/spec-py.c
++++ b/python/spec-py.c
+@@ -51,7 +51,7 @@ static PyObject *pkgGetSection(rpmSpecPkg pkg, int section)
+ {
+     char *sect = rpmSpecPkgGetSection(pkg, section);
+     if (sect != NULL) {
+-        PyObject *ps = PyString_FromString(sect);
++        PyObject *ps = PyBytes_FromString(sect);
+         free(sect);
+         if (ps != NULL)
+             return ps;
+diff --git a/rpmio/rpmglob.c b/rpmio/rpmglob.c
+index 4fc106d..0c6b0a3 100644
+--- a/rpmio/rpmglob.c
++++ b/rpmio/rpmglob.c
+@@ -649,7 +649,7 @@ static int prefix_array(const char *dirname, char **array, size_t n)
+ static int __glob_pattern_p(const char *pattern, int quote)
+ {
+     register const char *p;
+-    int open = 0;
++    int openBrackets = 0;
+ 
+     for (p = pattern; *p != '\0'; ++p)
+ 	switch (*p) {
+@@ -663,11 +663,11 @@ static int __glob_pattern_p(const char *pattern, int quote)
+ 	    break;
+ 
+ 	case '[':
+-	    open = 1;
++	    openBrackets = 1;
+ 	    break;
+ 
+ 	case ']':
+-	    if (open)
++	    if (openBrackets)
+ 		return 1;
+ 	    break;
+ 	}
+@@ -844,6 +844,8 @@ int rpmGlob(const char * patterns, int * argcPtr, ARGV_t * argvPtr)
+     int i, j;
+     int rc;
+ 
++    gflags |= GLOB_BRACE;
++
+     if (home != NULL && strlen(home) > 0) 
+ 	gflags |= GLOB_TILDE;
+ 
+@@ -966,5 +968,32 @@ exit:
+ 
+ int rpmIsGlob(const char * pattern, int quote)
+ {
+-    return __glob_pattern_p(pattern, quote);
++    if(!__glob_pattern_p(pattern, quote)) {
++
++	const char *begin;
++	const char *next;
++	const char *rest;
++
++	begin = strchr(pattern, '{');
++	if (begin == NULL)
++	    return 0;
++	/*
++	 * Find the first sub-pattern and at the same time find the
++	 *  rest after the closing brace.
++	 */
++	next = next_brace_sub(begin + 1);
++	if (next == NULL)
++	    return 0;
++
++	/* Now find the end of the whole brace expression.  */
++	rest = next;
++	while (*rest != '}') {
++	    rest = next_brace_sub(rest + 1);
++	    if (rest == NULL)
++		return 0;
++	}
++	/* Now we can be sure that brace expression is well-foermed. */
++    }
++
++    return 1;
+ }
+diff --git a/rpmio/rpmio.c b/rpmio/rpmio.c
+index 70551e0..625b063 100644
+--- a/rpmio/rpmio.c
++++ b/rpmio/rpmio.c
+@@ -723,7 +723,7 @@ typedef struct lzfile {
+ 
+ static LZFILE *lzopen_internal(const char *mode, int fd, int xz)
+ {
+-    int level = 7;	/* Use XZ's default compression level if unspecified */
++    int level = LZMA_PRESET_DEFAULT;
+     int encoding = 0;
+     FILE *fp;
+     LZFILE *lzfile;
+diff --git a/rpmpopt.in b/rpmpopt.in
+index 48c5c55..fc88da0 100644
+--- a/rpmpopt.in
++++ b/rpmpopt.in
+@@ -115,6 +115,14 @@ rpm	alias --triggerscripts --qf '\
+ rpm	alias --triggers --triggerscripts \
+ 	--POPTdesc=$"list trigger scriptlets from package(s)"
+ 
++rpm	alias --filetriggerscripts --qf '\
++[filetrigger%{FILETRIGGERTYPE} scriptlet (using %{FILETRIGGERSCRIPTPROG}) -- \
++%{FILETRIGGERCONDS}\n%{FILETRIGGERSCRIPTS}\n]\
++[transfiletrigger%{TRANSFILETRIGGERTYPE} scriptlet (using %{TRANSFILETRIGGERSCRIPTPROG}) -- \
++%{TRANSFILETRIGGERCONDS}\n%{TRANSFILETRIGGERSCRIPTS}\n]'
++rpm	alias --filetriggers --filetriggerscripts \
++	--POPTdesc=$"list filetrigger scriptlets from package(s)"
++
+ rpm	alias --last --qf '%|INSTALLTIME?{%{INSTALLTIME}}:{000000000}| %{NVRA} %|INSTALLTIME?{%{INSTALLTIME:date}}:{(not installed)}|\n' \
+ 	--pipe "LC_NUMERIC=C sort -r -n | sed 's,^[0-9]\+ ,,' | awk '{printf(\"%-45s %-s\n\", $1, substr($0,length($1)+2))}' " \
+ 	--POPTdesc=$"list package(s) by install time, most recent first"
+@@ -162,6 +170,7 @@ rpm	alias --httpproxy	--define '_httpproxy !#:+'
+ rpm	exec --addsign		rpmsign --addsign
+ rpm	exec --delsign		rpmsign --delsign
+ rpm	exec --resign		rpmsign --resign
++#rpm	exec --signfiles	rpmsign --signfiles
+ rpm	exec --checksig		rpmkeys --checksig
+ rpm	exec -K			rpmkeys --checksig
+ rpm	exec --import		rpmkeys --import
+diff --git a/rpmsign.c b/rpmsign.c
+index 9b93e39..7f48d98 100644
+--- a/rpmsign.c
++++ b/rpmsign.c
+@@ -6,6 +6,7 @@
+ #include <rpm/rpmcli.h>
+ #include <rpm/rpmsign.h>
+ #include "cliutils.h"
++#include "lib/rpmsignfiles.h"
+ #include "debug.h"
+ 
+ #if !defined(__GLIBC__) && !defined(__APPLE__)
+@@ -20,6 +21,10 @@ enum modes {
+ 
+ static int mode = 0;
+ 
++static int signfiles = 0, fskpass = 0;
++static char * fileSigningKey = NULL;
++static char * fileSigningKeyPassword = NULL;
++
+ static struct poptOption signOptsTable[] = {
+     { "addsign", '\0', (POPT_ARG_VAL|POPT_ARGFLAG_OR), &mode, MODE_ADDSIGN,
+ 	N_("sign package(s)"), NULL },
+@@ -27,6 +32,13 @@ static struct poptOption signOptsTable[] = {
+ 	N_("sign package(s) (identical to --addsign)"), NULL },
+     { "delsign", '\0', (POPT_ARG_VAL|POPT_ARGFLAG_OR), &mode, MODE_DELSIGN,
+ 	N_("delete package signatures"), NULL },
++    { "signfiles", '\0', POPT_ARG_NONE, &signfiles, 0,
++	N_("sign package(s) files"), NULL},
++    { "fskpath", '\0', POPT_ARG_STRING, &fileSigningKey, 0,
++	N_("use file signing key <key>"),
++	N_("<key>") },
++    { "fskpass", '\0', POPT_ARG_NONE, &fskpass, 0,
++	N_("prompt for file signing key password"), NULL},
+     POPT_TABLEEND
+ };
+ 
+@@ -47,16 +59,46 @@ static int doSign(poptContext optCon)
+     int rc = EXIT_FAILURE;
+     char * passPhrase = NULL;
+     char * name = rpmExpand("%{?_gpg_name}", NULL);
++    struct rpmSignArgs sig = {NULL, 0, 0};
+ 
+     if (rstreq(name, "")) {
+ 	fprintf(stderr, _("You must set \"%%_gpg_name\" in your macro file\n"));
+ 	goto exit;
+     }
+ 
++    if (fileSigningKey) {
++	addMacro(NULL, "_file_signing_key", NULL, fileSigningKey, RMIL_GLOBAL);
++    }
++
++    if (signfiles) {
++	const char *key = rpmExpand("%{?_file_signing_key}", NULL);
++	if (rstreq(key, "")) {
++	    fprintf(stderr, _("You must set \"$$_file_signing_key\" in your macro file or on the command line with --fskpath\n"));
++	    goto exit;
++	}
++
++	if (fskpass) {
++#ifndef WITH_IMAEVM
++	    argerror(_("--fskpass may only be specified when signing files"));
++#else
++	    fileSigningKeyPassword = get_fskpass();
++#endif
++	}
++
++	addMacro(NULL, "_file_signing_key_password", NULL,
++	    fileSigningKeyPassword, RMIL_CMDLINE);
++	if (fileSigningKeyPassword) {
++	    memset(fileSigningKeyPassword, 0, strlen(fileSigningKeyPassword));
++	    free(fileSigningKeyPassword);
++	}
++
++	sig.signfiles = 1;
++    }
++
+     const char *arg;
+     rc = 0;
+     while ((arg = poptGetArg(optCon)) != NULL) {
+-	rc += rpmPkgSign(arg, NULL);
++	rc += rpmPkgSign(arg, &sig);
+     }
+ 
+ exit:
+@@ -80,6 +122,10 @@ int main(int argc, char *argv[])
+ 	argerror(_("no arguments given"));
+     }
+ 
++    if (fileSigningKey && !signfiles) {
++	argerror(_("--fskpath may only be specified when signing files"));
++    }
++
+     switch (mode) {
+     case MODE_ADDSIGN:
+     case MODE_RESIGN:
+diff --git a/scripts/brp-compress b/scripts/brp-compress
+index 247779e..71fed55 100755
+--- a/scripts/brp-compress
++++ b/scripts/brp-compress
+@@ -8,8 +8,8 @@ fi
+ cd "$RPM_BUILD_ROOT"
+ 
+ # Compress man pages
+-COMPRESS="gzip -9 -n"
+-COMPRESS_EXT=.gz
++COMPRESS=${COMPRESS:-gzip -9 -n}
++COMPRESS_EXT=${COMPRESS_EXT:-.gz}
+ 
+ for d in ./usr/man/man* ./usr/man/*/man* ./usr/info \
+ 	./usr/share/man/man* ./usr/share/man/*/man* ./usr/share/info \
+diff --git a/scripts/brp-python-bytecompile b/scripts/brp-python-bytecompile
+index a39240b..838f23d 100644
+--- a/scripts/brp-python-bytecompile
++++ b/scripts/brp-python-bytecompile
+@@ -89,14 +89,14 @@ done
+ # implementation:
+ 
+ # Generate normal (.pyc) byte-compiled files.
+-python_bytecompile "" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]" "$RPM_BUILD_ROOT" "$depth" "/"
++python_bytecompile "" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]|/usr/share/doc" "$RPM_BUILD_ROOT" "$depth" "/"
+ if [ $? -ne 0 -a 0$errors_terminate -ne 0 ]; then
+ 	# One or more of the files had a syntax error
+ 	exit 1
+ fi
+ 
+ # Generate optimized (.pyo) byte-compiled files.
+-python_bytecompile "-O" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]" "$RPM_BUILD_ROOT" "$depth" "/"
++python_bytecompile "-O" $default_python "/bin/|/sbin/|/usr/lib(64)?/python[0-9]\.[0-9]|/usr/share/doc" "$RPM_BUILD_ROOT" "$depth" "/"
+ if [ $? -ne 0 -a 0$errors_terminate -ne 0 ]; then
+ 	# One or more of the files had a syntax error
+ 	exit 1
+diff --git a/scripts/find-lang.sh b/scripts/find-lang.sh
+index 315d491..c1177e3 100755
+--- a/scripts/find-lang.sh
++++ b/scripts/find-lang.sh
+@@ -11,6 +11,8 @@
+ #in tact and are included with any redistribution of this file or any
+ #work based on this file.
+ 
++# 2011-11-16 Per Øyvind Karlsen <peroyvind@mandriva.org>
++#   * add support for HTML files (from Mandriva)
+ # 2004-06-20 Arkadiusz Miśkiewicz <arekm@pld-linux.org>
+ #   * merge PLD changes, kde, all-name (mkochano,pascalek@PLD)
+ # 1999-10-19 Artur Frysiak <wiget@pld-linux.org>
+@@ -31,8 +33,10 @@ PACKAGE_NAME.lang unless \$3 is given in which case output is written
+ to \$3.
+ Additional options:
+   --with-gnome		find GNOME help files
++  --with-mate		find MATE help files
+   --with-kde		find KDE help files
+   --with-qt		find Qt translation files
++  --with-html		find HTML files
+   --with-man		find localized man pages
+   --all-name		match all package/domain names
+   --without-mo		do not find locale files
+@@ -55,9 +59,11 @@ fi
+ shift
+ 
+ GNOME=#
++MATE=#
+ KDE=#
+ QT=#
+ MAN=#
++HTML=#
+ MO=
+ MO_NAME=$NAME.lang
+ ALL_NAME=#
+@@ -69,6 +75,10 @@ while test $# -gt 0 ; do
+   		GNOME=
+ 		shift
+ 		;;
++	--with-mate )
++		MATE=
++		shift
++		;;
+ 	--with-kde )
+ 		KDE=
+ 		shift
+@@ -81,6 +91,10 @@ while test $# -gt 0 ; do
+ 		MAN=
+ 		shift
+ 		;;
++	--with-html )
++		HTML=
++		shift
++		;;
+ 	--without-mo )
+ 		MO=#
+ 		shift
+@@ -141,6 +155,34 @@ s:^[^%].*::
+ s:%lang(C) ::
+ /^$/d' >> $MO_NAME
+ 
++find $TOP_DIR -type d|sed '
++s:'"$TOP_DIR"'::
++'"$NO_ALL_NAME$MATE"'s:\(.*/mate/help/'"$NAME"'$\):%dir \1:
++'"$NO_ALL_NAME$MATE"'s:\(.*/mate/help/'"$NAME"'/[a-zA-Z0-9.\_\-]/.\+\)::
++'"$NO_ALL_NAME$MATE"'s:\(.*/mate/help/'"$NAME"'\/\)\([^/_]\+\):%lang(\2) \1\2:
++'"$ALL_NAME$MATE"'s:\(.*/mate/help/[a-zA-Z0-9.\_\-]\+$\):%dir \1:
++'"$ALL_NAME$MATE"'s:\(.*/mate/help/[a-zA-Z0-9.\_\-]\+/[a-zA-Z0-9.\_\-]/.\+\)::
++'"$ALL_NAME$GNOME"'s:\(.*/mate/help/[a-zA-Z0-9.\_\-]\+\/\)\([^/_]\+\):%lang(\2) \1\2:
++s:%lang(.*) .*/mate/help/[a-zA-Z0-9.\_\-]\+/[a-zA-Z0-9.\_\-]\+/.*::
++s:^\([^%].*\)::
++s:%lang(C) ::
++/^$/d' >> $MO_NAME
++
++find "$TOP_DIR" -type d|sed '
++s:'"$TOP_DIR"'::
++'"$NO_ALL_NAME$MATE"'s:\(.*/omf/'"$NAME"'$\):%dir \1:
++'"$ALL_NAME$MATE"'s:\(.*/omf/[a-zA-Z0-9.\_\-]\+$\):%dir \1:
++s:^\([^%].*\)::
++/^$/d' >> $MO_NAME
++
++find "$TOP_DIR" -type f|sed '
++s:'"$TOP_DIR"'::
++'"$NO_ALL_NAME$MATE"'s:\(.*/omf/'"$NAME"'/'"$NAME"'-\([^/.]\+\)\.omf\):%lang(\2) \1:
++'"$ALL_NAME$MATE"'s:\(.*/omf/[a-zA-Z0-9.\_\-]\+/[a-zA-Z0-9.\_\-]\+-\([^/.]\+\)\.omf\):%lang(\2) \1:
++s:^[^%].*::
++s:%lang(C) ::
++/^$/d' >> $MO_NAME
++
+ KDE3_HTML=`kde-config --expandvars --install html 2>/dev/null`
+ if [ x"$KDE3_HTML" != x -a -d "$TOP_DIR$KDE3_HTML" ]; then
+ find "$TOP_DIR$KDE3_HTML" -type d|sed '
+@@ -167,6 +209,16 @@ s:%lang(C) ::
+ /^$/d' >> $MO_NAME
+ fi
+ 
++find "$TOP_DIR" -type d|sed '
++s:'"$TOP_DIR"'::
++'"$NO_ALL_NAME$HTML"'s:\(.*/doc/HTML/\)\([^/_]\+\)\(.*/'"$NAME"'/\)::
++'"$NO_ALL_NAME$HTML"'s:\(.*/doc/HTML/\)\([^/_]\+\)\(.*/'"$NAME"'\)$:%lang(\2) \1\2\3:
++'"$ALL_NAME$HTML"'s:\(.*/doc/HTML/\)\([^/_]\+\)\(.*/[a-zA-Z0-9.\_\-]\+/\)::
++'"$ALL_NAME$HTML"'s:\(.*/doc/HTML/\)\([^/_]\+\)\(.*/[a-zA-Z0-9.\_\-]\+$\):%lang(\2) \1\2\3:
++s:^\([^%].*\)::
++s:%lang(C) ::
++/^$/d' >> $MO_NAME
++
+ find "$TOP_DIR" -type f -o -type l|sed '
+ s:'"$TOP_DIR"'::
+ '"$NO_ALL_NAME$QT"'s:\(.*/'"$NAME"'_\([a-zA-Z]\{2\}\([_@].*\)\?\)\.qm$\):%lang(\2) \1:
+@@ -186,7 +238,7 @@ s:^\([^%].*\)::
+ s:%lang(C) ::
+ /^$/d' >> $MO_NAME
+ 
+-find "$TOP_DIR" -type f -o -type l|sed '
++find "$TOP_DIR" -type f -o -type l|sed -r 's/\.(bz2|gz|xz|lzma|Z)$//g' | sed '
+ s:'"$TOP_DIR"'::
+ '"$NO_ALL_NAME$MAN"'s:\(.*/man/\([^/_]\+\).*/man[a-z0-9]\+/'"$NAME"'\.[a-z0-9].*\):%lang(\2) \1*:
+ s:^\([^%].*\)::
+diff --git a/scripts/perl.prov b/scripts/perl.prov
+index af37328..a476a51 100755
+--- a/scripts/perl.prov
++++ b/scripts/perl.prov
+@@ -47,6 +47,7 @@
+ 
+ if ("@ARGV") {
+   foreach (@ARGV) {
++    next if !/\.pm$/;
+     process_file($_);
+   }
+ } else {
+@@ -55,6 +56,7 @@ if ("@ARGV") {
+   # contents of the file.
+ 
+   foreach (<>) {
++    next if !/\.pm$/;
+     process_file($_);
+   }
+ }
+@@ -114,7 +116,7 @@ sub process_file {
+       $inover = 0;
+     }
+ 
+-    if ($incomment || $inover) {
++    if ($incomment || $inover || m/^\s*#/) {
+        next;
+     }
+ 
+@@ -164,7 +166,7 @@ sub process_file {
+ 
+       if (m/\$Revision: (\d+[.0-9]+)/) {
+         $version = $1;
+-      } elsif (m/['"]?(\d+[.0-9]+)['"]?/) {
++      } elsif (m/=\s*['"]?(\d+[._0-9]+)['"]?/) {
+ 
+         # look for a static number hard coded in the script
+ 
+diff --git a/sign/rpmgensig.c b/sign/rpmgensig.c
+index 24bf39e..c312e39 100644
+--- a/sign/rpmgensig.c
++++ b/sign/rpmgensig.c
+@@ -17,9 +17,11 @@
+ #include <rpm/rpmfileutil.h>	/* rpmMkTemp() */
+ #include <rpm/rpmlog.h>
+ #include <rpm/rpmstring.h>
++#include <rpmio/rpmio_internal.h>
+ 
+ #include "lib/rpmlead.h"
+ #include "lib/signature.h"
++#include "lib/rpmsignfiles.h"
+ 
+ #include "debug.h"
+ 
+@@ -151,6 +153,10 @@ static int manageFile(FD_t *fdp, const char *fn, int flags)
+ 
+ /**
+  * Copy header+payload, calculating digest(s) on the fly.
++ * @param sfdp source file
++ * @param sfnp source path
++ * @param tfdp destination file
++ * @param tfnp destination path
+  */
+ static int copyFile(FD_t *sfdp, const char *sfnp,
+ 		FD_t *tfdp, const char *tfnp)
+@@ -159,11 +165,6 @@ static int copyFile(FD_t *sfdp, const char *sfnp,
+     ssize_t count;
+     int rc = 1;
+ 
+-    if (manageFile(sfdp, sfnp, O_RDONLY))
+-	goto exit;
+-    if (manageFile(tfdp, tfnp, O_WRONLY|O_CREAT|O_TRUNC))
+-	goto exit;
+-
+     while ((count = Fread(buf, sizeof(buf[0]), sizeof(buf), *sfdp)) > 0)
+     {
+ 	if (Fwrite(buf, sizeof(buf[0]), count, *tfdp) != count) {
+@@ -184,8 +185,6 @@ static int copyFile(FD_t *sfdp, const char *sfnp,
+     rc = 0;
+ 
+ exit:
+-    if (*sfdp)	(void) closeFile(sfdp);
+-    if (*tfdp)	(void) closeFile(tfdp);
+     return rc;
+ }
+ 
+@@ -474,13 +473,197 @@ static int replaceSignature(Header sigh, sigTarget sigt1, sigTarget sigt2)
+     return rc;
+ }
+ 
++static void unloadImmutableRegion(Header *hdrp, rpmTagVal tag)
++{
++    struct rpmtd_s copytd, td;
++    rpmtd utd = &td;
++    Header nh;
++    Header oh;
++    HeaderIterator hi;
++
++    if (headerGet(*hdrp, tag, utd, HEADERGET_DEFAULT)) {
++	nh = headerNew();
++	oh = headerCopyLoad(utd->data);
++	hi = headerInitIterator(oh);
++
++	while (headerNext(hi, &copytd)) {
++	    if (copytd.data)
++		headerPut(nh, &copytd, HEADERPUT_DEFAULT);
++	    rpmtdFreeData(&copytd);
++	}
++
++	headerFreeIterator(hi);
++	headerFree(oh);
++	rpmtdFreeData(utd);
++	headerFree(*hdrp);
++	*hdrp = headerLink(nh);
++	headerFree(nh);
++    }
++}
++
++static rpmRC replaceSigDigests(FD_t fd, const char *rpm, Header *sigp,
++			       off_t sigStart, off_t sigTargetSize,
++			       char *SHA1, uint8_t *MD5)
++{
++    off_t archiveSize;
++    rpmRC rc = RPMRC_OK;
++
++    if (Fseek(fd, sigStart, SEEK_SET) < 0) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("Could not seek in file %s: %s\n"),
++		rpm, Fstrerror(fd));
++	goto exit;
++    }
++
++    /* Get payload size from signature tag */
++    archiveSize = headerGetNumber(*sigp, RPMSIGTAG_PAYLOADSIZE);
++    if (!archiveSize) {
++	archiveSize = headerGetNumber(*sigp, RPMSIGTAG_LONGARCHIVESIZE);
++    }
++
++    /* Replace old digests in sigh */
++    rc = rpmGenerateSignature(SHA1, MD5, sigTargetSize, archiveSize, fd);
++    if (rc != RPMRC_OK) {
++	rpmlog(RPMLOG_ERR, _("generateSignature failed\n"));
++	goto exit;
++    }
++
++    if (Fseek(fd, sigStart, SEEK_SET) < 0) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("Could not seek in file %s: %s\n"),
++		rpm, Fstrerror(fd));
++	goto exit;
++    }
++
++    headerFree(*sigp);
++    rc = rpmReadSignature(fd, sigp, RPMSIGTYPE_HEADERSIG, NULL);
++    if (rc != RPMRC_OK) {
++	rpmlog(RPMLOG_ERR, _("rpmReadSignature failed\n"));
++	goto exit;
++    }
++
++exit:
++    return rc;
++}
++
++static rpmRC includeFileSignatures(FD_t fd, const char *rpm,
++				   Header *sigp, Header *hdrp,
++				   off_t sigStart, off_t headerStart)
++{
++    FD_t ofd = NULL;
++    char *trpm = NULL;
++    const char *key;
++    char *keypass;
++    char *SHA1 = NULL;
++    uint8_t *MD5 = NULL;
++    size_t sha1len;
++    size_t md5len;
++    off_t sigTargetSize;
++    rpmRC rc = RPMRC_OK;
++    struct rpmtd_s osigtd;
++    char *o_sha1 = NULL;
++    uint8_t o_md5[16];
++
++#ifndef WITH_IMAEVM
++    rpmlog(RPMLOG_ERR, _("missing libimaevm\n"));
++    return RPMRC_FAIL;
++#endif
++    unloadImmutableRegion(hdrp, RPMTAG_HEADERIMMUTABLE);
++
++    key = rpmExpand("%{?_file_signing_key}", NULL);
++
++    keypass = rpmExpand("%{_file_signing_key_password}", NULL);
++    if (rstreq(keypass, ""))
++	keypass = NULL;
++
++    rc = rpmSignFiles(*hdrp, key, keypass);
++    if (rc != RPMRC_OK) {
++	goto exit;
++    }
++
++    *hdrp = headerReload(*hdrp, RPMTAG_HEADERIMMUTABLE);
++    if (*hdrp == NULL) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("headerReload failed\n"));
++	goto exit;
++    }
++
++    ofd = rpmMkTempFile(NULL, &trpm);
++    if (ofd == NULL || Ferror(ofd)) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("rpmMkTemp failed\n"));
++	goto exit;
++    }
++
++    /* Copy archive to temp file */
++    if (copyFile(&fd, rpm, &ofd, trpm)) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("copyFile failed\n"));
++	goto exit;
++    }
++
++    if (Fseek(fd, headerStart, SEEK_SET) < 0) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("Could not seek in file %s: %s\n"),
++		rpm, Fstrerror(fd));
++	goto exit;
++    }
++
++    /* Start MD5 calculation */
++    fdInitDigest(fd, PGPHASHALGO_MD5, 0);
++
++    /* Write header to rpm and recalculate SHA1 */
++    fdInitDigest(fd, PGPHASHALGO_SHA1, 0);
++    rc = headerWrite(fd, *hdrp, HEADER_MAGIC_YES);
++    if (rc != RPMRC_OK) {
++	rpmlog(RPMLOG_ERR, _("headerWrite failed\n"));
++	goto exit;
++    }
++    fdFiniDigest(fd, PGPHASHALGO_SHA1, (void **)&SHA1, &sha1len, 1);
++
++    /* Copy archive from temp file */
++    if (Fseek(ofd, 0, SEEK_SET) < 0) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("Could not seek in file %s: %s\n"),
++		rpm, Fstrerror(fd));
++	goto exit;
++    }
++    if (copyFile(&ofd, trpm, &fd, rpm)) {
++	rc = RPMRC_FAIL;
++	rpmlog(RPMLOG_ERR, _("copyFile failed\n"));
++	goto exit;
++    }
++    unlink(trpm);
++
++    sigTargetSize = Ftell(fd) - headerStart;
++    fdFiniDigest(fd, PGPHASHALGO_MD5, (void **)&MD5, &md5len, 0);
++
++    if (headerGet(*sigp, RPMSIGTAG_MD5, &osigtd, HEADERGET_DEFAULT))
++	memcpy(o_md5, osigtd.data, 16);
++
++    if (headerGet(*sigp, RPMSIGTAG_SHA1, &osigtd, HEADERGET_DEFAULT))
++	o_sha1 = xstrdup(osigtd.data);
++
++    if (memcmp(MD5, o_md5, md5len) == 0 && strcmp(SHA1, o_sha1) == 0)
++	rpmlog(RPMLOG_WARNING,
++	       _("%s already contains identical file signatures\n"),
++	       rpm);
++    else
++	replaceSigDigests(fd, rpm, sigp, sigStart, sigTargetSize, SHA1, MD5);
++
++exit:
++if (ofd)    (void) closeFile(&ofd);
++    return rc;
++}
++
+ /** \ingroup rpmcli
+  * Create/modify elements in signature header.
+  * @param rpm		path to package
+  * @param deleting	adding or deleting signature?
++ * @param signfiles	sign files if non-zero
+  * @return		0 on success, -1 on error
+  */
+-static int rpmSign(const char *rpm, int deleting)
++static int rpmSign(const char *rpm, int deleting, int signfiles)
+ {
+     FD_t fd = NULL;
+     FD_t ofd = NULL;
+@@ -531,25 +714,11 @@ static int rpmSign(const char *rpm, int deleting)
+ 	goto exit;
+     }
+ 
+-    /* Dump the immutable region (if present). */
+-    if (headerGet(sigh, RPMTAG_HEADERSIGNATURES, &utd, HEADERGET_DEFAULT)) {
+-	struct rpmtd_s copytd;
+-	Header nh = headerNew();
+-	Header oh = headerCopyLoad(utd.data);
+-	HeaderIterator hi = headerInitIterator(oh);
+-	while (headerNext(hi, &copytd)) {
+-	    if (copytd.data)
+-		headerPut(nh, &copytd, HEADERPUT_DEFAULT);
+-	    rpmtdFreeData(&copytd);
+-	}
+-	headerFreeIterator(hi);
+-	headerFree(oh);
+-	rpmtdFreeData(&utd);
+-
+-	headerFree(sigh);
+-	sigh = headerLink(nh);
+-	headerFree(nh);
++    if (signfiles) {
++	includeFileSignatures(fd, rpm, &sigh, &h, sigStart, headerStart);
+     }
++
++    unloadImmutableRegion(&sigh, RPMTAG_HEADERSIGNATURES);
+     origSigSize = headerSizeof(sigh, HEADER_MAGIC_YES);
+ 
+     if (deleting) {	/* Nuke all the signature tags. */
+@@ -698,7 +867,7 @@ int rpmPkgSign(const char *path, const struct rpmSignArgs * args)
+ 	}
+     }
+ 
+-    rc = rpmSign(path, 0);
++    rc = rpmSign(path, 0, args->signfiles);
+ 
+     if (args) {
+ 	if (args->hashalgo) {
+@@ -714,5 +883,5 @@ int rpmPkgSign(const char *path, const struct rpmSignArgs * args)
+ 
+ int rpmPkgDelSign(const char *path)
+ {
+-    return rpmSign(path, 1);
++    return rpmSign(path, 1, 0);
+ }
+diff --git a/sign/rpmsign.h b/sign/rpmsign.h
+index e161aff..93db399 100644
+--- a/sign/rpmsign.h
++++ b/sign/rpmsign.h
+@@ -11,6 +11,7 @@ extern "C" {
+ struct rpmSignArgs {
+     char *keyid;
+     pgpHashAlgo hashalgo;
++    int signfiles;
+     /* ... what else? */
+ };
+ 
+diff --git a/tests/rpmgeneral.at b/tests/rpmgeneral.at
+index 312f43b..22c483e 100644
+--- a/tests/rpmgeneral.at
++++ b/tests/rpmgeneral.at
+@@ -113,8 +113,11 @@ FILENLINKS
+ FILEPROVIDE
+ FILERDEVS
+ FILEREQUIRE
++FILESIGNATURELENGTH
++FILESIGNATURES
+ FILESIZES
+ FILESTATES
++FILETRIGGERCONDS
+ FILETRIGGERFLAGS
+ FILETRIGGERINDEX
+ FILETRIGGERNAME
+@@ -122,6 +125,7 @@ FILETRIGGERPRIORITIES
+ FILETRIGGERSCRIPTFLAGS
+ FILETRIGGERSCRIPTPROG
+ FILETRIGGERSCRIPTS
++FILETRIGGERTYPE
+ FILETRIGGERVERSION
+ FILEUSERNAME
+ FILEVERIFYFLAGS
+@@ -256,6 +260,7 @@ SUPPLEMENTNAME
+ SUPPLEMENTNEVRS
+ SUPPLEMENTS
+ SUPPLEMENTVERSION
++TRANSFILETRIGGERCONDS
+ TRANSFILETRIGGERFLAGS
+ TRANSFILETRIGGERINDEX
+ TRANSFILETRIGGERNAME
+@@ -263,6 +268,7 @@ TRANSFILETRIGGERPRIORITIES
+ TRANSFILETRIGGERSCRIPTFLAGS
+ TRANSFILETRIGGERSCRIPTPROG
+ TRANSFILETRIGGERSCRIPTS
++TRANSFILETRIGGERTYPE
+ TRANSFILETRIGGERVERSION
+ TRIGGERCONDS
+ TRIGGERFLAGS
