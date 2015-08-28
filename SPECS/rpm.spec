@@ -121,6 +121,7 @@ Patch145: rpm-forbid-badly-commented-define-in-spec.patch
 #Patch151: rpm-4.6.0-rc1-protect-against-non-robust-futex.patch
 
 # Introduce (deprecated) %%apply_patches:
+# (To be dropped once all pkgs are converted to %%auto_setup)
 Patch157: rpm-4.10.1-introduce-_after_setup-which-is-called-after-setup.patch
 Patch159: introduce-apply_patches-and-lua-var-patches_num.patch
 
@@ -168,6 +169,7 @@ Patch3004: rpm_add_armv5tl.patch
 # Mageia patches that are easier to rediff on top of FC patches:
 #---------------------------------------------------------------
 # (tv) merge mga stuff from rpm-setup:
+# (for spec-helper)
 Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 
 # 2 patches to drop in mga7:
