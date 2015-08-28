@@ -1,5 +1,5 @@
---- ./scripts/script.reqcript.req.tv2	2015-08-28 05:04:54.252419908 -0400
-+++ ./scripts/script.reqcript.req	2015-08-28 05:06:08.221383229 -0400
+--- ./scripts/script.req.tv2	2015-08-28 05:04:54.252419908 -0400
++++ ./scripts/script.req	2015-08-28 05:06:08.221383229 -0400
 @@ -43,6 +43,17 @@
  	    if [ -n "$PKG" ]; then
  		    echo $PKG
