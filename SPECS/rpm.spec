@@ -612,7 +612,7 @@ fi
 %if %with python
 %files -n python-rpm
 %{python_sitearch}/rpm
-%{python_sitearch}/rpm_python-%{version}-py2.7.egg-info
+%{python_sitearch}/rpm_python-%{version}-py*.egg-info
 
 %files -n python3-rpm
 %defattr(-,root,root)
