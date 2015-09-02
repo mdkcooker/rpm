@@ -612,12 +612,12 @@ fi
 %if %with python
 %files -n python-rpm
 %{python_sitearch}/rpm
-%{python_sitearch}/rpm_python-%{version}-py*.egg-info
+%{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
 
 %files -n python3-rpm
 %defattr(-,root,root)
 %{python3_sitearch}/rpm
-%{python3_sitearch}/rpm_python-%{version}-py%{python3_version}.egg-info
+%{python3_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py%{python3_version}.egg-info
 %endif
 
 %files -n %librpmname
