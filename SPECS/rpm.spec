@@ -39,8 +39,8 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmver 4.12.90
-#define snapver		rc1
+%define rpmver 4.13.0
+%define snapver		rc1
 %define srcver          %{rpmver}%{?snapver:-%{snapver}}
 %define libver		4.12
 %define libmajor	7
@@ -63,12 +63,6 @@ Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
-
-#
-# git diff rpm-4.13.0-alpha
-#
-
-Patch0: git.diff
 
 #
 # Fedora patches
