@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}8
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -150,9 +150,6 @@ Patch177: script-no-file-deps2.diff
 Patch180: elf_libs_req.diff 
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
-
-# faster but less secure XZ encoding:
-Patch1008: rpm-4.12.0-xz-faster.patch
 
 # Automatically handle ruby gem extraction in %%setup:
 Patch2006: rpm-4.12.90-setup-rubygems.patch
