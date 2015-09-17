@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}9
+Release:	%mkrel %{?snapver:0.%{snapver}.}10
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -68,6 +68,7 @@ Source1:	macros.filter
 # Fedora patches
 #
 # Patches already upstream:
+Patch100: rpm-4.13.0-rc1-Fix-new-richdep-syntax.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -150,6 +151,11 @@ Patch177: script-no-file-deps2.diff
 Patch180: elf_libs_req.diff 
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
+
+# (tv) rename cloberred %%configure as %%old_configure:
+Patch200: rpm_configure.diff
+# (tv) make %%autopach abort on missing patch:
+Patch201: 0001-fix-autopatch-when-patch-do-not-exist.patch
 
 # Automatically handle ruby gem extraction in %%setup:
 Patch2006: rpm-4.12.90-setup-rubygems.patch
