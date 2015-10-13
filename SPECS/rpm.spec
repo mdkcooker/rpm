@@ -193,6 +193,7 @@ BuildRequires:	ed
 BuildRequires:	gettext-devel
 BuildRequires:  libsqlite3-devel
 BuildRequires:  db5.3-devel
+BuildRequires:  dbus-devel
 BuildRequires:  neon-devel
 BuildRequires:	popt-devel
 BuildRequires:	nss-devel
