@@ -1,4 +1,4 @@
-From 5d52d2cf275aff900294633f48cda6369a9065ea Mon Sep 17 00:00:00 2001
+From 73ea59e0d53503bb45d5eac9d9792127a6d04c23 Mon Sep 17 00:00:00 2001
 From: Thierry Vignaud <thierry.vignaud@gmail.com>
 Date: Thu, 17 Sep 2015 04:36:47 -0400
 Subject: [PATCH] fix %autopatch when patch do not exist
@@ -13,6 +13,8 @@ when it fails to apply a patch because it doesn't exists. Eg:
 + /usr/bin/patch -p1 -s
 
 Let's catch that error
+
+Signed-off-by: Lubos Kardos <lkardos@redhat.com>
 ---
  macros.in | 1 +
  1 file changed, 1 insertion(+)
@@ -30,5 +32,5 @@ index 5dddede..5e0d17b 100644
  
  # Automatically apply all patches
 -- 
-2.4.5
+1.9.3
 
