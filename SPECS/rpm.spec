@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}12
+Release:	%mkrel %{?snapver:0.%{snapver}.}13
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -75,6 +75,7 @@ Patch103: rpm-4.13.0-wrong-version-macro.patch
 Patch104: rpm-4.13.0-memory-error.patch
 Patch105: rpm-4.13.0-rpmdeps-weakdep-support.patch
 Patch106: rpm-4.13.0-autopatch-fix.patch
+Patch107: rpm-4.13.0-ignore-sigpipe.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
