@@ -189,35 +189,35 @@ Patch6001: do-not-link-libpython.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
-BuildRequires:	zlib-devel
+BuildRequires:	pkgconfig(zlib)
 BuildRequires:  bzip2-devel
-BuildRequires:	liblzma-devel >= 5
+BuildRequires:	pkgconfig(liblzma) >= 5
 BuildRequires:	automake
 BuildRequires:	elfutils-devel
 BuildRequires:	libbeecrypt-devel
 #BuildRequires:	binutils-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
-BuildRequires:  libsqlite3-devel
+BuildRequires:  pkgconfig(sqlite3)
 BuildRequires:  db5.3-devel
-BuildRequires:  dbus-devel
-BuildRequires:  neon-devel
-BuildRequires:	popt-devel
-BuildRequires:	nss-devel
+BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  pkgconfig(neon)
+BuildRequires:	pkgconfig(popt)
+BuildRequires:	pkgconfig(nss)
 BuildRequires:	magic-devel
 BuildRequires:  rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_version}}
 BuildRequires:  readline-devel
-BuildRequires:	ncurses-devel
-BuildRequires:  openssl-devel
-BuildRequires:  lua5.2-devel >= 5.2.3-3.mga5
-BuildRequires:  libcap-devel
+BuildRequires:	pkgconfig(ncurses)
+BuildRequires:  pkgconfig(libssl)
+BuildRequires:  pkgconfig(lua) >= 5.2.3-3.mga5
+BuildRequires:  pkgconfig(libcap)
 BuildRequires:  pkgconfig(libarchive)
 # Needed for doc
 #BuildRequires:	graphviz
 BuildRequires:	tetex
 %if %with python
-BuildRequires:  python-devel
-BuildRequires:  python3-devel
+BuildRequires:  pkgconfig(python)
+BuildRequires:  pkgconfig(python-3.5)
 %endif
 # for testsuite:
 BuildRequires: eatmydata
