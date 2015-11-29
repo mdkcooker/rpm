@@ -58,7 +58,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}14
+Release:	%mkrel %{?snapver:0.%{snapver}.}15
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -78,6 +78,7 @@ Patch106: rpm-4.13.0-autopatch-fix.patch
 Patch107: rpm-4.13.0-ignore-sigpipe.patch
 Patch108: rpm-4.13.0-unsupported-keys.patch
 Patch109: rpm-4.13.0-fix-crash-on-corrupted.patch
+Patch110: rpm-4.13.0-disabling-filetriggers.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
