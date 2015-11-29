@@ -1,3 +1,5 @@
+# WARNING: This package is synced with FC
+
 %define lib64arches	x86_64 
 
 %ifarch %lib64arches
