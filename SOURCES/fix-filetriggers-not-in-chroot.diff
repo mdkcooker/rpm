@@ -17,10 +17,29 @@ index 154237e..3c5cbb6 100644
  		break;
  	    default:
 diff --git a/lib/rpmtriggers.c b/lib/rpmtriggers.c
-index 211e62f..f4e7f2e 100644
+index 211e62f..1ef0647 100644
 --- a/lib/rpmtriggers.c
 +++ b/lib/rpmtriggers.c
-@@ -599,3 +599,13 @@ rpmRC runImmedFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
+@@ -530,6 +530,9 @@ rpmRC runFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
+     /* Sort triggers by priority, offset, trigger index */
+     rpmtriggersSortAndUniq(triggers);
+ 
++    if (rpmChrootIn() != 0)
++	return RPMRC_FAIL;
++
+     /* Handle stored triggers */
+     for (i = 0; i < triggers->count; i++) {
+ 	if (priorityClass == 1) {
+@@ -550,6 +553,8 @@ rpmRC runFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
+ 	headerFree(trigH);
+     }
+     rpmtriggersFree(triggers);
++    /* XXX an error here would require a full abort */
++    (void) rpmChrootOut();
+ 
+     return (nerrors == 0) ? RPMRC_OK : RPMRC_FAIL;
+ }
+@@ -599,3 +604,13 @@ rpmRC runImmedFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
  
      return (nerrors == 0) ? RPMRC_OK : RPMRC_FAIL;
  }
@@ -61,35 +80,3 @@ index bca79b8..299f9d1 100644
  #ifdef __cplusplus
  }
  #endif
-diff --git a/lib/transaction.c b/lib/transaction.c
-index 8f440b7..7d81ba2 100644
---- a/lib/transaction.c
-+++ b/lib/transaction.c
-@@ -1490,8 +1490,12 @@ int rpmtsRun(rpmts ts, rpmps okProbs, rpmprobFilterFlags ignoreSet)
- 
-     if (!rpmpsNumProblems(tsprobs)) {
- 	/* Run file triggers in this package other package(s) set off. */
--	runFileTriggers(ts, NULL, RPMSENSE_TRIGGERUN,
--			RPMSCRIPT_TRANSFILETRIGGER, 0);
-+	if (rpmChrootIn() == 0) {
-+	   runFileTriggers(ts, NULL, RPMSENSE_TRIGGERUN,
-+			   RPMSCRIPT_TRANSFILETRIGGER, 0);
-+	   /* XXX an error here would require a full abort */
-+	   (void) rpmChrootOut();
-+	}
- 	/* Run file triggers in other package(s) this package sets off. */
- 	runTransScripts(ts, PKG_TRANSFILETRIGGERUN);
-     }
-@@ -1579,7 +1583,11 @@
- 
-     /* Run file triggers in other package(s) this package sets off. */
-     if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOSTTRANS|RPMTRANS_FLAG_NOTRIGGERIN))) {
--	runFileTriggers(ts, NULL, RPMSENSE_TRIGGERIN, RPMSCRIPT_TRANSFILETRIGGER, 0);
-+	if (rpmChrootIn() == 0) {
-+	    runFileTriggers(ts, NULL, RPMSENSE_TRIGGERIN, RPMSCRIPT_TRANSFILETRIGGER, 0);
-+	    /* XXX an error here would require a full abort */
-+	    (void) rpmChrootOut();
-+	}
-     }
-     if (!(rpmtsFlags(ts) & (RPMTRANS_FLAG_NOPOSTTRANS|RPMTRANS_FLAG_NOTRIGGERPOSTUN))) {
- 	runPostUnTransFileTrigs(ts);
