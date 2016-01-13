@@ -1,21 +1,3 @@
-diff --git a/lib/psm.c b/lib/psm.c
-index 154237e..3c5cbb6 100644
---- a/lib/psm.c
-+++ b/lib/psm.c
-@@ -841,11 +841,11 @@ rpmRC rpmpsmRun(rpmts ts, rpmte te, pkgGoal goal)
- 		rc = runInstScript(psm, goal);
- 		break;
- 	    case PKG_TRANSFILETRIGGERIN:
--		rc = runImmedFileTriggers(ts, te, RPMSENSE_TRIGGERIN,
-+		rc = runImmedFileTriggersInChroot(ts, te, RPMSENSE_TRIGGERIN,
- 					    RPMSCRIPT_TRANSFILETRIGGER, 0);
- 		break;
- 	    case PKG_TRANSFILETRIGGERUN:
--		rc = runImmedFileTriggers(ts, te, RPMSENSE_TRIGGERUN,
-+		rc = runImmedFileTriggersInChroot(ts, te, RPMSENSE_TRIGGERUN,
- 					    RPMSCRIPT_TRANSFILETRIGGER, 0);
- 		break;
- 	    default:
 diff --git a/lib/rpmtriggers.c b/lib/rpmtriggers.c
 index 211e62f..1ef0647 100644
 --- a/lib/rpmtriggers.c
@@ -39,44 +21,3 @@ index 211e62f..1ef0647 100644
  
      return (nerrors == 0) ? RPMRC_OK : RPMRC_FAIL;
  }
-@@ -599,3 +604,13 @@ rpmRC runImmedFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
- 
-     return (nerrors == 0) ? RPMRC_OK : RPMRC_FAIL;
- }
-+
-+rpmRC runImmedFileTriggersInChroot(rpmts ts, rpmte te, rpmsenseFlags sense,
-+			    rpmscriptTriggerModes tm, int priorityClass)
-+{
-+    if (rpmChrootIn() == 0) {
-+	runImmedFileTriggers(ts, te, sense, tm, priorityClass);
-+	/* XXX an error here would require a full abort */
-+	(void) rpmChrootOut();
-+    }
-+}
-diff --git a/lib/rpmtriggers.h b/lib/rpmtriggers.h
-index bca79b8..299f9d1 100644
---- a/lib/rpmtriggers.h
-+++ b/lib/rpmtriggers.h
-@@ -76,6 +76,22 @@ rpmRC runFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
-  */
- rpmRC runImmedFileTriggers(rpmts ts, rpmte te, rpmsenseFlags sense,
- 			    rpmscriptTriggerModes tm, int upper);
-+
-+/* Run file triggers in this te other package(s) set off (but goes in chroot first).
-+ * This is used for transaction file triggers.
-+ * @param ts		transaction set
-+ * @param te		transaction entry
-+ * @param sense		defines which triggers should be set off (triggerin,
-+ *			triggerun, triggerpostun)
-+ * @param triggerClass	1 to run triggers that should be executed before
-+ *			standard scriptlets
-+ *			2 to run triggers that should be executed after
-+ *			standard scriptlets
-+ *			0 to run all triggers
-+ * @param tm		trigger mode, (filetrigger/transfiletrigger)
-+ */
-+rpmRC runImmedFileTriggersInChroot(rpmts ts, rpmte te, rpmsenseFlags sense,
-+			    rpmscriptTriggerModes tm, int upper);
- #ifdef __cplusplus
- }
- #endif
