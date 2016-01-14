@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}18
+Release:	%mkrel %{?snapver:0.%{snapver}.}19
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -191,7 +191,7 @@ Patch4012: rpm-mga-suggests.diff
 Patch6001: do-not-link-libpython.patch
 
 # (tv): fix transaction file triggers not run in chroot (mga#17217):
-Patch6002: fix-filetriggers-not-in-chroot.diff
+Patch6002: 0001-Fix-not-chrooting-transaction-file-triggers.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf
