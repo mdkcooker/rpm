@@ -81,6 +81,7 @@ Patch107: rpm-4.13.0-ignore-sigpipe.patch
 Patch108: rpm-4.13.0-unsupported-keys.patch
 Patch109: rpm-4.13.0-fix-crash-on-corrupted.patch
 Patch110: rpm-4.13.0-disabling-filetriggers.patch
+Patch111: rpm-4.13.0-chroot-file-triggers.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -189,9 +190,6 @@ Patch4012: rpm-mga-suggests.diff
 
 # (Debian): avoid useless) linking (&dependency) on all supported python versions:
 Patch6001: do-not-link-libpython.patch
-
-# (tv): fix transaction file triggers not run in chroot (mga#17217):
-Patch6002: 0001-Fix-not-chrooting-transaction-file-triggers.patch
 
 License:	GPLv2+
 BuildRequires:	autoconf

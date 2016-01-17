@@ -1,4 +1,4 @@
-From 3c5cff1e435e80626820b096f7b00b4c3bf6e562 Mon Sep 17 00:00:00 2001
+From 9aff39d0d530332e8cae376f2390b6546239a20e Mon Sep 17 00:00:00 2001
 From: Lubos Kardos <lkardos@redhat.com>
 Date: Thu, 14 Jan 2016 13:35:28 +0100
 Subject: [PATCH] Fix not chrooting transaction file triggers
@@ -67,5 +67,5 @@ index 211e62f..4c6e821 100644
      return (nerrors == 0) ? RPMRC_OK : RPMRC_FAIL;
  }
 -- 
-2.7.0
+1.9.3
 
