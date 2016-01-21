@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}20
+Release:	%mkrel %{?snapver:0.%{snapver}.}21
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -84,6 +84,7 @@ Patch110: rpm-4.13.0-disabling-filetriggers.patch
 Patch111: rpm-4.13.0-chroot-file-triggers.patch
 Patch112: rpm-4.13.0-missingok.patch
 Patch113: rpm-4.13.0-recursing-rpmdeps.patch
+Patch114: rpm-4.13.0-autosetup-errors.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -120,7 +121,7 @@ Patch84: rpm-4.4.2.2-rpmqv-ghost.patch
 
 # [Dec 2008] macrofiles from rpmrc does not overrides MACROFILES anymore
 # Upstream 4.11 will have /usr/lib/rpm/macros.d:
-Patch114: rpm-4.9.0-read-macros_d-dot-macros.patch
+Patch144: rpm-4.9.0-read-macros_d-dot-macros.patch
 
 # without this patch, "#%%define foo bar" is surprisingly equivalent to "%%define foo bar"
 # with this patch, "#%%define foo bar" is a fatal error
