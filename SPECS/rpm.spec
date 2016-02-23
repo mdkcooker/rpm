@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}22
+Release:	%mkrel %{?snapver:0.%{snapver}.}23
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -85,6 +85,9 @@ Patch111: rpm-4.13.0-chroot-file-triggers.patch
 Patch112: rpm-4.13.0-missingok.patch
 Patch113: rpm-4.13.0-recursing-rpmdeps.patch
 Patch114: rpm-4.13.0-autosetup-errors.patch
+Patch115: rpm-4.13.0-unlimited-macro-expand.patch
+Patch116: rpm-4.13.0-idle-and-sleep-in-systemd-inhibit.patch
+Patch117: rpm-4.13.0-add-mipsr6-support.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
