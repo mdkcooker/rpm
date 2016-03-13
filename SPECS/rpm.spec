@@ -207,6 +207,7 @@ BuildRequires:	pkgconfig(zlib)
 BuildRequires:  bzip2-devel
 BuildRequires:	pkgconfig(liblzma) >= 5
 BuildRequires:	automake
+BuildRequires:	doxygen
 BuildRequires:	elfutils-devel
 BuildRequires:	libbeecrypt-devel
 #BuildRequires:	binutils-devel
@@ -338,6 +339,14 @@ Requires:	%librpmbuild = %epoch:%version
 This package contains scripts and executable programs that are used to
 build packages using RPM.
 
+%package doc
+Summary: RPM Documentation
+Group:   Documentation
+BuildArch: noarch
+
+%description doc
+This package contains the RPM documentation.
+
 %package sign
 Summary: Package signing support
 Group:   System/Base
@@ -398,7 +407,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         %{?_with_python} \
         --with-glob \
         --without-selinux \
-        --without-apidocs \
+        --with-apidocs \
         --with-cap
 
 %make
@@ -654,6 +663,9 @@ fi
 
 %files -n %librpmsign
 %{_libdir}/librpmsign.so.%{libmajor}*
+
+%files doc
+%doc doc/librpm/html
 
 %files sign
 %{_bindir}/rpmsign
