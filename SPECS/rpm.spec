@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}24
+Release:	%mkrel %{?snapver:0.%{snapver}.}25
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -174,6 +174,9 @@ Patch180: elf_libs_req.diff
 Patch181: assumeexec.diff 
 # (tv) fix memleak in file triggers (UPSTREAM):
 Patch190: 0001-Fix-memory-leak-in-file-triggers.patch
+# (wally) Use fuzz settings for %%autopatch/%%autosetup,
+# from Neal Gompa: https://github.com/rpm-software-management/rpm/pull/63
+Patch191: 0001-Use-fuzz-settings-for-autopatchautosetup.patch
 
 # (tv) rename cloberred %%configure as %%old_configure:
 Patch200: rpm_configure.diff
