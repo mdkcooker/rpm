@@ -10,7 +10,7 @@ Index: macros.in
 +%arm	armv3l armv4b armv4l armv4tl armv5tl armv5tel armv5tejl armv6l armv6hl armv7l armv7hl armv7hnl
  
  #------------------------------------------------------------------------------
- # arch macro for all supported MIPS processors
+ # arch macro for 32-bit MIPS processors
 Index: rpmrc.in
 ===================================================================
 --- a/rpmrc.in
