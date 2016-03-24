@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}25
+Release:	%mkrel %{?snapver:0.%{snapver}.}26
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -90,6 +90,7 @@ Patch116: rpm-4.13.0-idle-and-sleep-in-systemd-inhibit.patch
 Patch117: rpm-4.13.0-add-mipsr6-support.patch
 Patch118: rpm-4.13.0-Use-pkg-dpaths-during-dependency-generation.patch
 Patch119: rpm-4.13.0-Noarch-ExclusiveArch.patch
+Patch120: rpm-4.13.0-redirect2null.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
