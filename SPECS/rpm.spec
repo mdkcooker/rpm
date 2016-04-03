@@ -407,6 +407,7 @@ RPM_OPT_FLAGS=-g
 export CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
 CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     %configure2_5x \
+        --localstatedir=%{_var} \
         --sharedstatedir=%{_var}/lib \
         --enable-nls \
         --enable-sqlite3 \
