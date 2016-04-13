@@ -91,6 +91,8 @@ Patch117: rpm-4.13.0-add-mipsr6-support.patch
 Patch118: rpm-4.13.0-Use-pkg-dpaths-during-dependency-generation.patch
 Patch119: rpm-4.13.0-Noarch-ExclusiveArch.patch
 Patch120: rpm-4.13.0-redirect2null.patch
+Patch121: rpm-4.13.0-lang-doc-directives.patch
+Patch122: rpm-4.13.0-elem-progress-callback.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
