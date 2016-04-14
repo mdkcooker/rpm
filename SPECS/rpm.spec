@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}28
+Release:	%mkrel %{?snapver:0.%{snapver}.}29
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -298,6 +298,7 @@ Group:	  System/Libraries
 Provides: librpm = %version-%release
 # for fixed lua:
 Requires:  %{mklibname lua 5.2} >= 5.2.3-3.mga5
+Provides: rpm-libs = %version-%release
 
 %description -n %librpmname
 RPM is a powerful command line driven package management system capable of
