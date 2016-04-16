@@ -1,8 +1,14 @@
-From 0bd7ab40b9d1f613d3aef8c7aaaee28690447fac Mon Sep 17 00:00:00 2001
-From: Neal Gompa (ニール・ゴンパ) <ngompa13@gmail.com>
+From 50905f4a599f167622736fab24800fe062551809 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Neal=20Gompa=20=28=E3=83=8B=E3=83=BC=E3=83=AB=E3=83=BB?=
+ =?UTF-8?q?=E3=82=B3=E3=82=99=E3=83=B3=E3=83=8F=E3=82=9A=29?=
+ <ngompa13@gmail.com>
 Date: Sun, 13 Mar 2016 09:05:00 -0400
 Subject: [PATCH] Use fuzz settings for %autopatch/%autosetup
 
+In the %apply_patches that inspired %autopatch, patch application
+respects the fuzz settings that are used for %patch. %autopatch
+and %autosetup weren't using this, which led to an inconsistent
+patch application behavior.
 ---
  macros.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -20,6 +26,6 @@ index 7b807f9..ce252d4 100644
  
  # Mercurial (aka hg)
  %__scm_setup_hg(q)\
---
-libgit2 0.23.4
+-- 
+1.9.3
 

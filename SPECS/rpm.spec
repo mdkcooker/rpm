@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}29
+Release:	%mkrel %{?snapver:0.%{snapver}.}30
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -94,6 +94,9 @@ Patch120: rpm-4.13.0-redirect2null.patch
 Patch121: rpm-4.13.0-lang-doc-directives.patch
 Patch122: rpm-4.13.0-elem-progress-callback.patch
 Patch123: rpm-4.13.0-weak-rich-consistency.patch
+Patch124: rpm-4.13.0-fuzz-settings.patch
+Patch125: rpm-4.13.0-patch-flags.patch
+Patch126: rpm-4.13.0-no-backup-if-mismatch.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -182,9 +185,6 @@ Patch180: elf_libs_req.diff
 Patch181: assumeexec.diff 
 # (tv) fix memleak in file triggers (UPSTREAM):
 Patch190: 0001-Fix-memory-leak-in-file-triggers.patch
-# (wally) Use fuzz settings for %%autopatch/%%autosetup,
-# from Neal Gompa: https://github.com/rpm-software-management/rpm/pull/63
-Patch191: 0001-Use-fuzz-settings-for-autopatchautosetup.patch
 
 # (tv) rename cloberred %%configure as %%old_configure:
 Patch200: rpm_configure.diff
