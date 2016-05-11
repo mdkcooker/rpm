@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}31
+Release:	%mkrel %{?snapver:0.%{snapver}.}32
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -190,6 +190,9 @@ Patch190: 0001-Fix-memory-leak-in-file-triggers.patch
 
 # (tv) rename cloberred %%configure as %%old_configure:
 Patch200: rpm_configure.diff
+
+# (tv) fix segfault in perl-RPM4's testsuite:
+Patch201: 0001-fix-segfault-when-calling-with-args-NULL.patch
 
 # Automatically handle ruby gem extraction in %%setup:
 Patch2006: rpm-4.12.90-setup-rubygems.patch
