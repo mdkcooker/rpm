@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}32
+Release:	%mkrel %{?snapver:0.%{snapver}.}33
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -99,6 +99,7 @@ Patch125: rpm-4.13.0-patch-flags.patch
 Patch126: rpm-4.13.0-no-backup-if-mismatch.patch
 Patch127: rpm-4.13.0-rpmtd-out-of-bounds.patch
 Patch128: rpm-4.13.0-stringFormat-sigsegv.patch
+Patch129: rpm-4.13.0-filter-unversioned.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
