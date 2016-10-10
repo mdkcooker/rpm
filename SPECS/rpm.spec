@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}34
+Release:	%mkrel %{?snapver:0.%{snapver}.}35
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -102,6 +102,8 @@ Patch128: rpm-4.13.0-stringFormat-sigsegv.patch
 Patch129: rpm-4.13.0-filter-unversioned.patch
 Patch130: rpm-4.13.0-armv7hl-isa.patch
 Patch131: rpm-4.13.0-non-ASCII-keys.patch
+Patch132: rpm-4.13.0-rpm2archive-return-0-on-success.patch
+Patch133: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -347,7 +349,8 @@ Requires:	patch
 Requires:	make
 Requires:	tar
 Requires:	unzip
-Requires:	elfutils
+# Versioned requirement for Patch 133
+Requires:	elfutils >= 0.167-2
 Requires:	perl(CPAN::Meta) >= 2.112.150
 Requires:	perl(ExtUtils::MakeMaker) >= 6.570_700
 Requires:       perl(YAML::Tiny)
@@ -432,7 +435,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --with-apidocs \
         --with-cap
 
-%make
+%make_build
 %if %with python
 pushd python
 %{__python} setup.py build
@@ -441,7 +444,7 @@ popd
 %endif
 
 %install
-%makeinstall_std
+%make_install
 
 %if %with python
 # We need to build with --enable-python for the self-test suite, but we
