@@ -103,7 +103,6 @@ Patch129: rpm-4.13.0-filter-unversioned.patch
 Patch130: rpm-4.13.0-armv7hl-isa.patch
 Patch131: rpm-4.13.0-non-ASCII-keys.patch
 Patch132: rpm-4.13.0-rpm2archive-return-0-on-success.patch
-Patch133: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -120,6 +119,9 @@ Patch306: rpm-4.10.0-minidebuginfo.patch
 Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 # Add check against malicious CPIO file name size
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
+
+# Patches that expect Fedora patches
+Patch400: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 
 #
 # Mageia patches
