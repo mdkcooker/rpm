@@ -250,9 +250,6 @@ BuildRequires:  pkgconfig(libssl)
 BuildRequires:  pkgconfig(lua) >= 5.2.3-3.mga5
 BuildRequires:  pkgconfig(libcap)
 BuildRequires:  pkgconfig(libarchive)
-# Needed for doc
-#BuildRequires:	graphviz
-BuildRequires:	tetex
 %if %with python
 BuildRequires:  pkgconfig(python)
 BuildRequires:  pkgconfig(python-3.5)
