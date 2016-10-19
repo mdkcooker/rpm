@@ -129,6 +129,8 @@ Patch400: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 # Upstream patches not carried by FC:
 Patch500: rpm-4.13.0-rpm2archive-return-0-on-success.patch
 Patch501: 0001-rpm2cpio.sh-refactoring-to-reduce-extra-dependencies.patch
+# Automatically handle ruby gem extraction in %%setup:
+Patch502: 0001-Add-RubyGems-support.patch
 
 #
 # Mageia patches
@@ -204,9 +206,6 @@ Patch190: 0001-Fix-memory-leak-in-file-triggers.patch
 
 # (tv) fix segfault in perl-RPM4's testsuite:
 Patch201: 0001-fix-segfault-when-calling-with-args-NULL.patch
-
-# Automatically handle ruby gem extraction in %%setup:
-Patch2006: rpm-4.12.90-setup-rubygems.patch
 
 # Various arch enabling:
 Patch3003: rpm_arm_mips_isa_macros.patch

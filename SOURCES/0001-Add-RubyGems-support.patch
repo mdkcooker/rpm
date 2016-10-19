@@ -1,0 +1,116 @@
+From 89d1dd0a7c63c7497d334e9f240ce7e36ca89434 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 5 Nov 2015 14:29:21 +0100
+Subject: [PATCH] Add RubyGems support.
+
+Allow to expand RubyGems .gem file using regular %setup macro and in
+addition generate also associated .gemspec file.
+---
+ build/parsePrep.c   | 22 ++++++++++++++++++++++
+ configure.ac        |  1 +
+ macros.in           |  1 +
+ rpmio/rpmfileutil.c |  2 ++
+ rpmio/rpmfileutil.h |  3 ++-
+ 5 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/build/parsePrep.c b/build/parsePrep.c
+index b94aad2..64477e7 100644
+--- a/build/parsePrep.c
++++ b/build/parsePrep.c
+@@ -170,6 +170,7 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+     if (compressed != COMPRESSED_NOT) {
+ 	char *zipper, *t = NULL;
+ 	int needtar = 1;
++	int needgemspec = 0;
+ 
+ 	switch (compressed) {
+ 	case COMPRESSED_NOT:	/* XXX can't happen */
+@@ -200,6 +201,11 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ 	    t = "%{__7zip} x";
+ 	    needtar = 0;
+ 	    break;
++	case COMPRESSED_GEM:
++	    t = "%{__gem} unpack";
++	    needtar = 0;
++	    needgemspec = 1;
++	    break;
+ 	}
+ 	zipper = rpmGetPath(t, NULL);
+ 	if (needtar) {
+@@ -208,6 +214,22 @@ static char *doUntar(rpmSpec spec, uint32_t c, int quietly)
+ 		"if [ $STATUS -ne 0 ]; then\n"
+ 		"  exit $STATUS\n"
+ 		"fi", zipper, fn, tar, taropts);
++	} else if (needgemspec) {
++	    char *gem = rpmGetPath("%{__gem}", NULL);
++	    char *gemspec = NULL;
++	    char gemnameversion[strlen(sp->source) - 3];
++
++	    rstrlcpy(gemnameversion, sp->source, strlen(sp->source) - 3);
++	    gemspec = rpmGetPath("%{_builddir}/", gemnameversion, ".gemspec", NULL);
++
++	    rasprintf(&buf, "%s '%s' && %s spec '%s' --ruby > '%s'\n"
++		"STATUS=$?\n"
++		"if [ $STATUS -ne 0 ]; then\n"
++		"  exit $STATUS\n"
++		"fi", zipper, fn, gem, fn, gemspec);
++
++	    free(gemspec);
++	    free(gem);
+ 	} else {
+ 	    rasprintf(&buf, "%s '%s'\n"
+ 		"STATUS=$?\n"
+diff --git a/configure.ac b/configure.ac
+index e1baeb6..d6e8c0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -109,6 +109,7 @@ AC_PATH_PROG(__INSTALL, install, /usr/bin/install, $MYPATH)
+ AC_PATH_PROG(__LRZIP, lrzip, /usr/bin/lrzip, $MYPATH)
+ AC_PATH_PROG(__LZIP, lzip, /usr/bin/lzip, $MYPATH)
+ AC_PATH_PROG(__XZ, xz, /usr/bin/xz, $MYPATH)
++AC_PATH_PROG(__GEM, gem, /usr/bin/gem, $MYPATH)
+ AC_PATH_PROG(__MAKE, make, /usr/bin/make, $MYPATH)
+ AC_PATH_PROG(__MKDIR, mkdir, /bin/mkdir, $MYPATH)
+ AC_PATH_PROG(__MV, mv, /bin/mv, $MYPATH)
+diff --git a/macros.in b/macros.in
+index 6ea04c9..f36dd5e 100644
+--- a/macros.in
++++ b/macros.in
+@@ -68,6 +68,7 @@
+ %__ssh			@__SSH@
+ %__tar			@__TAR@
+ %__unzip		@__UNZIP@
++%__gem			@__GEM@
+ %__git			@__GIT@
+ %__hg			@__HG@
+ %__bzr			@__BZR@
+diff --git a/rpmio/rpmfileutil.c b/rpmio/rpmfileutil.c
+index 40d619c..67bffb9 100644
+--- a/rpmio/rpmfileutil.c
++++ b/rpmio/rpmfileutil.c
+@@ -370,6 +370,8 @@ int rpmFileIsCompressed(const char * file, rpmCompressedMagic * compressed)
+ 	*compressed = COMPRESSED_7ZIP;
+     } else if (rpmFileHasSuffix(file, ".lzma")) {
+ 	*compressed = COMPRESSED_LZMA;
++    } else if (rpmFileHasSuffix(file, ".gem")) {
++	*compressed = COMPRESSED_GEM;
+     }
+ 
+     return rc;
+diff --git a/rpmio/rpmfileutil.h b/rpmio/rpmfileutil.h
+index 79fac86..3c0a984 100644
+--- a/rpmio/rpmfileutil.h
++++ b/rpmio/rpmfileutil.h
+@@ -26,7 +26,8 @@ typedef enum rpmCompressedMagic_e {
+     COMPRESSED_XZ		= 5,	/*!< xz can handle */
+     COMPRESSED_LZIP		= 6,	/*!< lzip can handle */
+     COMPRESSED_LRZIP		= 7,	/*!< lrzip can handle */
+-    COMPRESSED_7ZIP		= 8	/*!< 7zip can handle */
++    COMPRESSED_7ZIP		= 8,	/*!< 7zip can handle */
++    COMPRESSED_GEM		= 9	/*!< gem can handle */
+ } rpmCompressedMagic;
+ 
+ /** \ingroup rpmfileutil
+-- 
+2.10.1
+
