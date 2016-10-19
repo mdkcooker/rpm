@@ -125,7 +125,9 @@ Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
 # Patches that expect Fedora patches
 Patch400: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
-Patch401: rpm-4.13.0-rpm2archive-return-0-on-success.patch
+
+# Upstream patches not carried by FC:
+Patch500: rpm-4.13.0-rpm2archive-return-0-on-success.patch
 
 #
 # Mageia patches
