@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}36
+Release:	%mkrel %{?snapver:0.%{snapver}.}37
 Group:		System/Packaging
 Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
@@ -128,6 +128,7 @@ Patch400: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 
 # Upstream patches not carried by FC:
 Patch500: rpm-4.13.0-rpm2archive-return-0-on-success.patch
+Patch501: 0001-rpm2cpio.sh-refactoring-to-reduce-extra-dependencies.patch
 
 #
 # Mageia patches

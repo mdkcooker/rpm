@@ -1,0 +1,117 @@
+From 19dbaff8dd051688c0acf1b6605bf13a7fe019bd Mon Sep 17 00:00:00 2001
+From: Alexey Gladkov <gladkov.alexey@gmail.com>
+Date: Fri, 9 Sep 2016 15:03:41 +0200
+Subject: [PATCH] rpm2cpio.sh: refactoring to reduce extra dependencies
+
+rpm2cpio.sh was refactored to minimize the use of external tools.
+
+* after refactoring the utility requires to work: dd, printf, and unarchivers;
+* add check that file passed as argument is a rpm-file;
+* fix signatures of compressed data.
+
+Signed-off-by: Alexey Gladkov <gladkov.alexey@gmail.com>
+---
+ scripts/rpm2cpio.sh | 92 ++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 52 insertions(+), 40 deletions(-)
+
+diff --git a/scripts/rpm2cpio.sh b/scripts/rpm2cpio.sh
+index cb93ead..f7d50fd 100755
+--- a/scripts/rpm2cpio.sh
++++ b/scripts/rpm2cpio.sh
+@@ -1,41 +1,53 @@
+-#!/bin/sh
+-
+-# Prevent gawk >= 4.0.x from getting funny ideas wrt UTF in printf()
+-LANG=C
+-
+-pkg=$1
+-if [ "$pkg" = "" -o ! -e "$pkg" ]; then
+-    echo "no package supplied" 1>&2
+-   exit 1
+-fi
+-
+-leadsize=96
+-o=`expr $leadsize + 8`
+-set `od -j $o -N 8 -t u1 $pkg`
+-il=`expr 256 \* \( 256 \* \( 256 \* $2 + $3 \) + $4 \) + $5`
+-dl=`expr 256 \* \( 256 \* \( 256 \* $6 + $7 \) + $8 \) + $9`
+-# echo "sig il: $il dl: $dl"
+-
+-sigsize=`expr 8 + 16 \* $il + $dl`
+-o=`expr $o + $sigsize + \( 8 - \( $sigsize \% 8 \) \) \% 8 + 8`
+-set `od -j $o -N 8 -t u1 $pkg`
+-il=`expr 256 \* \( 256 \* \( 256 \* $2 + $3 \) + $4 \) + $5`
+-dl=`expr 256 \* \( 256 \* \( 256 \* $6 + $7 \) + $8 \) + $9`
+-# echo "hdr il: $il dl: $dl"
+-
+-hdrsize=`expr 8 + 16 \* $il + $dl`
+-o=`expr $o + $hdrsize`
+-
+-comp=`dd if="$pkg" ibs=$o skip=1 count=1 2>/dev/null \
+-      | dd bs=3 count=1 2>/dev/null`
+-
+-gz="`echo . | awk '{ printf("%c%c", 0x1f, 0x8b); }'`"
+-lzma="`echo . | awk '{ printf("%cLZ", 0xff); }'`"
+-xz="`echo . | awk '{ printf("%c7z", 0xfd); }'`"
+-case "$comp" in
+-    BZh)      dd if="$pkg" ibs=$o skip=1 2>/dev/null | bunzip2 ;;
+-    "$gz"*)   dd if="$pkg" ibs=$o skip=1 2>/dev/null | gunzip ;;
+-    "$xz"*)   dd if="$pkg" ibs=$o skip=1 2>/dev/null | xzcat ;;
+-    "$lzma"*) dd if="$pkg" ibs=$o skip=1 2>/dev/null | unlzma ;;
+-    *)        echo "Unrecognized rpm file: $pkg"; exit 1 ;;
++#!/bin/sh -efu
++
++fatal() {
++	echo "$*" >&2
++	exit 1
++}
++
++pkg="$1"
++[ -n "$pkg" -a -e "$pkg" ] ||
++	fatal "No package supplied"
++
++_dd() {
++	local o="$1"; shift
++	dd if="$pkg" skip="$o" iflag=skip_bytes status=none $*
++}
++
++calcsize() {
++	offset=$(($1 + 8))
++
++	local i b b0 b1 b2 b3 b4 b5 b6 b7
++
++	i=0
++	while [ $i -lt 8 ]; do
++		b="$(_dd $(($offset + $i)) bs=1 count=1)"
++		[ -z "$b" ] &&
++			b="0" ||
++			b="$(exec printf '%u\n' "'$b")"
++		eval "b$i=\$b"
++		i=$(($i + 1))
++	done
++
++	rsize=$((8 + ((($b0 << 24) + ($b1 << 16) + ($b2 << 8) + $b3) << 4) + ($b4 << 24) + ($b5 << 16) + ($b6 << 8) + $b7))
++	offset=$(($offset + $rsize))
++}
++
++case "$(_dd 0 bs=8 count=1)" in
++	"$(printf '\355\253\356\333')"*) ;; # '\xed\xab\xee\xdb'
++	*) fatal "File doesn't look like rpm: $pkg" ;;
++esac
++
++calcsize 96
++sigsize=$rsize
++
++calcsize $(($offset + (8 - ($sigsize % 8)) % 8))
++hdrsize=$rsize
++
++case "$(_dd $offset bs=3 count=1)" in
++	"$(printf '\102\132')"*) _dd $offset | bunzip2 ;; # '\x42\x5a'
++	"$(printf '\037\213')"*) _dd $offset | gunzip  ;; # '\x1f\x8b'
++	"$(printf '\375\067')"*) _dd $offset | xzcat   ;; # '\xfd\x37'
++	"$(printf '\135\000')"*) _dd $offset | unlzma  ;; # '\x5d\x00'
++	*) fatal "Unrecognized rpm file: $pkg" ;;
+ esac
+-- 
+2.10.1
+
