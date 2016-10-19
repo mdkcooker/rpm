@@ -120,6 +120,10 @@ Patch308: rpm-4.12.0.x-CVE-2013-6435.patch
 # Add check against malicious CPIO file name size
 Patch309: rpm-4.12.0.x-CVE-2014-8118.patch
 
+#
+# End of FC patches
+# 
+
 # Patches that expect Fedora patches
 Patch400: rpm-4.13.0-find-debuginfo-dont-copy-extra-sections.patch
 
