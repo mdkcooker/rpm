@@ -482,6 +482,7 @@ fi
 %define	rpmattr		%attr(0755, rpm, rpm)
 
 %files -f %{name}.lang
+%license COPYING
 %doc GROUPS CHANGES doc/manual/[a-z]*
 %attr(0755,rpm,rpm) /bin/rpm
 %attr(0755, rpm, rpm) %{_bindir}/rpm2cpio
@@ -652,6 +653,7 @@ fi
 %{_libdir}/librpmsign.so.%{libmajor}*
 
 %files doc
+%license COPYING
 %doc doc/librpm/html
 
 %files sign
