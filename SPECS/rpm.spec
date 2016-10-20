@@ -401,7 +401,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %make_build
 %if %with python
 pushd python
-%{__python} setup.py build
+%{__python2} setup.py build
 %{__python3} setup.py build
 popd
 %endif
@@ -414,7 +414,7 @@ popd
 # actually package the bindings built with setup.py (#531543#c26)
 rm -rf $RPM_BUILD_ROOT/%{python_sitearch}
 pushd python
-%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT
+%{__python2} setup.py install --skip-build --root $RPM_BUILD_ROOT
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
 popd
 %endif
