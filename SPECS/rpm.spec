@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}0
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -322,14 +322,6 @@ Requires:	%librpmbuild = %epoch:%version
 This package contains scripts and executable programs that are used to
 build packages using RPM.
 
-%package doc
-Summary: RPM Documentation
-Group:   Documentation
-BuildArch: noarch
-
-%description doc
-This package contains the RPM documentation.
-
 %package sign
 Summary: Package signing support
 Group:   System/Base
@@ -364,6 +356,17 @@ supplied by RPM (RPM Package Manager) libraries.
 This package should be installed if you want to develop Python 3
 programs that will manipulate RPM packages and databases.
 %endif
+
+%package apidocs
+Summary: API documentation for RPM libraries
+Group:   Documentation
+BuildArch: noarch
+# temporary cauldron rename:
+%rename rpm-doc
+
+%description apidocs
+This package contains API documentation for developing applications
+that will manipulate RPM packages and databases.
 
 %prep
 %setup -q -n %name-%srcver
@@ -652,7 +655,7 @@ fi
 %files -n %librpmsign
 %{_libdir}/librpmsign.so.%{libmajor}*
 
-%files doc
+%files apidocs
 %license COPYING
 %doc doc/librpm/html
 
