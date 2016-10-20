@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}0
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -178,7 +178,10 @@ Patch4012: rpm-mga-suggests.diff
 # (Debian): avoid useless) linking (&dependency) on all supported python versions:
 Patch6001: do-not-link-libpython.patch
 
-License:	GPLv2+
+# Partially GPL/LGPL dual-licensed and some bits with BSD
+# SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
+License: GPLv2+
+
 BuildRequires:	autoconf
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:  bzip2-devel
@@ -241,6 +244,7 @@ about the package like its version, a description, etc.
 %package   -n %librpmbuild
 Summary:   Libraries for building and signing RPM packages
 Group:     System/Libraries
+License: GPLv2+ and LGPLv2+ with exceptions
 Obsoletes: rpm-build-libs%{_isa} < %{version}-%{release}
 Provides: rpm-build-libs%{_isa} = %{version}-%{release}
 
@@ -251,6 +255,7 @@ packages.
 %package  -n %librpmsign
 Summary:  Libraries for building and signing RPM packages
 Group:    System/Libraries
+License: GPLv2+ and LGPLv2+ with exceptions
 
 %description -n %librpmsign
 This package contains the RPM shared libraries for building and signing
@@ -259,6 +264,7 @@ packages.
 %package -n %librpmname
 Summary:  Library used by rpm
 Group:	  System/Libraries
+License: GPLv2+ and LGPLv2+ with exceptions
 Provides: librpm = %version-%release
 # for fixed lua:
 Requires:  %{mklibname lua 5.2} >= 5.2.3-3.mga5
@@ -272,6 +278,7 @@ This package contains common files to all applications based on rpm.
 %package -n %librpmnamedevel
 Summary:	Development files for applications which will manipulate RPM packages
 Group:		Development/C
+License: GPLv2+ and LGPLv2+ with exceptions
 Requires:	rpm = %epoch:%{version}-%{release}
 Provides:	librpm-devel = %version-%release
 Provides:   	rpm-devel = %version-%release
