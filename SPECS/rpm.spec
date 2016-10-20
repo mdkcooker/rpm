@@ -369,8 +369,7 @@ This package contains API documentation for developing applications
 that will manipulate RPM packages and databases.
 
 %prep
-%setup -q -n %name-%srcver
-%autopatch -p1
+%autosetup -n %{name}-%{srcver} 1} -p1
 
 %build
 %define _disable_ld_no_undefined 1
