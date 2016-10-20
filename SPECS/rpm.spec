@@ -17,11 +17,6 @@
 %define _localstatedir /var
 %define _infodir %_datadir/info
 
-# Define directory which holds rpm config files, and some binaries actually
-# NOTE: it remains */lib even on lib64 platforms as only one version
-#       of rpm is supported anyway, per architecture
-%define rpmdir %{_prefix}/lib/rpm
-
 %if %{?mklibname:0}%{?!mklibname:1}
 %define mklibname(ds)  %{_lib}%{1}%{?2:%{2}}%{?3:_%{3}}%{-s:-static}%{-d:-devel}
 %endif
@@ -38,8 +33,13 @@
 %define pyver %(python -V 2>&1 | cut -f2 -d" " | cut -f1,2 -d".")
 %endif
 
-%define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
-%define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
+%define __find_requires %{rpmhome}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
+%define __find_provides %{rpmhome}/%{_real_vendor}/find-provides
+
+# Define directory which holds rpm config files, and some binaries actually
+# NOTE: it remains */lib even on lib64 platforms as only one version
+#       of rpm is supported anyway, per architecture
+%define rpmhome /usr/lib/rpm
 
 %global rpmver 4.13.0
 %global snapver		rc2
@@ -435,8 +435,8 @@ rm -f doc-copy/Makefile*
 
 mkdir -p $RPM_BUILD_ROOT/var/spool/repackage
 
-mkdir -p %buildroot%rpmdir/macros.d
-install %SOURCE1 %buildroot%rpmdir/macros.d
+mkdir -p %buildroot%rpmhome/macros.d
+install %SOURCE1 %buildroot%rpmhome/macros.d
 mkdir -p %buildroot%_sysconfdir/rpm/macros.d
 cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 # Put your own system macros here
@@ -447,7 +447,7 @@ cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 
 EOF
 
-%{rpmdir}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
+%{rpmhome}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
 exit 0
@@ -488,68 +488,68 @@ fi
 %{_libdir}/rpm-plugins
 
 %dir %{_localstatedir}/spool/repackage
-%dir %{rpmdir}
+%dir %{rpmhome}
 %dir /etc/rpm
 %config(noreplace) /etc/rpm/macros
 %dir /etc/rpm/macros.d
-%attr(0755, rpm, rpm) %{rpmdir}/config.guess
-%attr(0755, rpm, rpm) %{rpmdir}/config.sub
-%attr(0755, rpm, rpm) %{rpmdir}/rpmdb_*
-%attr(0644, rpm, rpm) %{rpmdir}/macros
-%rpmdir/macros.d
-%attr(0755, rpm, rpm) %{rpmdir}/mkinstalldirs
-%attr(0755, rpm, rpm) %{rpmdir}/rpm.*
-%attr(0644, rpm, rpm) %{rpmdir}/rpmpopt*
-%attr(0644, rpm, rpm) %{rpmdir}/rpmrc
-%attr(0755, rpm, rpm) %{rpmdir}/elfdeps
-%attr(0755, rpm, rpm) %{rpmdir}/script.req
+%attr(0755, rpm, rpm) %{rpmhome}/config.guess
+%attr(0755, rpm, rpm) %{rpmhome}/config.sub
+%attr(0755, rpm, rpm) %{rpmhome}/rpmdb_*
+%attr(0644, rpm, rpm) %{rpmhome}/macros
+%rpmhome/macros.d
+%attr(0755, rpm, rpm) %{rpmhome}/mkinstalldirs
+%attr(0755, rpm, rpm) %{rpmhome}/rpm.*
+%attr(0644, rpm, rpm) %{rpmhome}/rpmpopt*
+%attr(0644, rpm, rpm) %{rpmhome}/rpmrc
+%attr(0755, rpm, rpm) %{rpmhome}/elfdeps
+%attr(0755, rpm, rpm) %{rpmhome}/script.req
 
-%rpmattr	%{rpmdir}/rpm2cpio.sh
-%rpmattr	%{rpmdir}/tgpg
+%rpmattr	%{rpmhome}/rpm2cpio.sh
+%rpmattr	%{rpmhome}/tgpg
 
-%dir %attr(   -, rpm, rpm) %{rpmdir}/fileattrs
-%attr(0644, rpm, rpm) %{rpmdir}/fileattrs/*.attr
+%dir %attr(   -, rpm, rpm) %{rpmhome}/fileattrs
+%attr(0644, rpm, rpm) %{rpmhome}/fileattrs/*.attr
 
-%dir %attr(   -, rpm, rpm) %{rpmdir}/platform/
-%exclude %{rpmdir}/platform/m68k-linux/macros
-%exclude %{rpmdir}/platform/riscv64-linux/macros
+%dir %attr(   -, rpm, rpm) %{rpmhome}/platform/
+%exclude %{rpmhome}/platform/m68k-linux/macros
+%exclude %{rpmhome}/platform/riscv64-linux/macros
 %ifarch %{ix86} x86_64
-%attr(   -, rpm, rpm) %{rpmdir}/platform/i*86-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/athlon-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/pentium*-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/geode-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/i*86-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/athlon-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/pentium*-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/geode-*
 %else
-%exclude %{rpmdir}/platform/i*86-linux/macros
-%exclude %{rpmdir}/platform/athlon-linux/macros
-%exclude %{rpmdir}/platform/pentium*-linux/macros
-%exclude %{rpmdir}/platform/geode-linux/macros
+%exclude %{rpmhome}/platform/i*86-linux/macros
+%exclude %{rpmhome}/platform/athlon-linux/macros
+%exclude %{rpmhome}/platform/pentium*-linux/macros
+%exclude %{rpmhome}/platform/geode-linux/macros
 %endif
 %ifarch x86_64
-%attr(   -, rpm, rpm) %{rpmdir}/platform/amd64-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/x86_64-*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/ia32e-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/amd64-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/x86_64-*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/ia32e-*
 %else
-%exclude %{rpmdir}/platform/amd64-linux/macros
-%exclude %{rpmdir}/platform/ia32e-linux/macros
-%exclude %{rpmdir}/platform/x86_64-linux/macros
+%exclude %{rpmhome}/platform/amd64-linux/macros
+%exclude %{rpmhome}/platform/ia32e-linux/macros
+%exclude %{rpmhome}/platform/x86_64-linux/macros
 %endif
 %ifarch %arm
-%attr(   -, rpm, rpm) %{rpmdir}/platform/arm*
-%attr(   -, rpm, rpm) %{rpmdir}/platform/aarch64*/macros
+%attr(   -, rpm, rpm) %{rpmhome}/platform/arm*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/aarch64*/macros
 %else
-%exclude %{rpmdir}/platform/arm*/macros
-%exclude %{rpmdir}/platform/aarch64*/macros
+%exclude %{rpmhome}/platform/arm*/macros
+%exclude %{rpmhome}/platform/aarch64*/macros
 %endif
-%attr(   -, rpm, rpm) %{rpmdir}/platform/noarch*
+%attr(   -, rpm, rpm) %{rpmhome}/platform/noarch*
 # new in 4.10.0:
-%exclude %{rpmdir}/platform/alpha*-linux/macros
-%exclude %{rpmdir}/platform/sparc*-linux/macros
-%exclude %{rpmdir}/platform/ia64*-linux/macros
-%exclude %{rpmdir}/platform/m68k*-linux/macros
-%exclude %{rpmdir}/platform/mips*-linux/macros
-%exclude %{rpmdir}/platform/ppc*-linux/macros
-%exclude %{rpmdir}/platform/s390*-linux/macros
-%exclude %{rpmdir}/platform/sh*-linux/macros
+%exclude %{rpmhome}/platform/alpha*-linux/macros
+%exclude %{rpmhome}/platform/sparc*-linux/macros
+%exclude %{rpmhome}/platform/ia64*-linux/macros
+%exclude %{rpmhome}/platform/m68k*-linux/macros
+%exclude %{rpmhome}/platform/mips*-linux/macros
+%exclude %{rpmhome}/platform/ppc*-linux/macros
+%exclude %{rpmhome}/platform/s390*-linux/macros
+%exclude %{rpmhome}/platform/sh*-linux/macros
 
 
 
