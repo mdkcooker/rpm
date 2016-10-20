@@ -43,7 +43,7 @@
 
 %global rpmver 4.13.0
 %global snapver		rc2
-%global srcver          %{rpmver}%{?snapver:-%{snapver}}
+%global srcver %{version}%{?snapver:-%{snapver}}
 %global srcdir %{?snapver:testing}%{!?snapver:%{name}-%(v=%{version}; echo ${v%.*}.x)}
 %global libmajor	7
 %global librpmname      %mklibname rpm  %{libmajor}
