@@ -41,17 +41,17 @@
 %define __find_requires %{rpmdir}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmdir}/%{_real_vendor}/find-provides
 
-%define rpmver 4.13.0
-%define snapver		rc1
-%define srcver          %{rpmver}%{?snapver:-%{snapver}}
-%define libver		4.12
-%define libmajor	7
-%define librpmname      %mklibname rpm  %{libmajor}
-%define librpmnamedevel %mklibname -d rpm
-%define librpmsign      %mklibname rpmsign %{libmajor}
-%define librpmbuild     %mklibname rpmbuild %{libmajor}
+%global rpmver 4.13.0
+%global snapver		rc1
+%global srcver          %{rpmver}%{?snapver:-%{snapver}}
+%global libver		4.12
+%global libmajor	7
+%global librpmname      %mklibname rpm  %{libmajor}
+%global librpmnamedevel %mklibname -d rpm
+%global librpmsign      %mklibname rpmsign %{libmajor}
+%global librpmbuild     %mklibname rpmbuild %{libmajor}
 
-%define rpmsetup_version 1.34
+%global rpmsetup_version 1.34
 
 %bcond_with debug
 %bcond_without python
