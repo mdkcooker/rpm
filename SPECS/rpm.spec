@@ -60,12 +60,13 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
+Source2:	missing.tgz
 
 #
 # Fedora patches
@@ -87,6 +88,10 @@ Patch304: rpm-4.9.1.1-ld-flags.patch
 Patch501: 0001-rpm2cpio.sh-refactoring-to-reduce-extra-dependencies.patch
 # Automatically handle ruby gem extraction in %%setup:
 Patch502: 0001-Add-RubyGems-support.patch
+# fix testsuite:
+Patch503: 0001-Fix-error-handling-in-rpmio-Python-binding-test-case.patch
+Patch504: 0001-fix-calling-sepdebugcrcfix.patch
+Patch505: 0001-fix-testsuite-adjust-pkg-list.patch
 
 #
 # Mageia patches
@@ -369,7 +374,7 @@ This package contains API documentation for developing applications
 that will manipulate RPM packages and databases.
 
 %prep
-%autosetup -n %{name}-%{srcver} 1} -p1
+%autosetup -n %{name}-%{srcver} 1} -p1 -a2
 
 %build
 %define _disable_ld_no_undefined 1
@@ -459,7 +464,6 @@ EOF
 %{rpmhome}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
 
 %check
-exit 0
 eatmydata make check
 [ "$(ls -A tests/rpmtests.dir)" ] && cat tests/rpmtests.log
 
