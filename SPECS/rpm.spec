@@ -90,7 +90,7 @@ Patch501: 0001-rpm2cpio.sh-refactoring-to-reduce-extra-dependencies.patch
 Patch502: 0001-Add-RubyGems-support.patch
 # fix testsuite:
 Patch503: 0001-Fix-error-handling-in-rpmio-Python-binding-test-case.patch
-Patch504: 0001-fix-calling-sepdebugcrcfix.patch
+Patch504: 0001-Don-t-use-hardcoded-paths-to-tools-scripts-in-find-d.patch
 Patch505: 0001-fix-testsuite-adjust-pkg-list.patch
 
 #
