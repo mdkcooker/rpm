@@ -489,7 +489,7 @@ fi
 
 %files -f %{name}.lang
 %license COPYING
-%doc GROUPS CHANGES doc/manual/[a-z]*
+%doc CHANGES doc/manual/[a-z]*
 %attr(0755,rpm,rpm) /bin/rpm
 %attr(0755, rpm, rpm) %{_bindir}/rpm2cpio
 %attr(0755, rpm, rpm) %{_bindir}/rpm2archive
