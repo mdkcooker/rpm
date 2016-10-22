@@ -434,10 +434,10 @@ install -m 644 scripts/rpm.log ${RPM_BUILD_ROOT}/etc/logrotate.d/rpm
 
 mkdir -p $RPM_BUILD_ROOT/var/lib/rpm
 for dbi in \
-	Basenames Conflictname Dirnames Group Installtid Name Providename \
-	Provideversion Removetid Requirename Requireversion Triggername \
-	Obsoletename Packages Sha1header Sigmd5 __db.001 __db.002 \
-	__db.003 __db.004 __db.005 __db.006 __db.007 __db.008 __db.009
+	Basenames Conflictname Dirnames Group Installtid Name Obsoletename \
+	Packages Providename Requirename Triggername Sha1header Sigmd5 \
+	__db.001 __db.002 __db.003 __db.004 __db.005 __db.006 __db.007 \
+	__db.008 __db.009
 do
     touch $RPM_BUILD_ROOT/var/lib/rpm/$dbi
 done
