@@ -54,7 +54,6 @@
 %global rpmsetup_version 1.34
 
 %bcond_with debug
-%bcond_without python
 
 Summary:	The RPM package management system
 Name:		rpm
@@ -211,10 +210,8 @@ BuildRequires:  pkgconfig(libssl)
 BuildRequires:  pkgconfig(lua) >= 5.2.3-3.mga5
 BuildRequires:  pkgconfig(libcap)
 BuildRequires:  pkgconfig(libarchive)
-%if %with python
 BuildRequires:  pkgconfig(python)
 BuildRequires:  pkgconfig(python-3.5)
-%endif
 # for testsuite:
 BuildRequires: eatmydata
 BuildRequires: fakechroot
@@ -333,7 +330,6 @@ Group:   System/Base
 %description sign
 This package contains support for digitally signing RPM packages.
 
-%if %with python
 %package -n python-rpm
 Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
@@ -359,7 +355,6 @@ supplied by RPM Package Manager libraries.
 
 This package should be installed if you want to develop Python 3
 programs that will manipulate RPM packages and databases.
-%endif
 
 %package apidocs
 Summary: API documentation for RPM libraries
@@ -399,20 +394,18 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --with-glob \
         --without-selinux \
         --with-apidocs \
-        --with-cap
+        --with-cap \
+	--enable-python
 
 %make_build
-%if %with python
 pushd python
 %{__python2} setup.py build
 %{__python3} setup.py build
 popd
-%endif
 
 %install
 %make_install
 
-%if %with python
 # We need to build with --enable-python for the self-test suite, but we
 # actually package the bindings built with setup.py (#531543#c26)
 rm -rf $RPM_BUILD_ROOT/%{python_sitearch}
@@ -420,7 +413,6 @@ pushd python
 %{__python2} setup.py install --skip-build --root $RPM_BUILD_ROOT
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
 popd
-%endif
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
@@ -636,7 +628,6 @@ fi
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
 
-%if %with python
 %files -n python-rpm
 %{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
@@ -645,7 +636,6 @@ fi
 %defattr(-,root,root)
 %{python3_sitearch}/rpm
 %{python3_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py%{python3_version}.egg-info
-%endif
 
 %files -n %librpmname
 %{_libdir}/librpm.so.%{libmajor}*
