@@ -389,7 +389,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --localstatedir=%{_var} \
         --sharedstatedir=%{_var}/lib \
         --enable-nls \
-        --without-javaglue \
         %{?_with_debug} \
         --with-external-db \
         %{?_with_python} \
