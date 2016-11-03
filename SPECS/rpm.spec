@@ -395,7 +395,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         %{?_with_debug} \
         --with-external-db \
         %{?_with_python} \
-        --with-glob \
         --without-selinux \
         --with-apidocs \
         --with-cap \
