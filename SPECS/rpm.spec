@@ -391,7 +391,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --enable-nls \
         %{?_with_debug} \
         --with-external-db \
-        %{?_with_python} \
         --without-selinux \
         --with-apidocs \
         --with-cap \
