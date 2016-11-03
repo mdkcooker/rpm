@@ -293,10 +293,11 @@ Requires:       %librpmsign = %epoch:%version-%release
 
 %description -n %librpmnamedevel
 This package contains the RPM C library and header files.  These
-development files will simplify the process of writing programs
-which manipulate RPM packages and databases and are intended to make
-it easier to create graphical package managers or any other tools
-that need an intimate knowledge of RPM packages in order to function.
+development files will simplify the process of writing programs that
+manipulate RPM packages and databases. These files are intended to
+simplify the process of creating graphical package managers or any
+other tools that need an intimate knowledge of RPM packages in order
+to function.
 
 This package should be installed if you want to develop programs that
 will manipulate RPM packages and databases.
