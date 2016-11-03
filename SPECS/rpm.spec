@@ -74,6 +74,10 @@ Source2:	missing.tgz
 #
 # Fedora patches
 #
+
+# gnupg2 comes installed by default, avoid need to drag in gnupg too
+Patch4: rpm-4.8.1-use-gpg2.patch
+
 # Patches already upstream:
 
 # These are not yet upstream
