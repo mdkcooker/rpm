@@ -388,7 +388,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
 %configure2_5x \
     --localstatedir=%{_var} \
     --sharedstatedir=%{_var}/lib \
-    --enable-nls \
     %{?_with_debug} \
     --with-external-db \
     --with-lua \
