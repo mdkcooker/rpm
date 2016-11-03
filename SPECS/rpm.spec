@@ -42,7 +42,7 @@
 %define rpmhome /usr/lib/rpm
 
 %global rpmver 4.13.0
-%global snapver		rc2
+#global snapver		rc2
 %global srcver %{version}%{?snapver:-%{snapver}}
 %global srcdir %{?snapver:testing}%{!?snapver:%{name}-%(v=%{version}; echo ${v%.*}.x)}
 %global libmajor	7
@@ -60,7 +60,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}2
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -90,7 +90,6 @@ Patch501: 0001-rpm2cpio.sh-refactoring-to-reduce-extra-dependencies.patch
 Patch502: 0001-Add-RubyGems-support.patch
 # fix testsuite:
 Patch503: 0001-Fix-error-handling-in-rpmio-Python-binding-test-case.patch
-Patch504: 0001-Don-t-use-hardcoded-paths-to-tools-scripts-in-find-d.patch
 Patch505: 0001-fix-testsuite-adjust-pkg-list.patch
 
 #
