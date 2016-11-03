@@ -385,16 +385,16 @@ RPM_OPT_FLAGS=-g
 %endif
 export CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
 CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
-    %configure2_5x \
-        --localstatedir=%{_var} \
-        --sharedstatedir=%{_var}/lib \
-        --enable-nls \
-        %{?_with_debug} \
-        --with-external-db \
-	--with-lua \
-        --without-selinux \
-        --with-cap \
-	--enable-python
+%configure2_5x \
+    --localstatedir=%{_var} \
+    --sharedstatedir=%{_var}/lib \
+    --enable-nls \
+    %{?_with_debug} \
+    --with-external-db \
+    --with-lua \
+    --without-selinux \
+    --with-cap \
+    --enable-python
 
 %make_build
 pushd python
