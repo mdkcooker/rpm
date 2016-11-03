@@ -61,7 +61,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -210,6 +210,7 @@ BuildRequires:	pkgconfig(ncurses)
 BuildRequires:  pkgconfig(libssl)
 BuildRequires:  pkgconfig(lua) >= 5.2.3-3.mga5
 BuildRequires:  pkgconfig(libcap)
+BuildRequires:  libacl-devel
 BuildRequires:  pkgconfig(libarchive)
 BuildRequires:  pkgconfig(python)
 BuildRequires:  pkgconfig(python-3.5)
@@ -393,6 +394,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     --with-lua \
     --without-selinux \
     --with-cap \
+    --with-acl \
     --enable-python
 
 %make_build
