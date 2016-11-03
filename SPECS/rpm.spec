@@ -240,10 +240,11 @@ Conflicts: jpackage-utils < 1:1.7.5-17
 Conflicts: %{_lib}rpm3 < 1:4.12.0.1-20.3
 
 %description
-RPM is a powerful command line driven package management system capable of
-installing, uninstalling, verifying, querying, and updating software packages.
-Each software package consists of an archive of files along with information
-about the package like its version, a description, etc.
+The RPM Package Manager (RPM) is a powerful command line driven
+package management system capable of installing, uninstalling,
+verifying, querying, and updating software packages.  Each software
+package consists of an archive of files along with information about
+the package like its version, a description, etc.
 
 %package   -n %librpmbuild
 Summary:   Libraries for building and signing RPM packages
@@ -323,8 +324,8 @@ Requires:	rpm-%{_real_vendor}-setup-build %{?rpmsetup_version:>= %{rpmsetup_vers
 Requires:	%librpmbuild = %epoch:%version
 
 %description build
-This package contains scripts and executable programs that are used to
-build packages using RPM.
+The rpm-build package contains the scripts and executable programs
+that are used to build packages using the RPM Package Manager.
 
 %package sign
 Summary: Package signing support
@@ -342,7 +343,7 @@ Requires:	rpm = %epoch:%{version}-%{release}
 %description -n python-rpm
 The rpm-python package contains a module which permits applications
 written in the Python programming language to use the interface
-supplied by RPM (RPM Package Manager) libraries.
+supplied by RPM Package Manager libraries.
 
 This package should be installed if you want to develop Python 2
 programs that will manipulate RPM packages and databases.
@@ -355,7 +356,7 @@ Requires:	rpm = %epoch:%{version}-%{release}
 %description -n python3-rpm
 The rpm-python package contains a module which permits applications
 written in the Python programming language to use the interface
-supplied by RPM (RPM Package Manager) libraries.
+supplied by RPM Package Manager libraries.
 
 This package should be installed if you want to develop Python 3
 programs that will manipulate RPM packages and databases.
