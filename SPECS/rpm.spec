@@ -198,7 +198,6 @@ BuildRequires:	libbeecrypt-devel
 BuildRequires:	binutils-devel
 BuildRequires:	ed
 BuildRequires:	gettext-devel
-BuildRequires:  pkgconfig(sqlite3)
 BuildRequires:  db5.3-devel
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(neon)
@@ -390,7 +389,6 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
         --localstatedir=%{_var} \
         --sharedstatedir=%{_var}/lib \
         --enable-nls \
-        --enable-sqlite3 \
         --without-javaglue \
         %{?_with_debug} \
         --with-external-db \
