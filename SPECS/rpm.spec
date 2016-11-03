@@ -36,6 +36,8 @@
 %define __find_requires %{rpmhome}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmhome}/%{_real_vendor}/find-provides
 
+# run internal testsuite?
+%bcond_without check
 %bcond_with debug
 
 # Define directory which holds rpm config files, and some binaries actually
@@ -214,7 +216,9 @@ BuildRequires:  pkgconfig(python)
 BuildRequires:  pkgconfig(python-3.5)
 # for testsuite:
 BuildRequires: eatmydata
+%if %{with check}
 BuildRequires: fakechroot
+%endif
 
 Requires:	bzip2 >= 0.9.0c-2
 Requires:	xz
@@ -454,9 +458,11 @@ EOF
 
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
+%if %{with check}
 %check
 eatmydata make check
 [ "$(ls -A tests/rpmtests.dir)" ] && cat tests/rpmtests.log
+%endif
 
 %pre
 /usr/share/rpm-helper/add-user rpm $1 rpm /var/lib/rpm /bin/false
