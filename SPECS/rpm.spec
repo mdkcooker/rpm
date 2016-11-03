@@ -414,8 +414,6 @@ pushd python
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
 popd
 
-find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
-
 # Save list of packages through cron
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.daily
 install -m 755 scripts/rpm.daily ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.daily/rpm
@@ -453,6 +451,8 @@ cat > %buildroot%_sysconfdir/rpm/macros <<EOF
 EOF
 
 %{rpmhome}/%{_host_vendor}/find-lang.pl $RPM_BUILD_ROOT %{name}
+
+find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
 %check
 eatmydata make check
