@@ -427,11 +427,11 @@ popd
 find $RPM_BUILD_ROOT -name "*.la"|xargs rm -f
 
 # Save list of packages through cron
-mkdir -p ${RPM_BUILD_ROOT}/etc/cron.daily
-install -m 755 scripts/rpm.daily ${RPM_BUILD_ROOT}/etc/cron.daily/rpm
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.daily
+install -m 755 scripts/rpm.daily ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.daily/rpm
 
-mkdir -p ${RPM_BUILD_ROOT}/etc/logrotate.d
-install -m 644 scripts/rpm.log ${RPM_BUILD_ROOT}/etc/logrotate.d/rpm
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/logrotate.d
+install -m 644 scripts/rpm.log ${RPM_BUILD_ROOT}%{_sysconfdir}/logrotate.d/rpm
 
 mkdir -p $RPM_BUILD_ROOT/var/lib/rpm
 for dbi in \
