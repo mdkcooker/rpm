@@ -342,7 +342,7 @@ Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
 
 %description -n python-rpm
-The python-rpm package contains a module which permits applications
+The python-rpm package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by RPM Package Manager libraries.
 
@@ -355,7 +355,7 @@ Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
 
 %description -n python3-rpm
-The python3-rpm package contains a module which permits applications
+The python3-rpm package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by RPM Package Manager libraries.
 
