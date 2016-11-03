@@ -36,6 +36,8 @@
 %define __find_requires %{rpmhome}/%{_real_vendor}/find-requires %{?buildroot:%{buildroot}} %{?_target_cpu:%{_target_cpu}}
 %define __find_provides %{rpmhome}/%{_real_vendor}/find-provides
 
+%bcond_with debug
+
 # Define directory which holds rpm config files, and some binaries actually
 # NOTE: it remains */lib even on lib64 platforms as only one version
 #       of rpm is supported anyway, per architecture
@@ -52,8 +54,6 @@
 %global librpmbuild     %mklibname rpmbuild %{libmajor}
 
 %global rpmsetup_version 1.34
-
-%bcond_with debug
 
 Summary:	The RPM package management system
 Name:		rpm
