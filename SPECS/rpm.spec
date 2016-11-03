@@ -38,6 +38,8 @@
 
 # run internal testsuite?
 %bcond_without check
+# build with new db format
+%bcond_with ndb
 %bcond_with debug
 
 # Define directory which holds rpm config files, and some binaries actually
@@ -395,6 +397,7 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     --without-selinux \
     --with-cap \
     --with-acl \
+    %{?with_ndb: --with-ndb} \
     --enable-python
 
 %make_build
