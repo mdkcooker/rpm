@@ -259,8 +259,6 @@ Summary:  Libraries for manipulating RPM packages
 Group:	  System/Libraries
 License: GPLv2+ and LGPLv2+ with exceptions
 Provides: librpm = %version-%release
-# for fixed lua:
-Requires:  %{mklibname lua 5.2} >= 5.2.3-3.mga5
 Provides: rpm-libs = %version-%release
 
 %description -n %librpmname
