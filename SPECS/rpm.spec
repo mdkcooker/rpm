@@ -653,21 +653,21 @@ fi
 %{_mandir}/man8/rpmsign.8*
 
 %files -n python2-%{name}
-%{python_sitearch}/rpm
-%{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
+%{python_sitearch}/%{name}/
+%{python_sitearch}/%{name}_python-*.egg-info
 
 %files -n python3-%{name}
 %defattr(-,root,root)
-%{python3_sitearch}/rpm
-%{python3_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py%{python3_version}.egg-info
+%{python3_sitearch}/%{name}/
+%{python3_sitearch}/%{name}_python-*.egg-info
 
 %files -n %librpmnamedevel
-%{_includedir}/rpm
 %{_libdir}/librpm.so
 %{_libdir}/librpmio.so
 %{_libdir}/librpmbuild.so
 %{_libdir}/librpmsign.so
-%{_libdir}/pkgconfig/rpm.pc
+%{_libdir}/pkgconfig/%{name}.pc
+%{_includedir}/%{name}/
 
 %files apidocs
 %license COPYING
