@@ -638,11 +638,11 @@ fi
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
 
-%files -n python2-rpm
+%files -n python2-%{name}
 %{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
 
-%files -n python3-rpm
+%files -n python3-%{name}
 %defattr(-,root,root)
 %{python3_sitearch}/rpm
 %{python3_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py%{python3_version}.egg-info
