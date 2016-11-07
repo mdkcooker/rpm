@@ -339,13 +339,15 @@ Group:   System/Base
 %description sign
 This package contains support for digitally signing RPM packages.
 
-%package -n python-rpm
+%package -n python2-%{name}
 Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
+Provides: python-%{name} = %{version}-%{release}
+Obsoletes: python-%{name} <= 4.13.0-3.mga6
 
-%description -n python-rpm
-The python-rpm package contains a module that permits applications
+%description -n python2-%{name}
+The python2-rpm package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by RPM Package Manager libraries.
 
@@ -636,7 +638,7 @@ fi
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
 
-%files -n python-rpm
+%files -n python2-rpm
 %{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
 
