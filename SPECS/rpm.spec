@@ -668,10 +668,7 @@ fi
 %{python3_sitearch}/%{name}_python-*.egg-info
 
 %files -n %librpmnamedevel
-%{_libdir}/librpm.so
-%{_libdir}/librpmio.so
-%{_libdir}/librpmbuild.so
-%{_libdir}/librpmsign.so
+%{_libdir}/librp*[a-z].so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
 
