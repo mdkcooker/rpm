@@ -321,7 +321,7 @@ Requires:	patch
 Requires:	make
 Requires:	tar
 Requires:	unzip
-# Versioned requirement for Patch 133
+# Versioned requirement for Patch 400
 Requires:	elfutils >= 0.167-2
 Requires:	perl(CPAN::Meta) >= 2.112.150
 Requires:	perl(ExtUtils::MakeMaker) >= 6.570_700
