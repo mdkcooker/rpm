@@ -568,7 +568,12 @@ fi
 
 
 
-%{_mandir}/man[18]/*.[18]*
+%{_mandir}/man8/rpm.8*
+%{_mandir}/man8/rpmdb.8*
+%{_mandir}/man8/rpmgraph.8*
+%{_mandir}/man8/rpmkeys.8*
+%{_mandir}/man8/rpm2cpio.8*
+%{_mandir}/man1/*.1*
 %lang(fr) %{_mandir}/fr/man[18]/*.[18]*
 %lang(ja) %{_mandir}/ja/man[18]/*.[18]*
 %lang(ko) %{_mandir}/ko/man[18]/*.[18]*
@@ -647,6 +652,7 @@ fi
 
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
+%{_mandir}/man8/rpmspec.8*
 
 %files sign
 %{_bindir}/rpmsign
