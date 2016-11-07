@@ -671,4 +671,4 @@ fi
 
 %files apidocs
 %license COPYING
-%doc doc/librpm/html
+%doc doc/librpm/html/*
