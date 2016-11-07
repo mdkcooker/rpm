@@ -353,12 +353,12 @@ supplied by RPM Package Manager libraries.
 This package should be installed if you want to develop Python 2
 programs that will manipulate RPM packages and databases.
 
-%package -n python3-rpm
+%package -n python3-%{name}
 Summary:	Python 3 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
 
-%description -n python3-rpm
+%description -n python3-%{name}
 The python3-rpm package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by RPM Package Manager libraries.
