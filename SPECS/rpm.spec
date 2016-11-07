@@ -569,12 +569,12 @@ fi
 
 
 %{_mandir}/man[18]/*.[18]*
+%lang(fr) %{_mandir}/fr/man[18]/*.[18]*
+%lang(ja) %{_mandir}/ja/man[18]/*.[18]*
+%lang(ko) %{_mandir}/ko/man[18]/*.[18]*
 %lang(pl) %{_mandir}/pl/man[18]/*.[18]*
 %lang(ru) %{_mandir}/ru/man[18]/*.[18]*
-%lang(ja) %{_mandir}/ja/man[18]/*.[18]*
 %lang(sk) %{_mandir}/sk/man[18]/*.[18]*
-%lang(fr) %{_mandir}/fr/man[18]/*.[18]*
-%lang(ko) %{_mandir}/ko/man[18]/*.[18]*
 
 %config(noreplace,missingok)	/etc/cron.daily/rpm
 %config(noreplace,missingok)	/etc/logrotate.d/rpm
