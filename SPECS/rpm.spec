@@ -242,8 +242,6 @@ Requires(pre):		rpm-helper
 Requires(pre):		coreutils
 Requires(postun):	rpm-helper
 
-Conflicts: perl-URPM < 4.0-2.mga3
-Conflicts: jpackage-utils < 1:1.7.5-17
 # fix for plugins conflict:
 Conflicts: %{_lib}rpm3 < 1:4.12.0.1-20.3
 
