@@ -601,6 +601,16 @@ fi
 %rpmdbattr	/var/lib/rpm/Sigmd5
 %rpmdbattr	/var/lib/rpm/Triggername
 
+%files -n %librpmname
+%{_libdir}/librpm.so.%{libmajor}*
+%{_libdir}/librpmio.so.%{libmajor}*
+
+%files -n %librpmbuild
+%{_libdir}/librpmbuild.so.%{libmajor}*
+
+%files -n %librpmsign
+%{_libdir}/librpmsign.so.%{libmajor}*
+
 %files build
 %doc CHANGES
 %doc doc-copy/*
@@ -638,6 +648,10 @@ fi
 %{_mandir}/man8/rpmbuild.8*
 %{_mandir}/man8/rpmdeps.8*
 
+%files sign
+%{_bindir}/rpmsign
+%{_mandir}/man8/rpmsign.8*
+
 %files -n python2-%{name}
 %{python_sitearch}/rpm
 %{python_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py*.egg-info
@@ -647,24 +661,6 @@ fi
 %{python3_sitearch}/rpm
 %{python3_sitearch}/rpm_python-%{version}%{?snapver:_%{snapver}}-py%{python3_version}.egg-info
 
-%files -n %librpmname
-%{_libdir}/librpm.so.%{libmajor}*
-%{_libdir}/librpmio.so.%{libmajor}*
-
-%files -n %librpmbuild
-%{_libdir}/librpmbuild.so.%{libmajor}*
-
-%files -n %librpmsign
-%{_libdir}/librpmsign.so.%{libmajor}*
-
-%files apidocs
-%license COPYING
-%doc doc/librpm/html
-
-%files sign
-%{_bindir}/rpmsign
-%{_mandir}/man8/rpmsign.8*
-
 %files -n %librpmnamedevel
 %{_includedir}/rpm
 %{_libdir}/librpm.so
@@ -673,3 +669,6 @@ fi
 %{_libdir}/librpmsign.so
 %{_libdir}/pkgconfig/rpm.pc
 
+%files apidocs
+%license COPYING
+%doc doc/librpm/html
