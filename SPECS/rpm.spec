@@ -69,7 +69,6 @@ Group:		System/Packaging
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
-Source2:	missing.tgz
 
 #
 # Fedora patches
@@ -377,7 +376,7 @@ This package contains API documentation for developing applications
 that will manipulate RPM packages and databases.
 
 %prep
-%autosetup -n %{name}-%{srcver} 1} -p1 -a2
+%autosetup -n %{name}-%{srcver} 1} -p1
 
 %build
 %define _disable_ld_no_undefined 1
