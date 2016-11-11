@@ -1,7 +1,7 @@
 From 52e9b5efde5cdc7368331537a7b98b17f5633cc6 Mon Sep 17 00:00:00 2001
 From: Panu Matilainen <pmatilai@redhat.com>
 Date: Fri, 11 Nov 2016 13:42:47 +0200
-Subject: [PATCH] Ensure that file trigger conditions are paths.
+Subject: [PATCH 4/6] Ensure that file trigger conditions are paths.
 
 ---
  build/parseScript.c | 6 ++++++

@@ -63,7 +63,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}4
+Release:	%mkrel %{?snapver:0.%{snapver}.}5
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -99,8 +99,11 @@ Patch502: 0001-Add-RubyGems-support.patch
 Patch503: 0001-Fix-error-handling-in-rpmio-Python-binding-test-case.patch
 Patch505: 0001-fix-testsuite-adjust-pkg-list.patch
 # file triggers fixes:
-Patch506: 0001-Ensure-that-file-trigger-conditions-are-paths.patch
-
+Patch600: 0001-Require-whitespace-around-trigger-separators-RhBug-1.patch
+Patch601: 0002-Revise-trigger-separator-checking-a-bit-to-pave-way-.patch
+Patch602: 0003-Ensure-that-a-trigger-condition-actually-exists.patch
+Patch603: 0004-Ensure-that-file-trigger-conditions-are-paths.patch
+Patch604: 0005-Make-package-exists-does-not-exist-error-more-inform.patch
 #
 # Mageia patches
 #
