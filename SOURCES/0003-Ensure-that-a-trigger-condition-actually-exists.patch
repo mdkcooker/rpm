@@ -1,0 +1,57 @@
+From dd7af7ed6efffa5d8dea39296f77c4fa34a40020 Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Fri, 11 Nov 2016 12:59:50 +0200
+Subject: [PATCH 3/6] Ensure that a trigger condition actually exists.
+
+All this time rpm has merrily accepted a trigger with no condition
+at all, eg "%triggerin --". Doh. Check and error out on missing trigger.
+This is all ridiculously subtle and fragile - pay attention to splitting
+the line only after all error messages have been done for full error
+message, but since we're now moving s further on whitespace we need
+to store the separation point into another helper to avoid breaking
+the other %trigger line semantics.
+---
+ build/parseScript.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/build/parseScript.c b/build/parseScript.c
+index 2cffbe4..0063422 100644
+--- a/build/parseScript.c
++++ b/build/parseScript.c
+@@ -15,6 +15,7 @@
+ 
+ #include "debug.h"
+ 
++#define SKIPSPACE(s) { while (*(s) && risspace(*(s))) (s)++; }
+ 
+ /**
+  */
+@@ -251,7 +252,7 @@ int parseScript(rpmSpec spec, int parsePart)
+     if (tag == RPMTAG_TRIGGERSCRIPTS || tag == RPMTAG_FILETRIGGERSCRIPTS ||
+ 	tag == RPMTAG_TRANSFILETRIGGERSCRIPTS) {
+ 	/* break line into two at the -- separator */
+-	char *s = spec->line;
++	char *sep, *s = spec->line;
+ 	while ((s = strstr(s, "--")) != NULL) {
+ 	    s += 2;
+ 	    if (risblank(*(s-3)) && risblank(*s))
+@@ -264,7 +265,15 @@ int parseScript(rpmSpec spec, int parsePart)
+ 	    goto exit;
+ 	}
+ 
+-	*(s-3) = '\0';
++	sep = s;
++	SKIPSPACE(s);
++	if (*s == '\0') {
++	    rpmlog(RPMLOG_ERR, _("line %d: missing trigger condition: %s\n"),
++				spec->lineNum, spec->line);
++	    goto exit;
++	}
++
++	*sep = '\0';
+ 	reqargs = xstrdup(s);
+     }
+     
+-- 
+2.10.2
+

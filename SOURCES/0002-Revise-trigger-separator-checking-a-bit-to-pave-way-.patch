@@ -1,0 +1,51 @@
+From 8fc3a220b3984296989ee3c595b1cf6ae1b2dc2d Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Fri, 11 Nov 2016 12:44:06 +0200
+Subject: [PATCH 2/6] Revise trigger separator checking a bit to pave way for
+ next commit
+
+Make the missing separator check more obvious (check s, not reqargs),
+jump over a potential separator when found, and eliminate a leftover early
+return causing memleaks. Apart from memleak, shouldn't actually change it.
+---
+ build/parseScript.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/build/parseScript.c b/build/parseScript.c
+index 067442c..2cffbe4 100644
+--- a/build/parseScript.c
++++ b/build/parseScript.c
+@@ -250,22 +250,22 @@ int parseScript(rpmSpec spec, int parsePart)
+ 
+     if (tag == RPMTAG_TRIGGERSCRIPTS || tag == RPMTAG_FILETRIGGERSCRIPTS ||
+ 	tag == RPMTAG_TRANSFILETRIGGERSCRIPTS) {
+-	/* break line into two */
++	/* break line into two at the -- separator */
+ 	char *s = spec->line;
+ 	while ((s = strstr(s, "--")) != NULL) {
+-	    if (risblank(*(s-1)) && risblank(*(s+2))) {
+-		reqargs = xstrdup(s + 2);
++	    s += 2;
++	    if (risblank(*(s-3)) && risblank(*s))
+ 		break;
+-	    }
+-	    s++;
+ 	}
+ 
+-	if (!reqargs) {
++	if (s == NULL) {
+ 	    rpmlog(RPMLOG_ERR, _("line %d: triggers must have --: %s\n"),
+ 		     spec->lineNum, spec->line);
+-	    return PART_ERROR;
++	    goto exit;
+ 	}
+-	*s = '\0';
++
++	*(s-3) = '\0';
++	reqargs = xstrdup(s);
+     }
+     
+     if ((rc = poptParseArgvString(spec->line, &argc, &argv))) {
+-- 
+2.10.2
+

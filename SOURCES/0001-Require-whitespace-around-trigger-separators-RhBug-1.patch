@@ -1,0 +1,51 @@
+From c217b60a7b55498e23ea3674a407d1cb7f8215ae Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Thu, 10 Nov 2016 16:44:36 +0200
+Subject: [PATCH 1/6] Require whitespace around trigger -- separators
+ (RhBug:1352828)
+
+"--" in filenames and such might be rare but it can exist, requiring
+whitespace surrounding the separator is the only sane thing to do.
+Would be easier to strstr() on " -- ", but inevitably that would
+break somebodys tab-aligned spec so...
+
+For anybody suspiciously looking at the pointer arithmetics: "--" cannot
+be at the beginning of a line which gets us here so s-1 has to be safe,
+and on the other side there has to be at least the trailing \0 at s+2.
+---
+ build/parseScript.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/build/parseScript.c b/build/parseScript.c
+index 64fd896..067442c 100644
+--- a/build/parseScript.c
++++ b/build/parseScript.c
+@@ -251,15 +251,21 @@ int parseScript(rpmSpec spec, int parsePart)
+     if (tag == RPMTAG_TRIGGERSCRIPTS || tag == RPMTAG_FILETRIGGERSCRIPTS ||
+ 	tag == RPMTAG_TRANSFILETRIGGERSCRIPTS) {
+ 	/* break line into two */
+-	char *s = strstr(spec->line, "--");
+-	if (!s) {
++	char *s = spec->line;
++	while ((s = strstr(s, "--")) != NULL) {
++	    if (risblank(*(s-1)) && risblank(*(s+2))) {
++		reqargs = xstrdup(s + 2);
++		break;
++	    }
++	    s++;
++	}
++
++	if (!reqargs) {
+ 	    rpmlog(RPMLOG_ERR, _("line %d: triggers must have --: %s\n"),
+ 		     spec->lineNum, spec->line);
+ 	    return PART_ERROR;
+ 	}
+-
+ 	*s = '\0';
+-	reqargs = xstrdup(s + 2);
+     }
+     
+     if ((rc = poptParseArgvString(spec->line, &argc, &argv))) {
+-- 
+2.10.2
+

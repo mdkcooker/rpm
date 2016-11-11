@@ -1,0 +1,124 @@
+From 8f3c798b12f8a3c2405e46cb2961f1ec32dd0d43 Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Fri, 11 Nov 2016 14:26:03 +0200
+Subject: [PATCH 5/6] Make package exists/does not exist error more informative
+
+Rearrange the message to "linenum: line: message" which is a more
+logical order of things (I think), and in particular, include the
+actual actual package name in the message. In order to do that,
+consolidate the error logging inside lookupPackage() where we
+now get a slightly hysterical logic around the error messages but what
+the hey, its not like this is an exported API.
+---
+ build/parseDescription.c | 6 +-----
+ build/parseFiles.c       | 5 +----
+ build/parsePolicies.c    | 5 +----
+ build/parsePreamble.c    | 1 -
+ build/parseScript.c      | 5 +----
+ build/spec.c             | 9 +++++++++
+ 6 files changed, 13 insertions(+), 18 deletions(-)
+
+diff --git a/build/parseDescription.c b/build/parseDescription.c
+index 0ab136f..428821e 100644
+--- a/build/parseDescription.c
++++ b/build/parseDescription.c
+@@ -60,12 +60,8 @@ int parseDescription(rpmSpec spec)
+ 	}
+     }
+ 
+-    if (lookupPackage(spec, name, flag, &pkg)) {
+-	rpmlog(RPMLOG_ERR, _("line %d: Package does not exist: %s\n"),
+-		 spec->lineNum, spec->line);
++    if (lookupPackage(spec, name, flag, &pkg))
+ 	goto exit;
+-    }
+-
+ 
+     sb = newStringBuf();
+ 
+diff --git a/build/parseFiles.c b/build/parseFiles.c
+index f0a607a..5ccc945 100644
+--- a/build/parseFiles.c
++++ b/build/parseFiles.c
+@@ -61,11 +61,8 @@ int parseFiles(rpmSpec spec)
+ 	}
+     }
+ 
+-    if (lookupPackage(spec, name, flag, &pkg)) {
+-	rpmlog(RPMLOG_ERR, _("line %d: Package does not exist: %s\n"),
+-		 spec->lineNum, spec->line);
++    if (lookupPackage(spec, name, flag, &pkg))
+ 	goto exit;
+-    }
+ 
+     /*
+      * This should be an error, but its surprisingly commonly abused for the
+diff --git a/build/parsePolicies.c b/build/parsePolicies.c
+index 1295416..54c8593 100644
+--- a/build/parsePolicies.c
++++ b/build/parsePolicies.c
+@@ -58,11 +58,8 @@ int parsePolicies(rpmSpec spec)
+ 	}
+     }
+ 
+-    if (lookupPackage(spec, name, flag, &pkg)) {
+-	rpmlog(RPMLOG_ERR, _("line %d: Package does not exist: %s\n"),
+-	       spec->lineNum, spec->line);
++    if (lookupPackage(spec, name, flag, &pkg))
+ 	goto exit;
+-    }
+ 
+     if ((rc = readLine(spec, STRIP_TRAILINGSPACE | STRIP_COMMENTS)) > 0) {
+ 	nextPart = PART_NONE;
+diff --git a/build/parsePreamble.c b/build/parsePreamble.c
+index 7923144..a2d92b5 100644
+--- a/build/parsePreamble.c
++++ b/build/parsePreamble.c
+@@ -1092,7 +1092,6 @@ int parsePreamble(rpmSpec spec, int initialPackage)
+ 	    goto exit;
+ 	
+ 	if (!lookupPackage(spec, name, flag, NULL)) {
+-	    rpmlog(RPMLOG_ERR, _("Package already exists: %s\n"), spec->line);
+ 	    free(name);
+ 	    goto exit;
+ 	}
+diff --git a/build/parseScript.c b/build/parseScript.c
+index 20fcdcc..48bc8d7 100644
+--- a/build/parseScript.c
++++ b/build/parseScript.c
+@@ -336,11 +336,8 @@ int parseScript(rpmSpec spec, int parsePart)
+ 	}
+     }
+     
+-    if (lookupPackage(spec, name, flag, &pkg)) {
+-	rpmlog(RPMLOG_ERR, _("line %d: Package does not exist: %s\n"),
+-		 spec->lineNum, spec->line);
++    if (lookupPackage(spec, name, flag, &pkg))
+ 	goto exit;
+-    }
+ 
+     if (tag != RPMTAG_TRIGGERSCRIPTS) {
+ 	if (headerIsEntry(pkg->header, progtag)) {
+diff --git a/build/spec.c b/build/spec.c
+index ffd7a2d..b72d357 100644
+--- a/build/spec.c
++++ b/build/spec.c
+@@ -86,6 +86,15 @@ rpmRC lookupPackage(rpmSpec spec, const char *name, int flag,Package *pkg)
+ 	    break;
+ 	}
+     }
++
++    if (p == NULL && pkg != NULL) {
++	rpmlog(RPMLOG_ERR, _("line %d: %s: package %s does not exist\n"),
++				spec->lineNum, spec->line, name);
++    } else if (p != NULL && pkg == NULL) {
++	rpmlog(RPMLOG_ERR, _("line %d: %s: package %s already exists\n"),
++				spec->lineNum, spec->line, name);
++    }
++
+     if (fullName == name)
+ 	free(fullName);
+ 
+-- 
+2.10.2
+
