@@ -63,7 +63,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}5
+Release:	%mkrel %{?snapver:0.%{snapver}.}6
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -345,8 +345,8 @@ This package contains support for digitally signing RPM packages.
 Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
-Provides: python-%{name} = %{version}-%{release}
-Obsoletes: python-%{name} <= 4.13.0-3.mga6
+Provides: python-%{name} = %epoch:%{version}-%{release}
+Obsoletes: python-%{name} <= %epoch:4.13.0-3.mga6
 
 %description -n python2-%{name}
 The python2-rpm package contains a module that permits applications
