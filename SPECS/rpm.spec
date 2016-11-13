@@ -346,7 +346,7 @@ Summary:	Python 2 bindings for apps which will manipulate RPM packages
 Group:		Development/Python
 Requires:	rpm = %epoch:%{version}-%{release}
 Provides: python-%{name} = %epoch:%{version}-%{release}
-Obsoletes: python-%{name} <= %epoch:4.13.0-3.mga6
+Obsoletes: python-%{name} <= 1:4.13.0-3
 
 %description -n python2-%{name}
 The python2-rpm package contains a module that permits applications
