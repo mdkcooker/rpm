@@ -63,7 +63,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}6
+Release:	%mkrel %{?snapver:0.%{snapver}.}7
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -173,6 +173,8 @@ Patch177: script-no-file-deps2.diff
 Patch180: elf_libs_req.diff 
 # [Suse]add --assumeexec option for previous patch:
 Patch181: assumeexec.diff 
+# (Martin Whitaker) disable the systemd-inhibit plugin when systemd-logind is not running (mga#20016):
+Patch182: systemd-inhibit-requires-logind.patch
 
 # Various arch enabling:
 Patch3003: rpm_arm_mips_isa_macros.patch
