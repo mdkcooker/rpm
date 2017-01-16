@@ -63,7 +63,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}7
+Release:	%mkrel %{?snapver:0.%{snapver}.}7.1
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -194,7 +194,10 @@ Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 Patch4012: rpm-mga-suggests.diff
 
 # (Debian): avoid useless) linking (&dependency) on all supported python versions:
-Patch6001: do-not-link-libpython.patch
+#Patch6001: do-not-link-libpython.patch
+
+# cooker patches
+Patch10000:	rpm-4.13.0-pythonembed2.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
@@ -407,7 +410,8 @@ CFLAGS="$RPM_OPT_FLAGS -fPIC" CXXFLAGS="$RPM_OPT_FLAGS -fPIC" \
     --with-cap \
     --with-acl \
     %{?with_ndb: --with-ndb} \
-    --enable-python
+    --enable-python \
+    --with-pythonembed
 
 %make_build
 pushd python
