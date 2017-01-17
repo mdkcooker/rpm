@@ -66,14 +66,13 @@ Version:        %{rpmver}
 Release:	%mkrel %{?snapver:0.%{snapver}.}7.1
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
-Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
+Source0:	https://github.com/rpm-software-management/rpm/releases/download/rpm-4.13.0-release/rpm-4.13.0.tar.bz2
 # extracted from http://pkgs.fedoraproject.org/cgit/redhat-rpm-config.git/plain/macros:
 Source1:	macros.filter
 
 #
 # Fedora patches
 #
-
 # gnupg2 comes installed by default, avoid need to drag in gnupg too
 Patch4: rpm-4.8.1-use-gpg2.patch
 
@@ -192,7 +191,6 @@ Patch4000: rpm-4.10.0-find-debuginfo__mga-cfg.diff
 Patch4010: rpm-4.12.0-oldsuggest_equals_recommends.patch
 # (tv) uneeeded: maps RECOMMENDNEVR to OLDSUGGEST instead of OLDRECOMMEND
 Patch4012: rpm-mga-suggests.diff
-
 # (Debian): avoid useless) linking (&dependency) on all supported python versions:
 #Patch6001: do-not-link-libpython.patch
 
