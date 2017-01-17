@@ -1,0 +1,782 @@
+diff -up rpm-4.13.0/configure.ac.pythonembed~ rpm-4.13.0/configure.ac
+--- rpm-4.13.0/configure.ac.pythonembed~	2017-01-17 14:30:56.854414243 +0100
++++ rpm-4.13.0/configure.ac	2017-01-17 14:31:03.509385191 +0100
+@@ -587,6 +587,7 @@ AS_IF([test "$enable_python" = yes],[
+   AM_PATH_PYTHON([2.6],[
+     WITH_PYTHON_INCLUDE=`${PYTHON} -c 'from distutils.sysconfig import *; import sys; sys.stdout.write(get_python_inc())'`
+     WITH_PYTHON_SUBPACKAGE=1
++    AC_DEFINE(ENABLE_PYTHON, 1, [build rpm python bindings])
+     save_CPPFLAGS="$CPPFLAGS"
+     CPPFLAGS="$CPPFLAGS -I$WITH_PYTHON_INCLUDE"
+     AC_CHECK_HEADER([Python.h],[],
+diff -up rpm-4.13.0/macros.in.pythonembed~ rpm-4.13.0/macros.in
+--- rpm-4.13.0/macros.in.pythonembed~	2017-01-17 14:30:56.855414239 +0100
++++ rpm-4.13.0/macros.in	2017-01-17 14:31:03.510385186 +0100
+@@ -1181,5 +1181,9 @@ end}
+ %{-S:%{expand:%__scm_setup_%{-S*} %{!-v:-q}}}\
+ %{!-N:%autopatch %{-v} %{-p:-p%{-p*}}}
+ 
++# Embedded python interpreter initialization commands
++%_pythonI_init	import rpm\
++%{nil}
++
+ # \endverbatim
+ #*/
+diff -up rpm-4.13.0/python/Makefile.am.pythonembed~ rpm-4.13.0/python/Makefile.am
+--- rpm-4.13.0/python/Makefile.am.pythonembed~	2017-01-17 14:30:56.856414234 +0100
++++ rpm-4.13.0/python/Makefile.am	2017-01-17 14:31:03.510385186 +0100
+@@ -1,13 +1,13 @@
+ # Makefile for rpm library.
+ 
+-EXTRA_DIST = rpm/__init__.py rpm/transaction.py
++EXTRA_DIST = rpm/__init__.py rpm/transaction.py rpm/generate.py
+ 
+ AM_CPPFLAGS = -I$(top_builddir)/include/
+ AM_CPPFLAGS += -I$(top_srcdir)/python
+ AM_CPPFLAGS += -I@WITH_PYTHON_INCLUDE@
+ 
+ pkgpyexec_LTLIBRARIES = _rpm.la _rpmb.la _rpms.la
+-pkgpyexec_DATA = rpm/__init__.py rpm/transaction.py
++pkgpyexec_DATA = rpm/__init__.py rpm/transaction.py rpm/generate.py
+ 
+ _rpm_la_LDFLAGS = -module -avoid-version -shared
+ _rpm_la_LIBADD = \
+@@ -30,7 +30,8 @@ _rpm_la_SOURCES = rpmmodule.c rpmsystem-
+ 	rpmstrpool-py.c rpmstrpool-py.h \
+ 	rpmtd-py.c rpmtd-py.h \
+ 	rpmte-py.c rpmte-py.h \
+-	rpmts-py.c rpmts-py.h
++	rpmts-py.c rpmts-py.h \
++	rpmpython.c
+ 
+ _rpmb_la_LDFLAGS = -module -avoid-version -shared
+ _rpmb_la_LIBADD = \
+diff -up rpm-4.13.0/python/rpm/generate.py.pythonembed~ rpm-4.13.0/python/rpm/generate.py
+--- rpm-4.13.0/python/rpm/generate.py.pythonembed~	2017-01-17 14:31:03.510385186 +0100
++++ rpm-4.13.0/python/rpm/generate.py	2017-01-17 14:31:03.510385186 +0100
+@@ -0,0 +1,313 @@
++import distutils.dist
++import os
++
++from subprocess import Popen, PIPE
++from distutils.command.bdist_rpm import bdist_rpm
++from distutils.command import sdist
++
++def _show_warning(message, category=Warning, filename=None, lineno=0, file=None, line=None):
++    return
++
++from distutils.sysconfig import get_config_var
++from distutils.filelist import FileList
++import distutils.core
++
++
++import string, os, sys
++from types import *
++from glob import glob
++import rpm
++
++class _bdist_rpm(bdist_rpm):
++    def _make_spec_file(self):
++        """Generate the text of an RPM spec file and return it as a
++        list of strings (one per line).
++        """
++        sdist = self.reinitialize_command('sdist')
++
++        sdist.warn = _show_warning
++        sdist.finalize_options()
++        sdist.filelist = FileList()
++        sdist.get_file_list()
++        manifest = sdist.filelist.files
++
++        build_py = sdist.get_finalized_command('build_py')
++        name = self.distribution.get_name()
++        version = self.distribution.get_version().replace('-','_')
++        release = self.release.replace('-','_')
++        summary = self.distribution.get_description().strip().strip('.')
++
++        spec_file = [
++            '%define\tmodule\t'+name,
++            ]
++        if name[:2] == "py":
++            spec_file.append('%define\tmodule\t' + name[2:])
++            module = '%{module}'
++        else:
++            module = '%{module}'
++
++        spec_file.extend([
++            '',
++            'Name:\t\tpython-' + module,
++            'Version:\t' + version,
++            'Release:\t' + release,
++            'Summary:\t' + summary,
++            'Source0:\thttp://pypi.python.org/packages/source/%c/%%{module}/%%{module}-%%{version}.tar' % name[0],
++            ])
++        # XXX yuck! this filename is available from the "sdist" command,
++        # but only after it has run: and we create the spec file before
++        # running "sdist", in case of --spec-only.
++        if sdist.formats and 'xztar' in sdist.formats:
++            spec_file[-1] += '.xz'
++        elif sdist.formats and 'bztar' in sdist.formats:
++            spec_file[-1] += '.bz2'
++        else:
++            spec_file[-1] += '.gz'
++
++        license = self.distribution.get_license()
++        if license == "UNKNOWN":
++                classifiers = self.distribution.get_classifiers()
++                for classifier in classifiers:
++                        values = classifier.split(" :: ")
++                        if values[0] == "License":
++                                license = values[-1]
++        license.replace("GPL ", "GPLv").strip()
++        spec_file.extend([
++            'License:\t' + license,
++            'Group:\t\tDevelopment/Python',])# + self.group,])
++        if self.distribution.get_url() != 'UNKNOWN':
++            spec_file.append('Url:\t\t' + self.distribution.get_url())
++
++        doc_names = ['README', 'CHANGES','ChangeLog', 'NEWS', 'THANKS',
++                'HISTORY', 'AUTHORS', 'BUGS', 'ReleaseNotes', 'DISCLAIMER',
++                'TODO', 'TROUBLESHOOTING', 'IDEAS', 'HACKING', 'WISHLIST',
++                'CREDITS', 'PROJECTS', 'LEGAL', 'KNOWN_BUGS',
++                'MISSING_FEATURES', 'FAQ', 'ANNOUNCE', 'FEATURES', 'WHATSNEW']
++        license_names = ['LICENSE', 'COPYRIGHT', 'COPYING']
++        common_licenses = glob('/usr/share/common-licenses/*')
++        for i in range(len(common_licenses)):
++            common_licenses[i] = os.path.basename(common_licenses[i])
++        doc_names.extend(license_names)
++        doc_suffixes = ('.doc', '.htm', '.txt', '.pdf', '.odt')
++
++        #print(self.distribution.get_command_list())
++        self.doc_files = []
++        self.license_files = []
++        all_files = []
++        if self.distribution.data_files:
++            all_files.extend(self.distribution.data_files)
++        if manifest:
++            all_files.extend(manifest)
++        if all_files:
++            for data_file in all_files:
++                done = False
++                for doc_name in doc_names:
++                    if doc_name.lower() in data_file.lower():
++                        # skip licenses already shipped with common-licenses package
++                        if doc_name in license_names:
++                            if license not in common_licenses:
++                                self.license_files.append(data_file)
++                                all_files.remove(data_file)
++                                done = True
++                                break
++                        if data_file in doc_names or data_file.endswith(".md"):
++                            self.doc_files.append(data_file)
++                            all_files.remove(data_file)
++                            done = True
++                            break
++                if done:
++                    continue
++                for doc_suffix in doc_suffixes:
++                    ext = os.path.splitext(data_file.lower())[1]
++                    if ext.lower().startswith(doc_suffix.lower()):
++                        #self.doc_files.append(data_file)
++                        break
++        if not self.force_arch:
++            # noarch if no extension modules
++            if not self.distribution.has_ext_modules():
++                spec_file.append('BuildArch:\tnoarch')
++        else:
++            spec_file.append( 'BuildArch:\t%s' % self.force_arch )
++
++        for field in ('Provides',
++                      'Requires',
++                      'Conflicts',
++                      'Obsoletes',
++                      ):
++            val = getattr(self, string.lower(field))
++            if type(val) is ListType:
++                spec_file.append('%s: %s' % (field, string.join(val)))
++            elif val is not None:
++                spec_file.append('%s: %s' % (field, val))
++
++        build_requires = []
++        if self.distribution.has_ext_modules():
++            build_requires.append('python-devel')
++        # Ugly, but should mostly work... :p
++        if 'setuptools' in str(self.distribution.__dict__) or 'setuptools' in str(sdist.__dict__):
++            build_requires.append('python-setuptools')
++        if build_requires:
++            spec_file.append('BuildRequires:\t' +
++                             string.join(build_requires))
++
++        if self.build_requires:
++            spec_file.append('BuildRequires:\t' +
++                             string.join(self.build_requires))
++
++        spec_file.extend([
++            '',
++            '%description',
++            self.distribution.get_long_description().strip()
++            ])
++
++
++        # insert contents of files
++
++        # XXX this is kind of misleading: user-supplied options are files
++        # that we open and interpolate into the spec file, but the defaults
++        # are just text that we drop in as-is.  Hmmm.
++
++        if 'test_suite' in self.distribution.__dict__ and self.distribution.test_suite:
++            verify_script = "%{__python} setup.py test"
++        else:
++            verify_script = None
++
++        script_options = [
++            ('prep', 'prep_script', "%setup -q -n %{module}-%{version}"),
++            ('build', 'build_script', "%{__python} setup.py build"),
++            ('install', 'install_script',
++             ("%{__python} setup.py install "
++              "--root=%{buildroot}")),
++            ('check', 'verify_script', verify_script),
++            ('pre', 'pre_install', None),
++            ('post', 'post_install', None),
++            ('preun', 'pre_uninstall', None),
++            ('postun', 'post_uninstall', None),
++        ]
++
++        for (rpm_opt, attr, default) in script_options:
++            # Insert contents of file referred to, if no file is referred to
++            # use 'default' as contents of script
++            val = getattr(self, attr)
++            if val or default:
++                spec_file.extend([
++                    '',
++                    '%' + rpm_opt,])
++                if val:
++                    spec_file.extend(string.split(open(val, 'r').read(), '\n'))
++                else:
++                    spec_file.append(default)
++
++
++        # files section
++        spec_file.extend([
++            '',
++            '%files',
++            ])
++
++        for license_file in self.license_files:
++            spec_file.append('%license ' + license_file)
++        for doc_file in self.doc_files:
++            spec_file.append('%doc ' + doc_file)
++
++        if self.distribution.has_ext_modules():
++            site_pkgs = '%{py_platsitedir}'
++        else:
++            site_pkgs = '%{py_puresitedir}'
++        if self.distribution.has_scripts():
++            for script in self.distribution.scripts:
++                if type(script) == StringType:
++                    spec_file.append(os.path.join('%{_bindir}', os.path.basename(script)))
++        site_pkgs_files = []
++        if self.distribution.data_files:
++            for data_file in self.distribution.data_files:
++                site_pkgs_files.append(os.path.join(site_pkgs, data_file))
++        if 'entry_points' in self.distribution.__dict__ and self.distribution.entry_points:
++            if type(self.distribution.entry_points) is DictType:
++                for entry_points in self.distribution.entry_points:
++                    for entry_point in self.distribution.entry_points[entry_points]:
++                        site_pkgs_files.append(os.path.join('%{_bindir}', os.path.basename(entry_point.split('=')[0])))
++        if 'py_modules' in self.distribution.__dict__ and self.distribution.py_modules:
++            for py_module in self.distribution.py_modules:
++                py_module = py_module.replace('.', os.path.sep)
++                site_pkgs_files.append(os.path.join(site_pkgs, py_module + '.py*'))
++        if 'packages' in self.distribution.__dict__ and self.distribution.packages:
++            for package in self.distribution.packages:
++                package = package.replace('.', os.path.sep)
++                spec_file.append('%dir ' + os.path.join(site_pkgs, package))
++                site_pkgs_files.append(os.path.join(site_pkgs, package, '*.py*'))
++        if self.distribution.has_ext_modules():
++            for ext_module in self.distribution.ext_modules:
++                ext_module = ext_module.name.replace('.', os.path.sep)
++                site_pkgs_files.append(os.path.join(site_pkgs, ext_module + get_config_var('SHLIB_EXT').replace('"', '')))
++
++        site_pkgs_files.sort()
++        for f in site_pkgs_files:
++            spec_file.append(f)
++
++        spec_file.append(os.path.join(site_pkgs, name.replace('-', '_') + '*.egg-info'))
++
++        packager = rpm.expandMacro('%packager')
++        
++        spec_file.extend([
++                '',
++                '%changelog',
++                '* Thu Oct 21 2010 %s %s-%s' % (packager, version, release),
++                '- Initial release',])
++        return spec_file
++
++def pyspec(module, version, release="1", suffix="tar.gz", python=rpm.expandMacro("%{__python}")):
++    os.chdir(rpm.expandMacro("%{_builddir}"))
++    filename = "%s-%s.%s" % (module, version, suffix)
++    uncompress = Popen(rpm.expandMacro("%{uncompress: %{_sourcedir}/" + filename + "}").split(), stdout=PIPE)
++    untar = Popen(rpm.expandMacro("%{__tar} -xo").split(), stdin=uncompress.stdout, stdout=PIPE)
++    output = untar.communicate()[0]
++    untar.wait()
++    os.chdir("%s-%s" % (module, version))
++
++    sys.argv = [rpm.expandMacro("%{__python}"), "setup.py"]
++    try:
++        dist = distutils.core.run_setup(sys.argv[1], stop_after="config")
++    except RuntimeError:
++        f = open(sys.argv[1], "r")
++        setup_py = f.read()
++        f.close()
++        sys.argv[1] = "setup2.py"
++        f = open(sys.argv[1], "w")
++
++        f.write(setup_py.replace('"__main__"', '__name__'))
++        f.close()
++        dist = distutils.core.run_setup(sys.argv[1], stop_after="config")
++
++    p = os.popen(python + " setup.py egg_info")
++    egginfo = None
++    for line in p.readlines():
++        if ".egg-info/PKG-INFO" in line:
++            for text in line.split():
++                if os.path.exists(text):
++                    egginfo = text
++                    break
++    p.close()
++
++    distmeta = distutils.dist.DistributionMetadata(path=egginfo)
++    distmeta.keywords = {"name" : module, "version" : version}
++    dist.version = version
++    dist.release = release
++    dist.script_name = "setup.py"
++
++    dist.metadata = distmeta
++
++    for basename in dist.metadata._METHOD_BASENAMES:
++        method_name = "get_" + basename
++        setattr(dist, method_name, getattr(dist.metadata, method_name))
++
++    specdist = _bdist_rpm(dist)
++    specdist.spec_only = True
++    specdist.initialize_options()
++    specdist.finalize_options()
++    specdist.finalize_package_data()
++    specdist.distribution = dist
++    specfile = specdist._make_spec_file()
++
++    for line in specfile:
++        print(line)
+diff -up rpm-4.13.0/python/rpmpython.c.pythonembed~ rpm-4.13.0/python/rpmpython.c
+--- rpm-4.13.0/python/rpmpython.c.pythonembed~	2017-01-17 14:31:03.511385182 +0100
++++ rpm-4.13.0/python/rpmpython.c	2017-01-17 14:31:03.511385182 +0100
+@@ -0,0 +1,158 @@
++#include <Python.h>
++#if PY_VERSION_HEX < 0x03050000 && PY_VERSION_HEX >= 0x03000000
++#include <fileutils.h>
++#define Py_DecodeLocale _Py_char2wchar
++#endif
++
++#include <rpm/rpmio.h>
++#include <rpm/rpmmacro.h>
++
++#include "rpmpython.h"
++
++extern int _rpmpython_debug;
++extern rpmpython _rpmpythonI;
++
++struct rpmpython_s {
++    void * I; 	/* (unused) */
++};
++
++rpmpython rpmpythonFree(rpmpython python)
++{
++    if (python == NULL) python = _rpmpythonI;
++
++    Py_Finalize();
++    /* free(python->I); */
++    _rpmpythonI = NULL;
++    free(python);
++    return NULL;
++}
++
++#if PY_VERSION_HEX >= 0x03000000
++static const char _rpmpythonI_init[] =	"from io import StringIO;"
++					"sys.stdout = StringIO();";
++#else
++static const char _rpmpythonI_init[] =	"from cStringIO import StringIO;"
++					"sys.stdout = StringIO();";
++#endif
++
++rpmpython rpmpythonNew(ARGV_t * argvp, uint32_t flags)
++{
++    rpmpython python = NULL;
++    ARGV_t argv = argvp ? *argvp : NULL;
++
++    int initialize = (_rpmpythonI == NULL);
++    python = initialize
++       ? (_rpmpythonI = calloc(1, sizeof(rpmpython))) : _rpmpythonI;
++
++    if (!Py_IsInitialized()) {
++	Py_Initialize();
++    }
++
++    if (!(flags & RPMPYTHON_NO_INIT)) {
++	int ac = argvCount((ARGV_t)argv);
++#if PY_VERSION_HEX >= 0x03000000
++	wchar_t ** wav = NULL;
++#endif
++	static const char _pythonI_init[] = "%{?_pythonI_init}";
++	char * s = rpmExpand("import sys;", (flags & RPMPYTHON_NO_IO_REDIR) ? "" : _rpmpythonI_init, _pythonI_init, NULL);
++
++	if (ac) {
++#if PY_VERSION_HEX >= 0x03000000
++	    wav = malloc(ac * sizeof(wchar_t*));
++	    for (int i = 0; i < ac; i++)
++		wav[i] = Py_DecodeLocale(argv[i], NULL);
++	    PySys_SetArgvEx(ac, wav, 0);
++#else
++	    PySys_SetArgvEx(ac, (char **)argv, 0);
++#endif
++	}
++	if (_rpmpython_debug)
++	    fprintf(stderr, "==========\n%s\n==========\n", s);
++	rpmpythonRun(python, s, NULL);
++	free(s);
++
++#if PY_VERSION_HEX >= 0x03000000
++	if(wav) {
++	    for (int i = 0; i < ac; i++)
++		free(wav[i]);
++	    free(wav);
++	}
++#endif
++    }
++    return python;
++}
++
++rpmRC rpmpythonRunFile(rpmpython python, const char * fn, char **resultp)
++{
++    rpmRC rc = RPMRC_FAIL;
++if (_rpmpython_debug)
++fprintf(stderr, "==> %s(%p,%s)\n", __FUNCTION__, python, fn);
++
++    if (python == NULL) python = _rpmpythonI;
++
++    if (fn != NULL) {
++	const char * pyfn = ((fn == NULL || !strcmp(fn, "-")) ? "<stdin>" : fn);
++	FILE * pyfp = (!strcmp(pyfn, "<stdin>") ? stdin : fopen(fn, "rb"));
++	int closeit = (pyfp != stdin);
++	PyCompilerFlags cf = { 0 };
++
++	if (pyfp != NULL) {
++	    PyRun_AnyFileExFlags(pyfp, pyfn, closeit, &cf);
++	    rc = RPMRC_OK;
++	}
++    }
++    return rc;
++}
++
++rpmRC rpmpythonRun(rpmpython python, const char * str, char **resultp)
++{
++    rpmRC rc = RPMRC_FAIL;
++    struct stat sb;
++
++if (_rpmpython_debug)
++fprintf(stderr, "==> %s(%p,%s,%p)\n", __FUNCTION__, python, str, resultp);
++
++    if (python == NULL) python = _rpmpythonI;
++
++    if (str != NULL) {
++	if ((!strcmp(str, "-")) /* Macros from stdin arg. */
++		|| ((str[0] == '/' || strchr(str, ' ') == NULL)
++		    && !stat(str, &sb) && S_ISREG(sb.st_mode))) /* Macros from a file arg. */
++	{
++	    return rpmpythonRunFile(python, str, resultp);
++	}
++	char *val = strdup(str);
++	PyCompilerFlags cf = { 0 };
++	PyObject * m = PyImport_AddModule("__main__");
++	PyObject * d = (m ? PyModule_GetDict(m) : NULL);
++	PyObject * v = (m ? PyRun_StringFlags(val, Py_file_input, d, d, &cf) : NULL);
++
++	if (v == NULL) {
++	    PyErr_Print();
++	} else {
++	    PyObject * sys_stdout = PySys_GetObject("stdout");
++	    if (sys_stdout != NULL) {
++		if (resultp != NULL) {
++		    PyObject * o = PyObject_CallMethod(sys_stdout, "getvalue", NULL);
++#if PY_VERSION_HEX >= 0x03000000
++		    *resultp = strdup((PyUnicode_Check(o) ? PyUnicode_AsUTF8(o) : ""));
++#else
++		    *resultp = strdup((PyString_Check(o) ? PyString_AsString(o) : ""));
++#endif
++		    PyObject_CallMethod(sys_stdout, "seek", "i",0);
++		    PyObject_CallMethod(sys_stdout, "truncate", NULL);
++
++		    Py_XDECREF(o);
++		}
++	    }
++	    if (!PyFile_WriteString("", sys_stdout))
++		PyErr_Clear();
++	}
++
++	Py_XDECREF(v);
++
++	free(val);
++	rc = RPMRC_OK;
++    }
++    return rc;
++}
+diff -up rpm-4.13.0/python/rpmpython.h.pythonembed~ rpm-4.13.0/python/rpmpython.h
+--- rpm-4.13.0/python/rpmpython.h.pythonembed~	2017-01-17 14:31:03.511385182 +0100
++++ rpm-4.13.0/python/rpmpython.h	2017-01-17 14:31:03.511385182 +0100
+@@ -0,0 +1,72 @@
++#ifndef RPMPYTHON_H
++#define RPMPYTHON_H
++
++/** \ingroup rpmio
++ * \file rpmio/rpmpython.h
++ */
++
++#include <rpm/argv.h>
++#include <rpm/rpmtypes.h>
++#include <rpm/rpmsw.h>
++#include <rpm/rpmio.h>
++
++typedef struct rpmpython_s * rpmpython;
++
++extern int _rpmpython_debug;
++
++extern rpmpython _rpmpythonI;
++
++
++/** \ingroup rpmpython
++ * Initialization flags for rpmpythonNew().
++ */
++typedef	enum rpmpythonFlag_e {
++    RPMPYTHON_NO_INIT           = 1<<30,
++    RPMPYTHON_NO_IO_REDIR	= 1<<29
++} rpmpythonFlag;
++
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * Destroy a python interpreter.
++ * @param python	python interpreter
++ * @return		NULL on last dereference
++ */
++rpmpython rpmpythonFree(rpmpython python);
++
++/**
++ * Create and load a python interpreter.
++ * @param av		python interpreter args (or NULL)
++ * @param flags		python interpreter flags
++ * @return		new python interpreter
++ */
++rpmpython rpmpythonNew(ARGV_t * av, uint32_t flags);
++
++/**
++ * Execute python from a file.
++ * @param python	python interpreter
++ * @param fn		python file to run (NULL returns RPMRC_FAIL)
++ * @param *resultp	python exec result
++ * @return		RPMRC_OK on success
++ */
++rpmRC rpmpythonRunFile(rpmpython python, const char * fn,
++		char ** resultp);
++
++/**
++ * Execute python string.
++ * @param python	python interpreter
++ * @param str		python string to execute (NULL returns RPMRC_FAIL)
++ * @param *resultp	python exec result
++ * @return		RPMRC_OK on success
++ */
++rpmRC rpmpythonRun(rpmpython python, const char * str,
++		char ** resultp);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* RPMPYTHON_H */
+diff -up rpm-4.13.0/python/setup.py.in.pythonembed~ rpm-4.13.0/python/setup.py.in
+--- rpm-4.13.0/python/setup.py.in.pythonembed~	2016-10-13 09:12:21.461778493 +0200
++++ rpm-4.13.0/python/setup.py.in	2017-01-17 14:31:03.511385182 +0100
+@@ -32,6 +32,7 @@ rpmmod = Extension('rpm._rpm',
+                                 'rpmstrpool-py.c', 'rpmfiles-py.c', 
+ 				'rpmarchive-py.c', 'rpmtd-py.c',
+                                 'rpmte-py.c', 'rpmts-py.c', 'rpmmodule.c',
++                                'rpmpython.c'
+                              ],
+                    include_dirs = pkgconfig('--cflags'),
+                    libraries = pkgconfig('--libs'),
+diff -up rpm-4.13.0/rpmio/macro.c.pythonembed~ rpm-4.13.0/rpmio/macro.c
+--- rpm-4.13.0/rpmio/macro.c.pythonembed~	2017-01-17 14:30:59.839401211 +0100
++++ rpm-4.13.0/rpmio/macro.c	2017-01-17 14:31:03.512385178 +0100
+@@ -34,6 +34,10 @@ extern int optind;
+ #include "rpmio/rpmlua.h"
+ #endif
+ 
++#ifdef ENABLE_PYTHON
++#include "python/rpmpython.h"
++#endif
++
+ #include "debug.h"
+ 
+ enum macroFlags_e {
+@@ -1176,6 +1180,32 @@ expandMacro(MacroBuf mb, const char *src
+ 		s = se;
+ 		continue;
+ 	}
++#endif
++
++#ifdef	ENABLE_PYTHON
++	if (STREQ("python", f, fn)) {
++		rpmpython python = NULL;
++		char *scriptbuf;
++		char *printbuf = NULL;
++
++		if (!(python = rpmpythonNew(NULL, 0)))
++		    rc = 1;
++		else {
++		    scriptbuf = xmalloc(gn + 1);
++		    if (g != NULL && gn > 0)
++			memcpy(scriptbuf, g, gn);
++		    scriptbuf[gn] = '\0';
++		    if (rpmpythonRun(python, scriptbuf, &printbuf) != RPMRC_OK)
++			rc = 1;
++		    else if (printbuf != NULL && *printbuf != '\0') {
++			mbAppendStr(mb, printbuf);
++			free(printbuf);
++		    }
++		    free(scriptbuf);
++		}
++		s = se;
++		continue;
++	}
+ #endif
+ 
+ 	/* XXX necessary but clunky */
+diff -up rpm-4.13.0/rpmio/Makefile.am.pythonembed~ rpm-4.13.0/rpmio/Makefile.am
+--- rpm-4.13.0/rpmio/Makefile.am.pythonembed~	2017-01-17 14:30:59.838401215 +0100
++++ rpm-4.13.0/rpmio/Makefile.am	2017-01-17 14:31:03.511385182 +0100
+@@ -15,7 +15,7 @@ usrlib_LTLIBRARIES = librpmio.la
+ librpmio_la_SOURCES = \
+ 	argv.c base64.c digest.h digest.c macro.c \
+ 	rpmhook.c rpmio.c rpmlog.c rpmmalloc.c \
+-	rpmpgp.c rpmsq.c rpmsw.c url.c \
++	rpmpgp.c rpmpython.c rpmsq.c rpmsw.c url.c \
+ 	rpmio_internal.h rpmhook.h \
+ 	rpmstring.c rpmfileutil.c rpmglob.c \
+ 	rpmkeyring.c rpmstrpool.c
+diff -up rpm-4.13.0/rpmio/rpmpython.c.pythonembed~ rpm-4.13.0/rpmio/rpmpython.c
+--- rpm-4.13.0/rpmio/rpmpython.c.pythonembed~	2017-01-17 14:31:03.512385178 +0100
++++ rpm-4.13.0/rpmio/rpmpython.c	2017-01-17 14:31:03.512385178 +0100
+@@ -0,0 +1,100 @@
++#include "system.h"
++
++#ifdef ENABLE_PYTHON
++
++#include <dlfcn.h>
++#include <rpm/rpmlog.h>
++
++#include <rpm/rpmio.h>
++#include <rpm/rpmmacro.h>
++
++#include "debug.h"
++
++#include "python/rpmpython.h"
++
++int _rpmpython_debug = 0;
++
++rpmpython _rpmpythonI = NULL;
++
++static int _dlopened = 0;
++static rpmpython (*rpmpythonFree_p) (rpmpython python);
++static rpmpython (*rpmpythonNew_p) (ARGV_t * av, uint32_t flags);
++static rpmRC (*rpmpythonRunFile_p) (rpmpython python, const char * fn, char ** resultp);
++static rpmRC (*rpmpythonRun_p) (rpmpython python, const char * str, char ** resultp);
++
++static void loadModule(void) {
++    char *pattern = rpmExpand("%{?rpmpython_modpath}%{?!rpmpython_modpath:%{python_sitearch}/rpm}/_rpm*.so", NULL);
++    const char *librpmpython = pattern;
++    void *h = NULL;
++    Dl_info info;
++    ARGV_t files = NULL;
++
++    if (_rpmpython_debug)
++        rpmlog(RPMLOG_DEBUG, " %8s (pattern) %s\n", __func__, pattern);
++
++
++    /* Python 3 has additional suffix in front of just .so for extensions
++     * if built with distutils (setup.py), while using .so if built with
++     * make, so need to support both */
++    if (rpmGlob(librpmpython, NULL, &files) != 0) {
++	rpmlog(RPMLOG_WARNING, "\"%s\" does not exist, "
++		    "embedded python will not be available\n",
++		librpmpython);
++    } else if (!(h = dlopen((librpmpython = *files), RTLD_NOW|RTLD_GLOBAL|RTLD_DEEPBIND))) {
++	rpmlog(RPMLOG_WARNING, "Unable to open \"%s\" (%s), "
++		    "embedded python will not be available\n",
++		librpmpython, dlerror());
++    } else if (!((rpmpythonNew_p = dlsym(h, "rpmpythonNew"))
++		&& (rpmpythonFree_p = dlsym(h, "rpmpythonFree"))
++		&& (rpmpythonRunFile_p = dlsym(h, "rpmpythonRunFile"))
++		&& (rpmpythonRun_p = dlsym(h, "rpmpythonRun")))) {
++	rpmlog(RPMLOG_WARNING, "Opened library \"%s\" is incompatible (%s), "
++		    "embedded python will not be available\n",
++		librpmpython, dlerror());
++    } else if (dladdr(rpmpythonNew_p, &info) && strcmp(librpmpython, info.dli_fname)) {
++	rpmlog(RPMLOG_WARNING, "\"%s\" lacks rpmpython interpreter support, "
++		    "embedded python will not be available\n",
++		librpmpython);
++    } else
++	_dlopened = 1;
++
++    if (_rpmpython_debug)
++        rpmlog(RPMLOG_DEBUG, " %8s (librpmpython, %d) %s\n", __func__, _dlopened, librpmpython);
++
++    if (h && !_dlopened && dlclose (h))
++	    rpmlog(RPMLOG_WARNING, "Error closing library \"%s\": %s", librpmpython,
++		    dlerror());
++
++    argvFree(files);
++    free(pattern);
++}
++
++rpmpython rpmpythonFree(rpmpython python)
++{
++    if (_dlopened) return rpmpythonFree_p(python);
++    else return NULL;
++}
++
++
++rpmpython rpmpythonNew(ARGV_t * argvp, uint32_t flags)
++{
++    rpmpython python = NULL;
++    if (!_dlopened) loadModule();
++    if (_dlopened) python = rpmpythonNew_p(argvp, flags);
++    return python;
++}
++
++rpmRC rpmpythonRunFile(rpmpython python, const char * fn, char **resultp)
++{
++    rpmRC rc = RPMRC_FAIL;
++    if (_dlopened) rc = rpmpythonRunFile_p(python, fn, resultp);
++    return rc;
++}
++
++rpmRC rpmpythonRun(rpmpython python, const char * str, char **resultp)
++{
++    rpmRC rc = RPMRC_FAIL;
++    if (_dlopened) return rpmpythonRun_p(python, str, resultp);
++    return rc;
++}
++#endif
