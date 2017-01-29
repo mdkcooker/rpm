@@ -532,45 +532,7 @@ fi
 %attr(0644, rpm, rpm) %{rpmhome}/fileattrs/*.attr
 
 %dir %attr(   -, rpm, rpm) %{rpmhome}/platform/
-%exclude %{rpmhome}/platform/m68k-linux/macros
-%exclude %{rpmhome}/platform/riscv64-linux/macros
-%ifarch %{ix86} x86_64
-%attr(   -, rpm, rpm) %{rpmhome}/platform/i*86-*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/athlon-*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/pentium*-*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/geode-*
-%else
-%exclude %{rpmhome}/platform/i*86-linux/macros
-%exclude %{rpmhome}/platform/athlon-linux/macros
-%exclude %{rpmhome}/platform/pentium*-linux/macros
-%exclude %{rpmhome}/platform/geode-linux/macros
-%endif
-%ifarch x86_64
-%attr(   -, rpm, rpm) %{rpmhome}/platform/amd64-*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/x86_64-*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/ia32e-*
-%else
-%exclude %{rpmhome}/platform/amd64-linux/macros
-%exclude %{rpmhome}/platform/ia32e-linux/macros
-%exclude %{rpmhome}/platform/x86_64-linux/macros
-%endif
-%ifarch %arm
-%attr(   -, rpm, rpm) %{rpmhome}/platform/arm*
-%attr(   -, rpm, rpm) %{rpmhome}/platform/aarch64*/macros
-%else
-%exclude %{rpmhome}/platform/arm*/macros
-%exclude %{rpmhome}/platform/aarch64*/macros
-%endif
-%attr(   -, rpm, rpm) %{rpmhome}/platform/noarch*
-# new in 4.10.0:
-%exclude %{rpmhome}/platform/alpha*-linux/macros
-%exclude %{rpmhome}/platform/sparc*-linux/macros
-%exclude %{rpmhome}/platform/ia64*-linux/macros
-%exclude %{rpmhome}/platform/m68k*-linux/macros
-%exclude %{rpmhome}/platform/mips*-linux/macros
-%exclude %{rpmhome}/platform/ppc*-linux/macros
-%exclude %{rpmhome}/platform/s390*-linux/macros
-%exclude %{rpmhome}/platform/sh*-linux/macros
+%attr(   -, rpm, rpm) %{rpmhome}/platform/*
 
 
 
