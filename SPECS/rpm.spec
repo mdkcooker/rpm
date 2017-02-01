@@ -25,6 +25,10 @@
 %define distsuffix .mga
 %endif
 
+%if %{?_real_vendor:0}%{?!_real_vendor:1}
+%define _real_vendor mageia
+%endif
+
 %if %{?mkrel:0}%{?!mkrel:1}
 %define mkrel(c:) %{-c: 0.%{-c*}.}%{1}%{?distsuffix:%distsuffix}%{?!distsuffix:.mga}%{?mageia_release:%mageia_release}%{?subrel:.%subrel}
 %endif
