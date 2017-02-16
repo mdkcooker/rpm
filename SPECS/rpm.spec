@@ -51,7 +51,7 @@
 #       of rpm is supported anyway, per architecture
 %define rpmhome /usr/lib/rpm
 
-%global rpmver 4.13.0
+%global rpmver 4.13.0.1
 #global snapver		rc2
 %global srcver %{version}%{?snapver:-%{snapver}}
 %global srcdir %{?snapver:testing}%{!?snapver:%{name}-%(v=%{version}; echo ${v%.*}.x)}
@@ -67,7 +67,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}8
+Release:	%mkrel %{?snapver:0.%{snapver}.}1
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -82,9 +82,6 @@ Source1:	macros.filter
 Patch4: rpm-4.8.1-use-gpg2.patch
 
 # Patches already upstream:
-Patch100: rpm-4.13.x-transfiletriggerpostun-invalid-read.patch
-Patch101: rpm-4.13.0-signaturesize.patch
-Patch102: rpm-4.13.0-gdbindex.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
