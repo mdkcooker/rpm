@@ -67,7 +67,7 @@ Summary:	The RPM package management system
 Name:		rpm
 Epoch:		1
 Version:        %{rpmver}
-Release:	%mkrel %{?snapver:0.%{snapver}.}1
+Release:	%mkrel %{?snapver:0.%{snapver}.}2
 Group:		System/Packaging
 #Source:		http://www.rpm.org/releases/rpm-%{libver}.x/rpm-%{srcver}.tar.bz2
 Source0:	http://rpm.org/releases/%{srcdir}/%{name}-%{srcver}.tar.bz2
@@ -82,6 +82,18 @@ Source1:	macros.filter
 Patch4: rpm-4.8.1-use-gpg2.patch
 
 # Patches already upstream:
+
+Patch133: rpm-4.13.x-pythondistdeps.patch
+Patch134: rpm-4.13.x-pythondistdeps-Makefile.patch
+#Patch135: rpm-4.13.x-pythondistdeps-fileattr.patch
+Patch136: rpm-4.13.x-pythondistdeps.py-skip-distribution-metadata-if-ther.patch
+Patch137: rpm-4.13.x-pythondistdeps.py-show-warning-if-version-is-not-fou.patch
+Patch138: rpm-4.13.x-pythondistdeps.py-skip-.egg-link-files.patch
+Patch139: rpm-4.13.x-pythondistdeps.py-add-forgotten-import.patch
+Patch140: rpm-4.13.x-brp-python-bytecompile-Python3-only.patch
+# Upstream PR: https://github.com/rpm-software-management/rpm/pull/154
+# rhbz#1421776
+Patch141: rpm-4.13.x-pythondistdeps.py-fix-processing-wheels.patch
 Patch142: rpm-4.13.x-fix-refcount-for-spec_type.patch
 
 # These are not yet upstream
@@ -657,6 +669,7 @@ fi
 
 %rpmattr	%{_prefix}/lib/rpm/rpmdeps
 %rpmattr        %{_prefix}/lib/rpm/pythondeps.sh
+%rpmattr        %{_prefix}/lib/rpm/pythondistdeps.py*
 
 
 %{_mandir}/man8/rpmbuild.8*
