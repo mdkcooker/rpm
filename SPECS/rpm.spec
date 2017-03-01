@@ -82,6 +82,7 @@ Source1:	macros.filter
 Patch4: rpm-4.8.1-use-gpg2.patch
 
 # Patches already upstream:
+Patch142: rpm-4.13.x-fix-refcount-for-spec_type.patch
 
 # These are not yet upstream
 Patch302: rpm-4.7.1-geode-i686.patch
@@ -107,6 +108,7 @@ Patch601: 0002-Revise-trigger-separator-checking-a-bit-to-pave-way-.patch
 Patch602: 0003-Ensure-that-a-trigger-condition-actually-exists.patch
 Patch603: 0004-Ensure-that-file-trigger-conditions-are-paths.patch
 Patch604: 0005-Make-package-exists-does-not-exist-error-more-inform.patch
+
 #
 # Mageia patches
 #
